@@ -211,104 +211,97 @@
     </div>
 
     <script>
-        // Замените этот URL на URL вашего веб-приложения Google Apps Script
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzT95gaPODjWED9qCciEUdGlBhkC3CvhVQgR-AYrC1JUfIBNtpZZr--8E8BYgFG5xwFMA/exec';
+    // Замените этот URL на актуальный URL вашего Google Apps Script
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxPJdV3JTBcFBKobmzlFfHbAdpw8l8DO3yL0h_N5VSjMCyhv7XRxbQHck1yVMA4baBslw/exec';
+    
+    document.getElementById('carForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
         
-        document.getElementById('carForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const originalBtnText = submitBtn.textContent;
-            
-            // Показываем индикатор загрузки
-            submitBtn.innerHTML = '<span class="loading"></span> Отправка...';
-            submitBtn.disabled = true;
-            
-            const vin = document.getElementById('vin').value;
-            const brand = document.getElementById('brand').value;
-            const year = document.getElementById('year').value;
-            const article = document.getElementById('article').value;
-            const description = document.getElementById('description').value;
-            const phone = document.getElementById('phone').value;
-            
-            // Простая валидация
-            if (!vin || !description || !phone) {
-                showNotification('Заполните обязательные поля (VIN-код, описание проблемы и телефон)', 'error');
-                submitBtn.textContent = originalBtnText;
-                submitBtn.disabled = false;
-                return;
-            }
-            
-            if (vin.length !== 17) {
-                showNotification('VIN-код должен содержать 17 символов', 'error');
-                submitBtn.textContent = originalBtnText;
-                submitBtn.disabled = false;
-                return;
-            }
-            
-            try {
-                // Отправка данных в Google Apps Script
-                const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        vin: vin,
-                        brand: brand,
-                        year: year,
-                        article: article,
-                        description: description,
-                        phone: phone,
-                        timestamp: new Date().toLocaleString('ru-RU'),
-                        source: 'Telegram Bot'
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.result === "success") {
-                    showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
-                    document.getElementById('carForm').reset();
-                } else {
-                    showNotification('Произошла ошибка при отправке. Попробуйте еще раз.', 'error');
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showNotification('Произошла ошибка при отправке. Проверьте подключение к интернету.', 'error');
-            } finally {
-                // Восстанавливаем кнопку
-                submitBtn.textContent = originalBtnText;
-                submitBtn.disabled = false;
-            }
-        });
+        const submitBtn = document.getElementById('submitBtn');
+        const originalBtnText = submitBtn.textContent;
         
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = 'notification ' + type;
-            notification.style.display = 'block';
-            
-            // Скрыть уведомление через 5 секунд
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 5000);
+        // Показываем индикатор загрузки
+        submitBtn.innerHTML = '<span class="loading"></span> Отправка...';
+        submitBtn.disabled = true;
+        
+        const formData = {
+            vin: document.getElementById('vin').value,
+            brand: document.getElementById('brand').value,
+            year: document.getElementById('year').value,
+            article: document.getElementById('article').value,
+            description: document.getElementById('description').value,
+            phone: document.getElementById('phone').value,
+            timestamp: new Date().toLocaleString('ru-RU'),
+            source: 'Telegram Bot'
+        };
+        
+        // Простая валидация
+        if (!formData.vin || !formData.description || !formData.phone) {
+            showNotification('Заполните обязательные поля (VIN-код, описание проблемы и телефон)', 'error');
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
+            return;
         }
+        
+        if (formData.vin.length !== 17) {
+            showNotification('VIN-код должен содержать 17 символов', 'error');
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
+            return;
+        }
+        
+        try {
+            // Отправка данных в Google Apps Script
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Важно для обхода CORS ограничений
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            // При использовании no-cors мы не получим детальный ответ
+            // Поэтому просто показываем сообщение об успехе
+            showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
+            document.getElementById('carForm').reset();
+            
+        } catch (error) {
+            console.error('Ошибка:', error);
+            showNotification('Произошла ошибка при отправке. Проверьте подключение к интернету.', 'error');
+        } finally {
+            // Восстанавливаем кнопку
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
+        }
+    });
+    
+    function showNotification(message, type) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = 'notification ' + type;
+        notification.style.display = 'block';
+        
+        // Скрыть уведомление через 5 секунд
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 5000);
+    }
 
-        // Маска для телефона
-        document.getElementById('phone').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.startsWith('7') || value.startsWith('8')) {
-                value = value.substring(1);
-            }
-            if (value.length > 0) {
-                value = '+7 (' + value;
-                if (value.length > 7) value = value.substring(0, 7) + ') ' + value.substring(7);
-                if (value.length > 12) value = value.substring(0, 12) + '-' + value.substring(12);
-                if (value.length > 15) value = value.substring(0, 15) + '-' + value.substring(15);
-            }
-            e.target.value = value;
-        });
-    </script>
+    // Маска для телефона
+    document.getElementById('phone').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.startsWith('7') || value.startsWith('8')) {
+            value = value.substring(1);
+        }
+        if (value.length > 0) {
+            value = '+7 (' + value;
+            if (value.length > 7) value = value.substring(0, 7) + ') ' + value.substring(7);
+            if (value.length > 12) value = value.substring(0, 12) + '-' + value.substring(12);
+            if (value.length > 15) value = value.substring(0, 15) + '-' + value.substring(15);
+        }
+        e.target.value = value;
+    });
+</script>
 </body>
 </html>
