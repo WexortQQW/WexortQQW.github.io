@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -195,6 +196,12 @@
                     <label for="description" class="required">Описание проблемы</label>
                     <textarea id="description" name="description" placeholder="Подробно опишите проблему или нужную деталь..." required></textarea>
                 </div>
+
+                <!-- Добавлено поле для номера телефона -->
+                <div class="form-group">
+                    <label for="phone" class="required">Ваш телефон для связи</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
+                </div>
                 
                 <button type="submit" id="submitBtn">Отправить заявку</button>
             </form>
@@ -205,7 +212,7 @@
 
     <script>
         // Замените этот URL на URL вашего веб-приложения Google Apps Script
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxPJdV3JTBcFBKobmzlFfHbAdpw8l8DO3yL0h_N5VSjMCyhv7XRxbQHck1yVMA4baBslw/exec';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzA7b7m6wu3pn5H5V43v1IeUPZwt3rkKAXAz_LmOEPFlWpo0C5G-wyZiGwCqOE-tT6baw/exec';
         
         document.getElementById('carForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -222,10 +229,11 @@
             const year = document.getElementById('year').value;
             const article = document.getElementById('article').value;
             const description = document.getElementById('description').value;
+            const phone = document.getElementById('phone').value;
             
             // Простая валидация
-            if (!vin || !description) {
-                showNotification('Заполните обязательные поля (VIN-код и описание проблемы)', 'error');
+            if (!vin || !description || !phone) {
+                showNotification('Заполните обязательные поля (VIN-код, описание проблемы и телефон)', 'error');
                 submitBtn.textContent = originalBtnText;
                 submitBtn.disabled = false;
                 return;
@@ -250,7 +258,10 @@
                         brand: brand,
                         year: year,
                         article: article,
-                        description: description
+                        description: description,
+                        phone: phone,
+                        timestamp: new Date().toLocaleString('ru-RU'),
+                        source: 'Telegram Bot'
                     })
                 });
                 
@@ -283,6 +294,21 @@
                 notification.style.display = 'none';
             }, 5000);
         }
+
+        // Маска для телефона
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.startsWith('7') || value.startsWith('8')) {
+                value = value.substring(1);
+            }
+            if (value.length > 0) {
+                value = '+7 (' + value;
+                if (value.length > 7) value = value.substring(0, 7) + ') ' + value.substring(7);
+                if (value.length > 12) value = value.substring(0, 12) + '-' + value.substring(12);
+                if (value.length > 15) value = value.substring(0, 15) + '-' + value.substring(15);
+            }
+            e.target.value = value;
+        });
     </script>
 </body>
 </html>
