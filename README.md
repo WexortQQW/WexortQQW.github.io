@@ -205,7 +205,7 @@
 
     <script>
         // Замените этот URL на URL вашего веб-приложения Google Apps Script
-        const GAS_URL = 'https://script.google.com/macros/s/ВАШ_ИДЕНТИФИКАТОР_СКРИПТА/exec';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxPJdV3JTBcFBKobmzlFfHbAdpw8l8DO3yL0h_N5VSjMCyhv7XRxbQHck1yVMA4baBslw/exec';
         
         document.getElementById('carForm').addEventListener('submit', async function(e) {
             e.preventDefault();
