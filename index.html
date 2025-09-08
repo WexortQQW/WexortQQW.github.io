@@ -212,7 +212,7 @@
 
     <script>
     // Замените этот URL на актуальный URL вашего Google Apps Script
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbyMSjSdENSyhb3hyr9h5QMXP_Oast9HX67gkqA7bl5sgA7ByfxD4sHr-hO120LnGsEyAw/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/ВАШ_ID_СКРИПТА/exec';
     
     document.getElementById('carForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -224,15 +224,14 @@
         submitBtn.innerHTML = '<span class="loading"></span> Отправка...';
         submitBtn.disabled = true;
         
+        // Собираем данные из формы
         const formData = {
             vin: document.getElementById('vin').value,
             brand: document.getElementById('brand').value,
             year: document.getElementById('year').value,
             article: document.getElementById('article').value,
             description: document.getElementById('description').value,
-            phone: document.getElementById('phone').value,
-            timestamp: new Date().toLocaleString('ru-RU'),
-            source: 'Telegram Bot'
+            phone: document.getElementById('phone').value
         };
         
         // Простая валидация
@@ -254,15 +253,14 @@
             // Отправка данных в Google Apps Script
             const response = await fetch(GAS_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Важно для обхода CORS ограничений
+                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(formData)
             });
             
-            // При использовании no-cors мы не получим детальный ответ
-            // Поэтому просто показываем сообщение об успехе
+            // Показываем сообщение об успехе
             showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
             document.getElementById('carForm').reset();
             
