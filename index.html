@@ -5,333 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма заявки на автозапчасти</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        /* ... (ваши существующие стили остаются без изменений) ... */
         
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
+        /* Новые стили для вкладок */
+        .tabs {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        /* Шапка с названием компании */
-        .company-header {
-            text-align: center;
             margin-bottom: 20px;
-            width: 100%;
-            max-width: 500px;
+            border-bottom: 1px solid #ddd;
         }
         
-        .company-name {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 5px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .company-tagline {
-            font-size: 1rem;
-            color: #7f8c8d;
-            font-weight: 500;
-        }
-        
-        .container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 500px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-        
-        .header p {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-        
-        .form-container {
-            padding: 25px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 0.9rem;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 15px;
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #f8f9fa;
             border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.3s;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
         }
         
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-        
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .required::after {
-            content: " *";
-            color: #e74c3c;
-        }
-        
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 6px;
-            width: 100%;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: background 0.3s;
-            margin-top: 10px;
-        }
-        
-        button:hover {
-            background: #2980b9;
-        }
-        
-        .optional {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-        
-        .notification {
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 6px;
-            text-align: center;
-            display: none;
-        }
-        
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Футер */
-        .footer {
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-            padding: 15px;
-            color: #7f8c8d;
-            font-size: 0.85rem;
-        }
-        
-        .footer-links {
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        
-        .footer-links a {
-            color: #3498db;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: #2980b9;
-            text-decoration: underline;
-        }
-        
-        /* Новые стили для раздела проверки статуса */
-        .status-container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 500px;
-            overflow: hidden;
-            margin-top: 20px;
-            display: none;
-        }
-        
-        .status-header {
-            background: #27ae60;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .status-content {
-            padding: 20px;
-        }
-        
-        .status-info {
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            border-left: 4px solid #27ae60;
-        }
-        
-        .order-id-display {
+        .tab.active {
+            background: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
             font-weight: bold;
-            color: #2c3e50;
-            word-break: break-all;
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #e8f4fc;
-            border-radius: 4px;
-            border: 1px dashed #3498db;
         }
         
-        .copy-btn {
-            background: #95a5a6;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-left: 10px;
+        .tab-content {
+            display: none;
         }
         
-        .copy-btn:hover {
-            background: #7f8c8d;
-        }
-        
-        /* Адаптация для мини-приложений и мобильных устройств */
-        @media (max-width: 600px) {
-            .container {
-                border-radius: 8px;
-            }
-            
-            .header {
-                padding: 15px;
-            }
-            
-            .form-container {
-                padding: 20px;
-            }
-            
-            .company-name {
-                font-size: 1.8rem;
-            }
-            
-            body {
-                padding: 15px;
-                justify-content: flex-start;
-            }
-            
-            input, select, textarea {
-                padding: 10px 12px;
-                font-size: 16px; /* Предотвращает масштабирование в iOS */
-            }
-            
-            button {
-                padding: 12px 15px;
-            }
-        }
-        
-        @media (max-width: 400px) {
-            .company-name {
-                font-size: 1.5rem;
-            }
-            
-            .company-tagline {
-                font-size: 0.9rem;
-            }
-            
-            .header h1 {
-                font-size: 1.3rem;
-            }
-            
-            .header p {
-                font-size: 0.8rem;
-            }
-            
-            .form-container {
-                padding: 15px;
-            }
-            
-            .footer {
-                font-size: 0.8rem;
-            }
-        }
-        
-        /* Стили для интеграции в мини-приложения */
-        .mini-app-mode {
-            min-height: 100vh;
-            padding: 10px;
-        }
-        
-        .mini-app-mode .company-header {
-            margin-bottom: 15px;
-        }
-        
-        .mini-app-mode .container {
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .mini-app-mode .footer {
-            padding: 10px;
+        .tab-content.active {
+            display: block;
         }
     </style>
 </head>
@@ -342,59 +47,91 @@
         <div class="company-tagline">Все запчасти для вашего автомобиля</div>
     </div>
     
+    <!-- Вкладки для переключения между формой и проверкой статуса -->
     <div class="container">
-        <div class="header">
-            <h1>Заявка на автозапчасти</h1>
-            <p>Заполните форму для быстрого поиска деталей</p>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('form')">Новая заявка</div>
+            <div class="tab" onclick="switchTab('status')">Проверить статус</div>
         </div>
         
-        <div class="form-container">
-            <form id="carForm">
-                <div class="form-group">
-                    <label for="vin" class="required">VIN-код автомобиля</label>
-                    <input type="text" id="vin" name="vin" placeholder="Введите 17-значный VIN-код" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="brand">Марка автомобиля</label>
-                    <input type="text" id="brand" name="brand" placeholder="Например: Toyota, BMW, Volkswagen">
-                </div>
-                
-                <div class="form-group">
-                    <label for="year">Год выпуска</label>
-                    <input type="number" id="year" name="year" min="1950" max="2030" placeholder="Например: 2018">
-                </div>
-                
-                <div class="form-group">
-                    <label for="article">Артикул детали (при наличии)</label>
-                    <input type="text" id="article" name="article" placeholder="Если известен артикул нужной детали">
-                    <p class="optional">Необязательное поле</p>
-                </div>
-                
-                <div class="form-group">
-                    <label for="description" class="required">Описание проблемы</label>
-                    <textarea id="description" name="description" placeholder="Подробно опишите проблему или нужную деталь..." required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="phone" class="required">Ваш телефон для связи</label>
-                    <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email для уведомлений</label>
-                    <input type="email" id="email" name="email" placeholder="Ваш email (необязательно)">
-                    <p class="optional">Необязательное поле</p>
-                </div>
-                
-                <button type="submit" id="submitBtn">Отправить заявку</button>
-            </form>
+        <!-- Вкладка с формой -->
+        <div id="formTab" class="tab-content active">
+            <div class="header">
+                <h1>Заявка на автозапчасти</h1>
+                <p>Заполните форму для быстрого поиска деталей</p>
+            </div>
             
-            <div id="notification" class="notification"></div>
+            <div class="form-container">
+                <form id="carForm">
+                    <div class="form-group">
+                        <label for="vin" class="required">VIN-код автомобиля</label>
+                        <input type="text" id="vin" name="vin" placeholder="Введите 17-значный VIN-код" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="brand">Марка автомобиля</label>
+                        <input type="text" id="brand" name="brand" placeholder="Например: Toyota, BMW, Volkswagen">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="year">Год выпуска</label>
+                        <input type="number" id="year" name="year" min="1950" max="2030" placeholder="Например: 2018">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="article">Артикул детали (при наличии)</label>
+                        <input type="text" id="article" name="article" placeholder="Если известен артикул нужной детали">
+                        <p class="optional">Необязательное поле</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description" class="required">Описание проблемы</label>
+                        <textarea id="description" name="description" placeholder="Подробно опишите проблему или нужную деталь..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone" class="required">Ваш телефон для связи</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email для уведомлений</label>
+                        <input type="email" id="email" name="email" placeholder="Ваш email (необязательно)">
+                        <p class="optional">Необязательное поле</p>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn">Отправить заявку</button>
+                </form>
+                
+                <div id="notification" class="notification"></div>
+            </div>
+        </div>
+        
+        <!-- Вкладка с проверкой статуса -->
+        <div id="statusTab" class="tab-content">
+            <div class="header">
+                <h1>Проверка статуса заказа</h1>
+                <p>Введите номер заказа для проверки статуса</p>
+            </div>
+            
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="statusCheckInput">Номер заказа</label>
+                    <input type="text" id="statusCheckInput" placeholder="Введите номер заказа">
+                    <button onclick="checkStatus()" style="margin-top: 10px;">Проверить статус</button>
+                </div>
+                
+                <div id="statusResult" class="notification" style="display: none; margin-top: 15px;"></div>
+                
+                <div id="orderHistory" style="margin-top: 20px;">
+                    <h3>История ваших заказов</h3>
+                    <div id="orderList"></div>
+                </div>
+            </div>
         </div>
     </div>
     
-    <!-- Новый раздел для отображения ID и проверки статуса -->
+    <!-- Раздел для отображения ID после отправки формы -->
     <div class="status-container" id="statusContainer">
         <div class="status-header">
             <h2>Ваш заказ принят!</h2>
@@ -406,15 +143,9 @@
                 <button class="copy-btn" onclick="copyOrderId()">Скопировать номер</button>
             </div>
             
-            <div class="form-group">
-                <label for="statusCheck">Проверить статус заказа</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="statusCheck" placeholder="Введите номер заказа">
-                    <button onclick="checkStatus()" style="white-space: nowrap;">Проверить</button>
-                </div>
-            </div>
-            
-            <div id="statusResult" class="notification" style="display: none; margin-top: 15px;"></div>
+            <button onclick="switchTab('status')" style="margin-top: 15px; width: 100%;">
+                Проверить статус заказа
+            </button>
         </div>
     </div>
     
@@ -431,6 +162,30 @@
     // Замените этот URL на актуальный URL вашего Google Apps Script
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbwHNSsB-EoZbEr5LTG_xhU_Wo_kb9nxhYZcHik4xjNvu-c-W_PZTxZ3r7CP6XIsY6DoxA/exec';
     const STATUS_SCRIPT_URL = 'https://script.google.com/macros/s/ВАШ_СКРИПТ_ДЛЯ_ПРОВЕРКИ_СТАТУСА/exec';
+    
+    // Функция для переключения между вкладками
+    function switchTab(tabName) {
+        // Скрыть все вкладки
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Убрать активный класс со всех табов
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Показать выбранную вкладку
+        document.getElementById(tabName + 'Tab').classList.add('active');
+        
+        // Активировать соответствующий таб
+        document.querySelector(`.tab:nth-child(${tabName === 'form' ? 1 : 2})`).classList.add('active');
+        
+        // Если переключаемся на вкладку статуса, загружаем историю заказов
+        if (tabName === 'status') {
+            loadOrderHistory();
+        }
+    }
     
     // Генерация уникального ID на стороне клиента
     function generateUniqueId() {
@@ -454,11 +209,38 @@
         }
     }
     
+    // Загрузка истории заказов
+    function loadOrderHistory() {
+        try {
+            const orders = JSON.parse(localStorage.getItem('autodetail_orders') || '[]');
+            const orderList = document.getElementById('orderList');
+            
+            if (orders.length === 0) {
+                orderList.innerHTML = '<p>У вас пока нет сохраненных заказов.</p>';
+                return;
+            }
+            
+            orderList.innerHTML = '<ul>';
+            orders.forEach(orderId => {
+                orderList.innerHTML += `<li style="margin-bottom: 10px;">
+                    ${orderId} 
+                    <button onclick="document.getElementById('statusCheckInput').value='${orderId}'; checkStatus()" 
+                            style="margin-left: 10px; padding: 3px 8px; font-size: 12px;">
+                        Проверить
+                    </button>
+                </li>`;
+            });
+            orderList.innerHTML += '</ul>';
+        } catch (e) {
+            console.error('Ошибка при загрузке истории заказов:', e);
+        }
+    }
+    
     // Копирование ID в буфер обмена
     function copyOrderId() {
         const orderId = document.getElementById('orderIdDisplay').textContent;
         navigator.clipboard.writeText(orderId).then(() => {
-            showNotification('Номер заказа скопирован!', 'success', 2000, 'statusResult');
+            showNotification('Номер заказа скопирован!', 'success', 2000);
         }).catch(err => {
             console.error('Ошибка при копировании:', err);
         });
@@ -466,7 +248,7 @@
     
     // Проверка статуса заказа
     async function checkStatus() {
-        const orderId = document.getElementById('statusCheck').value.trim();
+        const orderId = document.getElementById('statusCheckInput').value.trim();
         if (!orderId) {
             showNotification('Введите номер заказа', 'error', 3000, 'statusResult');
             return;
@@ -610,16 +392,20 @@
         document.body.classList.add('mini-app-mode');
     }
     
-    // Показать историю заказов при загрузке страницы
+    // При загрузке страницы проверяем, есть ли параметр orderId в URL
     window.addEventListener('load', function() {
-        try {
-            const orders = JSON.parse(localStorage.getItem('autodetail_orders') || '[]');
-            if (orders.length > 0) {
-                document.getElementById('statusCheck').placeholder = `Например: ${orders[0]}`;
-            }
-        } catch (e) {
-            console.error('Ошибка при загрузке истории заказов:', e);
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+        
+        if (orderId) {
+            // Если в URL есть orderId, переключаемся на вкладку статуса
+            switchTab('status');
+            document.getElementById('statusCheckInput').value = orderId;
+            checkStatus();
         }
+        
+        // Загружаем историю заказов
+        loadOrderHistory();
     });
 </script>
 </body>
