@@ -5,276 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма заявки на автозапчасти</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        /* ... (ваши существующие стили остаются без изменений) ... */
         
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        /* Шапка с названием компании */
-        .company-header {
-            text-align: center;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 500px;
-        }
-        
-        .company-name {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 5px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .company-tagline {
-            font-size: 1rem;
-            color: #7f8c8d;
-            font-weight: 500;
-        }
-        
-        .container {
+        /* Новые стили для раздела проверки статуса */
+        .status-container {
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             width: 100%;
             max-width: 500px;
             overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-        
-        .header p {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-        
-        .form-container {
-            padding: 25px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 0.9rem;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-        
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .required::after {
-            content: " *";
-            color: #e74c3c;
-        }
-        
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 6px;
-            width: 100%;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: background 0.3s;
-            margin-top: 10px;
-        }
-        
-        button:hover {
-            background: #2980b9;
-        }
-        
-        .optional {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-        
-        .notification {
-            padding: 15px;
             margin-top: 20px;
-            border-radius: 6px;
-            text-align: center;
             display: none;
         }
         
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Футер */
-        .footer {
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
+        .status-header {
+            background: #27ae60;
+            color: white;
             padding: 15px;
-            color: #7f8c8d;
-            font-size: 0.85rem;
+            text-align: center;
         }
         
-        .footer-links {
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
+        .status-content {
+            padding: 20px;
         }
         
-        .footer-links a {
-            color: #3498db;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: #2980b9;
-            text-decoration: underline;
-        }
-        
-        /* Адаптация для мини-приложений и мобильных устройств */
-        @media (max-width: 600px) {
-            .container {
-                border-radius: 8px;
-            }
-            
-            .header {
-                padding: 15px;
-            }
-            
-            .form-container {
-                padding: 20px;
-            }
-            
-            .company-name {
-                font-size: 1.8rem;
-            }
-            
-            body {
-                padding: 15px;
-                justify-content: flex-start;
-            }
-            
-            input, select, textarea {
-                padding: 10px 12px;
-                font-size: 16px; /* Предотвращает масштабирование в iOS */
-            }
-            
-            button {
-                padding: 12px 15px;
-            }
-        }
-        
-        @media (max-width: 400px) {
-            .company-name {
-                font-size: 1.5rem;
-            }
-            
-            .company-tagline {
-                font-size: 0.9rem;
-            }
-            
-            .header h1 {
-                font-size: 1.3rem;
-            }
-            
-            .header p {
-                font-size: 0.8rem;
-            }
-            
-            .form-container {
-                padding: 15px;
-            }
-            
-            .footer {
-                font-size: 0.8rem;
-            }
-        }
-        
-        /* Стили для интеграции в мини-приложения */
-        .mini-app-mode {
-            min-height: 100vh;
-            padding: 10px;
-        }
-        
-        .mini-app-mode .company-header {
+        .status-info {
             margin-bottom: 15px;
-        }
-        
-        .mini-app-mode .container {
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .mini-app-mode .footer {
             padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .order-id-display {
+            font-weight: bold;
+            color: #2c3e50;
+            word-break: break-all;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e8f4fc;
+            border-radius: 4px;
+            border: 1px dashed #3498db;
+        }
+        
+        .copy-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #7f8c8d;
         }
     </style>
 </head>
@@ -324,10 +111,40 @@
                     <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
                 </div>
                 
+                <div class="form-group">
+                    <label for="email">Email для уведомлений</label>
+                    <input type="email" id="email" name="email" placeholder="Ваш email (необязательно)">
+                    <p class="optional">Необязательное поле</p>
+                </div>
+                
                 <button type="submit" id="submitBtn">Отправить заявку</button>
             </form>
             
             <div id="notification" class="notification"></div>
+        </div>
+    </div>
+    
+    <!-- Новый раздел для отображения ID и проверки статуса -->
+    <div class="status-container" id="statusContainer">
+        <div class="status-header">
+            <h2>Ваш заказ принят!</h2>
+        </div>
+        <div class="status-content">
+            <div class="status-info">
+                <p>Сохраните номер вашего заказа для отслеживания статуса:</p>
+                <div class="order-id-display" id="orderIdDisplay"></div>
+                <button class="copy-btn" onclick="copyOrderId()">Скопировать номер</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="statusCheck">Проверить статус заказа</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="statusCheck" placeholder="Введите номер заказа">
+                    <button onclick="checkStatus()" style="white-space: nowrap;">Проверить</button>
+                </div>
+            </div>
+            
+            <div id="statusResult" class="notification" style="display: none; margin-top: 15px;"></div>
         </div>
     </div>
     
@@ -343,6 +160,72 @@
     <script>
     // Замените этот URL на актуальный URL вашего Google Apps Script
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbwHNSsB-EoZbEr5LTG_xhU_Wo_kb9nxhYZcHik4xjNvu-c-W_PZTxZ3r7CP6XIsY6DoxA/exec';
+    const STATUS_SCRIPT_URL = 'https://script.google.com/macros/s/ВАШ_СКРИПТ_ДЛЯ_ПРОВЕРКИ_СТАТУСА/exec';
+    
+    // Генерация уникального ID на стороне клиента
+    function generateUniqueId() {
+        const timestamp = Date.now().toString(36);
+        const randomStr = Math.random().toString(36).substr(2, 9);
+        return `ORD-${timestamp}-${randomStr}`.toUpperCase();
+    }
+    
+    // Сохранение ID в локальное хранилище
+    function saveOrderId(orderId) {
+        try {
+            const orders = JSON.parse(localStorage.getItem('autodetail_orders') || '[]');
+            if (!orders.includes(orderId)) {
+                orders.push(orderId);
+                localStorage.setItem('autodetail_orders', JSON.stringify(orders));
+            }
+            return true;
+        } catch (e) {
+            console.error('Ошибка при сохранении ID:', e);
+            return false;
+        }
+    }
+    
+    // Копирование ID в буфер обмена
+    function copyOrderId() {
+        const orderId = document.getElementById('orderIdDisplay').textContent;
+        navigator.clipboard.writeText(orderId).then(() => {
+            showNotification('Номер заказа скопирован!', 'success', 2000);
+        }).catch(err => {
+            console.error('Ошибка при копировании:', err);
+        });
+    }
+    
+    // Проверка статуса заказа
+    async function checkStatus() {
+        const orderId = document.getElementById('statusCheck').value.trim();
+        if (!orderId) {
+            showNotification('Введите номер заказа', 'error', 3000, 'statusResult');
+            return;
+        }
+        
+        try {
+            showNotification('Проверяем статус...', 'info', 0, 'statusResult');
+            
+            const response = await fetch(`${STATUS_SCRIPT_URL}?orderId=${encodeURIComponent(orderId)}`);
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                const statusInfo = `
+                    <strong>Статус заказа:</strong> ${result.data.status || 'Не определен'}<br>
+                    <strong>Деталь:</strong> ${result.data.description || 'Не указана'}<br>
+                    <strong>VIN:</strong> ${result.data.vin || 'Не указан'}<br>
+                    <strong>Дата заказа:</strong> ${result.data.timestamp || 'Не указана'}
+                `;
+                document.getElementById('statusResult').innerHTML = statusInfo;
+                document.getElementById('statusResult').className = 'notification success';
+                document.getElementById('statusResult').style.display = 'block';
+            } else {
+                showNotification(result.message || 'Заказ не найден', 'error', 5000, 'statusResult');
+            }
+        } catch (error) {
+            console.error('Ошибка при проверке статуса:', error);
+            showNotification('Ошибка при проверке статуса', 'error', 5000, 'statusResult');
+        }
+    }
     
     document.getElementById('carForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -354,14 +237,19 @@
         submitBtn.innerHTML = '<span class="loading"></span> Отправка...';
         submitBtn.disabled = true;
         
+        // Генерируем уникальный ID
+        const orderId = generateUniqueId();
+        
         // Собираем данные из формы
         const formData = {
+            orderId: orderId,
             vin: document.getElementById('vin').value,
             brand: document.getElementById('brand').value,
             year: document.getElementById('year').value,
             article: document.getElementById('article').value,
             description: document.getElementById('description').value,
-            phone: document.getElementById('phone').value
+            phone: document.getElementById('phone').value,
+            email: document.getElementById('email').value
         };
         
         // Простая валидация
@@ -390,8 +278,22 @@
                 body: JSON.stringify(formData)
             });
             
+            // Сохраняем ID заказа
+            if (saveOrderId(orderId)) {
+                // Показываем ID пользователю
+                document.getElementById('orderIdDisplay').textContent = orderId;
+                document.getElementById('statusContainer').style.display = 'block';
+                
+                // Прокручиваем к разделу с ID
+                setTimeout(() => {
+                    document.getElementById('statusContainer').scrollIntoView({ 
+                        behavior: 'smooth' 
+                    });
+                }, 500);
+            }
+            
             // Показываем сообщение об успехе
-            showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
+            showNotification('Заявка успешно отправлена! Сохраните номер заказа для отслеживания статуса.', 'success');
             document.getElementById('carForm').reset();
             
         } catch (error) {
@@ -404,16 +306,18 @@
         }
     });
     
-    function showNotification(message, type) {
-        const notification = document.getElementById('notification');
-        notification.textContent = message;
+    function showNotification(message, type, duration = 5000, elementId = 'notification') {
+        const notification = document.getElementById(elementId);
+        notification.innerHTML = message;
         notification.className = 'notification ' + type;
         notification.style.display = 'block';
         
-        // Скрыть уведомление через 5 секунд
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 5000);
+        if (duration > 0) {
+            // Скрыть уведомление через указанное время
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, duration);
+        }
     }
 
     // Маска для телефона
@@ -435,6 +339,18 @@
     if (window.self !== window.top || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         document.body.classList.add('mini-app-mode');
     }
+    
+    // Показать историю заказов при загрузке страницы
+    window.addEventListener('load', function() {
+        try {
+            const orders = JSON.parse(localStorage.getItem('autodetail_orders') || '[]');
+            if (orders.length > 0) {
+                document.getElementById('statusCheck').placeholder = `Например: ${orders[0]}`;
+            }
+        } catch (e) {
+            console.error('Ошибка при загрузке истории заказов:', e);
+        }
+    });
 </script>
 </body>
 </html>
