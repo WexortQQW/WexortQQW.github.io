@@ -554,106 +554,53 @@
     }
     
     // Функция проверки статуса заказа
-    async function checkStatus() {
-        const orderId = document.getElementById('statusCheckInput').value.trim();
-        if (!orderId) {
-            showNotification('Введите номер заказа', 'error', 3000, 'statusResult');
-            return;
+    // Функция проверки статуса заказа
+async function checkStatus() {
+    const orderId = document.getElementById('statusCheckInput').value.trim();
+    if (!orderId) {
+        showNotification('Введите номер заказа', 'error', 3000, 'statusResult');
+        return;
+    }
+    
+    try {
+        showNotification('Проверяем статус...', 'info', 0, 'statusResult');
+        
+        // Формируем URL для запроса
+        const url = `${STATUS_SCRIPT_URL}?orderId=${encodeURIComponent(orderId)}`;
+        
+        // Выполняем запрос БЕЗ no-cors режима
+        const response = await fetch(url, {
+            method: 'GET'
+            // Убираем mode: 'no-cors' чтобы видеть реальный ответ от сервера
+        });
+        
+        // Проверяем статус ответа
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
         }
         
-        try {
-            showNotification('Проверяем статус...', 'info', 0, 'statusResult');
-            
-            // Формируем URL для запроса
-            const url = `${STATUS_SCRIPT_URL}?orderId=${encodeURIComponent(orderId)}`;
-            
-            // Выполняем запрос
-            const response = await fetch(url, {
-                method: 'GET',
-                mode: 'no-cors'
+        // Парсим ответ как JSON
+        const data = await response.json();
+        
+        // Отображаем реальные данные с сервера
+        displayStatusResult(data);
+        
+    } catch (error) {
+        console.error('Ошибка при проверке статуса:', error);
+        
+        // Показываем сообщение об ошибке, если заказ не найден
+        if (error.message.includes('404') || error.message.includes('не найден')) {
+            displayStatusResult({
+                orderId: orderId,
+                status: "не найден",
+                description: "Заказ с таким номером не найден в системе",
+                timestamp: new Date().toLocaleDateString('ru-RU')
             });
-            
-            // Для no-cors mode мы не можем прочитать ответ, поэтому используем альтернативный подход
-            // Просто показываем успешное сообщение (в реальном коде нужно обрабатывать ответ)
-            setTimeout(() => {
-                displayStatusResult({
-                    orderId: orderId,
-                    status: "в обработке",
-                    description: "Тестовое описание заказа",
-                    timestamp: new Date().toLocaleDateString('ru-RU')
-                });
-            }, 1000);
-            
-        } catch (error) {
-            console.error('Ошибка при проверке статуса:', error);
+        } else {
             showNotification('Не удалось проверить статус. Попробуйте позже.', 'error', 5000, 'statusResult');
         }
     }
-    
-    // Функция для отображения результата
-    function displayStatusResult(data) {
-        let statusMessage = "";
-        let statusClass = "info";
-        
-        // Определяем статус
-        const status = data.status || "Не определен";
-        
-        // Формируем сообщение в зависимости от статуса
-        switch(status) {
-            case "в обработке":
-                statusMessage = `
-                    <strong>Статус заказа:</strong> В обработке<br>
-                    <strong>Номер заказа:</strong> ${data.orderId}<br>
-                    <strong>Описание:</strong> ${data.description || 'Не указано'}<br>
-                    <em>Мы приняли ваш заказ в работу. Ожидайте обновления статуса.</em>
-                `;
-                statusClass = "info";
-                break;
-                
-            case "выполняется":
-                statusMessage = `
-                    <strong>Статус заказа:</strong> Выполняется<br>
-                    <strong>Номер заказа:</strong> ${data.orderId}<br>
-                    <strong>Описание:</strong> ${data.description || 'Не указано'}<br>
-                    <em>Ваш заказ находится в процессе выполнения.</em>
-                `;
-                statusClass = "info";
-                break;
-                
-            case "отказ клиента":
-                statusMessage = `
-                    <strong>Статус заказа:</strong> Отказ клиента<br>
-                    <strong>Номер заказа:</strong> ${data.orderId}<br>
-                    <strong>Описание:</strong> ${data.description || 'Не указано'}<br>
-                    <em>Заказ отменен по просьбе клиента.</em>
-                `;
-                statusClass = "error";
-                break;
-                
-            case "выполнено":
-                statusMessage = `
-                    <strong>Статус заказа:</strong> Выполнено<br>
-                    <strong>Номер заказа:</strong> ${data.orderId}<br>
-                    <strong>Описание:</strong> ${data.description || 'Не указано'}<br>
-                    <em>Ваш заказ завершен. Спасибо!</em>
-                `;
-                statusClass = "success";
-                break;
-                
-            default:
-                statusMessage = `
-                    <strong>Статус заказа:</strong> ${status}<br>
-                    <strong>Номер заказа:</strong> ${data.orderId}<br>
-                    <strong>Описание:</strong> ${data.description || 'Не указано'}<br>
-                `;
-        }
-        
-        // Обновляем интерфейс
-        const statusResult = document.getElementById('statusResult');
-        statusResult.innerHTML = statusMessage;
-        statusResult.className = `notification ${statusClass}`;
-        statusResult.style.display = 'block';
-    }
+}
     
     // Функция для показа уведомлений
     function showNotification(message, type, duration = 5000, elementId = 'notification') {
