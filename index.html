@@ -552,7 +552,7 @@
         });
     }
     
-    // Проверка статуса заказа
+    // Упрощенная функция проверки статуса заказа
 async function checkStatus() {
     const orderId = document.getElementById('statusCheckInput').value.trim();
     if (!orderId) {
@@ -561,54 +561,112 @@ async function checkStatus() {
     }
     
     try {
+        // Показываем индикатор загрузки
         showNotification('Проверяем статус...', 'info', 0, 'statusResult');
         
-        // Добавляем timestamp для предотвращения кэширования
-        const timestamp = new Date().getTime();
-        const url = `${STATUS_SCRIPT_URL}?orderId=${encodeURIComponent(orderId)}&t=${timestamp}`;
+        // Формируем URL для запроса
+        const url = `https://script.google.com/macros/s/AKfycbwHNSsB-EoZbEr5LTG_xhU_Wo_kb9nxhYZcHik4xjNvu-c-W_PZTxZ3r7CP6XIsY6DoxA/exec?orderId=${encodeURIComponent(orderId)}`;
         
+        // Выполняем запрос
         const response = await fetch(url);
+        
+        // Проверяем статус ответа
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        
+        // Парсим ответ
         const result = await response.json();
         
+        // Обрабатываем результат
         if (result.status === "success") {
-            // Упрощенное отображение только для 4 категорий статусов
-            const status = result.data.status || "Не определен";
-            let statusMessage = "";
-            let statusClass = "info";
-            
-            statusMessage = `
-                <strong>Статус заказа:</strong> ${status}<br>
-                <strong>Номер заказа:</strong> ${result.data.orderId || 'Не указан'}<br>
-                <strong>Описание:</strong> ${result.data.description || 'Не указано'}<br>
-            `;
-            
-            // Только 4 категории статусов
-            if (status === "в обработке") {
-                statusMessage += '<em>Мы приняли ваш заказ в работу. Ожидайте обновления статуса.</em>';
-                statusClass = "info";
-            } else if (status === "выполняется") {
-                statusMessage += '<em>Ваш заказ находится в процессе выполнения.</em>';
-                statusClass = "info";
-            } else if (status === "отказ клиента") {
-                statusMessage += '<em>Заказ отменен по просьбе клиента.</em>';
-                statusClass = "error";
-            } else if (status === "выполнено") {
-                statusMessage += '<em>Ваш заказ завершен. Спасибо!</em>';
-                statusClass = "success";
-            } else {
-                statusMessage += `<em>Статус: ${status}</em>`;
-            }
-            
-            document.getElementById('statusResult').innerHTML = statusMessage;
-            document.getElementById('statusResult').className = `notification ${statusClass}`;
-            document.getElementById('statusResult').style.display = 'block';
-            
+            // Отображаем информацию о статусе
+            displayStatusResult(result.data);
         } else {
             showNotification(result.message || 'Заказ не найден', 'error', 5000, 'statusResult');
         }
     } catch (error) {
         console.error('Ошибка при проверке статуса:', error);
-        showNotification('Ошибка при проверке статуса', 'error', 5000, 'statusResult');
+        showNotification('Не удалось проверить статус. Попробуйте позже.', 'error', 5000, 'statusResult');
+    }
+}
+
+// Функция для отображения результата
+function displayStatusResult(data) {
+    let statusMessage = "";
+    let statusClass = "info";
+    
+    // Определяем статус
+    const status = data.status || "Не определен";
+    
+    // Формируем сообщение в зависимости от статуса
+    switch(status) {
+        case "в обработке":
+            statusMessage = `
+                <strong>Статус заказа:</strong> В обработке<br>
+                <strong>Номер заказа:</strong> ${data.orderId}<br>
+                <strong>Описание:</strong> ${data.description}<br>
+                <em>Мы приняли ваш заказ в работу. Ожидайте обновления статуса.</em>
+            `;
+            statusClass = "info";
+            break;
+            
+        case "выполняется":
+            statusMessage = `
+                <strong>Статус заказа:</strong> Выполняется<br>
+                <strong>Номер заказа:</strong> ${data.orderId}<br>
+                <strong>Описание:</strong> ${data.description}<br>
+                <em>Ваш заказ находится в процессе выполнения.</em>
+            `;
+            statusClass = "info";
+            break;
+            
+        case "отказ клиента":
+            statusMessage = `
+                <strong>Статус заказа:</strong> Отказ клиента<br>
+                <strong>Номер заказа:</strong> ${data.orderId}<br>
+                <strong>Описание:</strong> ${data.description}<br>
+                <em>Заказ отменен по просьбе клиента.</em>
+            `;
+            statusClass = "error";
+            break;
+            
+        case "выполнено":
+            statusMessage = `
+                <strong>Статус заказа:</strong> Выполнено<br>
+                <strong>Номер заказа:</strong> ${data.orderId}<br>
+                <strong>Описание:</strong> ${data.description}<br>
+                <em>Ваш заказ завершен. Спасибо!</em>
+            `;
+            statusClass = "success";
+            break;
+            
+        default:
+            statusMessage = `
+                <strong>Статус заказа:</strong> ${status}<br>
+                <strong>Номер заказа:</strong> ${data.orderId}<br>
+                <strong>Описание:</strong> ${data.description}<br>
+            `;
+    }
+    
+    // Обновляем интерфейс
+    const statusResult = document.getElementById('statusResult');
+    statusResult.innerHTML = statusMessage;
+    statusResult.className = `notification ${statusClass}`;
+    statusResult.style.display = 'block';
+}
+
+// Функция для показа уведомлений
+function showNotification(message, type, duration = 5000, elementId = 'notification') {
+    const notification = document.getElementById(elementId);
+    notification.innerHTML = message;
+    notification.className = `notification ${type}`;
+    notification.style.display = 'block';
+    
+    if (duration > 0) {
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, duration);
     }
 }
     
