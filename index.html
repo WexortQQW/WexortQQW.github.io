@@ -553,34 +553,95 @@
     }
     
     // Проверка статуса заказа
-    async function checkStatus() {
-        const orderId = document.getElementById('statusCheckInput').value.trim();
-        if (!orderId) {
-            showNotification('Введите номер заказа', 'error', 3000, 'statusResult');
-            return;
-        }
-        
-        try {
-            showNotification('Проверяем статус...', 'info', 0, 'statusResult');
-            
-            // Для тестирования, используем заглушку
-            // В реальном коде замените на запрос к вашему Google Apps Script
-            setTimeout(() => {
-                const statusInfo = `
-                    <strong>Статус заказа:</strong> В обработке<br>
-                    <strong>Номер заказа:</strong> ${orderId}<br>
-                    <strong>Дата заказа:</strong> ${new Date().toLocaleDateString('ru-RU')}
-                `;
-                document.getElementById('statusResult').innerHTML = statusInfo;
-                document.getElementById('statusResult').className = 'notification info';
-                document.getElementById('statusResult').style.display = 'block';
-            }, 1000);
-            
-        } catch (error) {
-            console.error('Ошибка при проверке статуса:', error);
-            showNotification('Ошибка при проверке статуса', 'error', 5000, 'statusResult');
-        }
+async function checkStatus() {
+    const orderId = document.getElementById('statusCheckInput').value.trim();
+    if (!orderId) {
+        showNotification('Введите номер заказа', 'error', 3000, 'statusResult');
+        return;
     }
+    
+    try {
+        showNotification('Проверяем статус...', 'info', 0, 'statusResult');
+        
+        const response = await fetch(`${STATUS_SCRIPT_URL}?orderId=${encodeURIComponent(orderId)}`);
+        const result = await response.json();
+        
+        if (result.status === "success") {
+            let statusMessage = "";
+            let statusClass = "info";
+            
+            // Определяем сообщение в зависимости от статуса
+            switch(result.data.status) {
+                case "В обработке":
+                    statusMessage = `<strong>Статус заказа:</strong> В обработке<br>
+                                    <strong>Заказ:</strong> ${result.data.description || 'Не указано'}<br>
+                                    <strong>VIN:</strong> ${result.data.vin || 'Не указан'}<br>
+                                    <strong>Дата заказа:</strong> ${result.data.timestamp || 'Не указана'}<br>
+                                    <em>Мы приняли ваш заказ в работу. Ожидайте обновления статуса.</em>`;
+                    break;
+                    
+                case "Выполняется":
+                    statusMessage = `<strong>Статус заказа:</strong> Выполняется<br>
+                                    <strong>Заказ:</strong> ${result.data.description}<br>
+                                    <em>Ваш заказ находится в процессе выполнения. Мы ищем нужные детали.</em>`;
+                    statusClass = "info";
+                    break;
+                    
+                case "Найден у поставщика":
+                    statusMessage = `<strong>Статус заказа:</strong> Найден у поставщика<br>
+                                    <em>Нужные детали найдены у поставщика. Ожидайте поступления на склад.</em>`;
+                    statusClass = "success";
+                    break;
+                    
+                case "В пути":
+                    statusMessage = `<strong>Статус заказа:</strong> В пути<br>
+                                    <em>Детали уже в пути к нам на склад. Ожидайте уведомления.</em>`;
+                    statusClass = "success";
+                    break;
+                    
+                case "Готов к выдаче":
+                    statusMessage = `<strong>Статус заказа:</strong> Готов к выдаче<br>
+                                    <em>Ваш заказ готов к выдаче! Пожалуйста, свяжитесь с нами для уточнения деталей получения.</em>`;
+                    statusClass = "success";
+                    break;
+                    
+                case "Выполнено":
+                    statusMessage = `<strong>Статус заказа:</strong> Выполнено<br>
+                                    <em>Ваш заказ завершен. Спасибо, что выбрали нас!</em>`;
+                    statusClass = "success";
+                    break;
+                    
+                case "Отказ":
+                    statusMessage = `<strong>Статус заказа:</strong> Отказ<br>
+                                    <em>К сожалению, мы не смогли найти нужные детали. Свяжитесь с нами для уточнения деталей.</em>`;
+                    statusClass = "error";
+                    break;
+                    
+                case "Требует уточнения":
+                    statusMessage = `<strong>Статус заказа:</strong> Требует уточнения<br>
+                                    <em>Для выполнения заказа требуется дополнительная информация. Пожалуйста, свяжитесь с нами.</em>`;
+                    statusClass = "error";
+                    break;
+                    
+                default:
+                    statusMessage = `<strong>Статус заказа:</strong> ${result.data.status}<br>
+                                    <strong>Заказ:</strong> ${result.data.description}<br>
+                                    <strong>VIN:</strong> ${result.data.vin}<br>
+                                    <strong>Дата заказа:</strong> ${result.data.timestamp}`;
+            }
+            
+            document.getElementById('statusResult').innerHTML = statusMessage;
+            document.getElementById('statusResult').className = `notification ${statusClass}`;
+            document.getElementById('statusResult').style.display = 'block';
+            
+        } else {
+            showNotification(result.message || 'Заказ не найден', 'error', 5000, 'statusResult');
+        }
+    } catch (error) {
+        console.error('Ошибка при проверке статуса:', error);
+        showNotification('Ошибка при проверке статуса', 'error', 5000, 'statusResult');
+    }
+}
     
     // Отправка формы
     document.getElementById('carForm').addEventListener('submit', async function(e) {
