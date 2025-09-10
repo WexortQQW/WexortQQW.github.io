@@ -563,71 +563,40 @@ async function checkStatus() {
     try {
         showNotification('Проверяем статус...', 'info', 0, 'statusResult');
         
-        const response = await fetch(`${STATUS_SCRIPT_URL}?orderId=${encodeURIComponent(orderId)}`);
+        // Добавляем timestamp для предотвращения кэширования
+        const timestamp = new Date().getTime();
+        const url = `${STATUS_SCRIPT_URL}?orderId=${encodeURIComponent(orderId)}&t=${timestamp}`;
+        
+        const response = await fetch(url);
         const result = await response.json();
         
         if (result.status === "success") {
+            // Упрощенное отображение только для 4 категорий статусов
+            const status = result.data.status || "Не определен";
             let statusMessage = "";
             let statusClass = "info";
             
-            // Определяем сообщение в зависимости от статуса
-            switch(result.data.status) {
-                case "В обработке":
-                    statusMessage = `<strong>Статус заказа:</strong> В обработке<br>
-                                    <strong>Заказ:</strong> ${result.data.description || 'Не указано'}<br>
-                                    <strong>VIN:</strong> ${result.data.vin || 'Не указан'}<br>
-                                    <strong>Дата заказа:</strong> ${result.data.timestamp || 'Не указана'}<br>
-                                    <em>Мы приняли ваш заказ в работу. Ожидайте обновления статуса.</em>`;
-                    break;
-                    
-                case "Выполняется":
-                    statusMessage = `<strong>Статус заказа:</strong> Выполняется<br>
-                                    <strong>Заказ:</strong> ${result.data.description}<br>
-                                    <em>Ваш заказ находится в процессе выполнения. Мы ищем нужные детали.</em>`;
-                    statusClass = "info";
-                    break;
-                    
-                case "Найден у поставщика":
-                    statusMessage = `<strong>Статус заказа:</strong> Найден у поставщика<br>
-                                    <em>Нужные детали найдены у поставщика. Ожидайте поступления на склад.</em>`;
-                    statusClass = "success";
-                    break;
-                    
-                case "В пути":
-                    statusMessage = `<strong>Статус заказа:</strong> В пути<br>
-                                    <em>Детали уже в пути к нам на склад. Ожидайте уведомления.</em>`;
-                    statusClass = "success";
-                    break;
-                    
-                case "Готов к выдаче":
-                    statusMessage = `<strong>Статус заказа:</strong> Готов к выдаче<br>
-                                    <em>Ваш заказ готов к выдаче! Пожалуйста, свяжитесь с нами для уточнения деталей получения.</em>`;
-                    statusClass = "success";
-                    break;
-                    
-                case "Выполнено":
-                    statusMessage = `<strong>Статус заказа:</strong> Выполнено<br>
-                                    <em>Ваш заказ завершен. Спасибо, что выбрали нас!</em>`;
-                    statusClass = "success";
-                    break;
-                    
-                case "Отказ":
-                    statusMessage = `<strong>Статус заказа:</strong> Отказ<br>
-                                    <em>К сожалению, мы не смогли найти нужные детали. Свяжитесь с нами для уточнения деталей.</em>`;
-                    statusClass = "error";
-                    break;
-                    
-                case "Требует уточнения":
-                    statusMessage = `<strong>Статус заказа:</strong> Требует уточнения<br>
-                                    <em>Для выполнения заказа требуется дополнительная информация. Пожалуйста, свяжитесь с нами.</em>`;
-                    statusClass = "error";
-                    break;
-                    
-                default:
-                    statusMessage = `<strong>Статус заказа:</strong> ${result.data.status}<br>
-                                    <strong>Заказ:</strong> ${result.data.description}<br>
-                                    <strong>VIN:</strong> ${result.data.vin}<br>
-                                    <strong>Дата заказа:</strong> ${result.data.timestamp}`;
+            statusMessage = `
+                <strong>Статус заказа:</strong> ${status}<br>
+                <strong>Номер заказа:</strong> ${result.data.orderId || 'Не указан'}<br>
+                <strong>Описание:</strong> ${result.data.description || 'Не указано'}<br>
+            `;
+            
+            // Только 4 категории статусов
+            if (status === "в обработке") {
+                statusMessage += '<em>Мы приняли ваш заказ в работу. Ожидайте обновления статуса.</em>';
+                statusClass = "info";
+            } else if (status === "выполняется") {
+                statusMessage += '<em>Ваш заказ находится в процессе выполнения.</em>';
+                statusClass = "info";
+            } else if (status === "отказ клиента") {
+                statusMessage += '<em>Заказ отменен по просьбе клиента.</em>';
+                statusClass = "error";
+            } else if (status === "выполнено") {
+                statusMessage += '<em>Ваш заказ завершен. Спасибо!</em>';
+                statusClass = "success";
+            } else {
+                statusMessage += `<em>Статус: ${status}</em>`;
             }
             
             document.getElementById('statusResult').innerHTML = statusMessage;
