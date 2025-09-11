@@ -346,70 +346,64 @@
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbywX4yZPo7f-WYw9sWmaVZE-Cx9pCJSjLmm-eIQyBaDuOosOYC9baOEtLZ6a1ktnr0UNQ/exec';
     
     document.getElementById('carForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+    e.preventDefault(); // Добавьте эту строку!
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const originalBtnText = submitBtn.textContent;
+    
+    // Показываем индикатор загрузки
+    submitBtn.innerHTML = '<span class="loading"></span> Отправка...';
+    submitBtn.disabled = true;
+    
+    // Остальной код без изменений...
+    const formData = {
+        vin: document.getElementById('vin').value,
+        brand: document.getElementById('brand').value,
+        year: document.getElementById('year').value,
+        article: document.getElementById('article').value,
+        description: document.getElementById('description').value,
+        phone: document.getElementById('phone').value
+    };
+    
+    // Простая валидация
+    if (!formData.vin || !formData.description || !formData.phone) {
+        showNotification('Заполните обязательные поля (VIN-код, описание проблемы и телефон)', 'error');
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
+        return;
+    }
+    
+    if (formData.vin.length !== 17) {
+        showNotification('VIN-код должен содержать 17 символов', 'error');
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
+        return;
+    }
+    
+    try {
+        // Отправка данных в Google Apps Script
+        const response = await fetch(GAS_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
         
-        const submitBtn = document.getElementById('submitBtn');
-        const originalBtnText = submitBtn.textContent;
+        // Показываем сообщение об успехе
+        showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
+        document.getElementById('carForm').reset();
         
-        // Показываем индикатор загрузки
-        submitBtn.innerHTML = '<span class="loading"></span> Отправка...';
-        submitBtn.disabled = true;
-        
-        // Собираем данные из формы
-        const formData = {
-            vin: document.getElementById('vin').value,
-            brand: document.getElementById('brand').value,
-            year: document.getElementById('year').value,
-            article: document.getElementById('article').value,
-            description: document.getElementById('description').value,
-            phone: document.getElementById('phone').value
-        };
-        
-        // Простая валидация
-        if (!formData.vin || !formData.description || !formData.phone) {
-            showNotification('Заполните обязательные поля (VIN-код, описание проблемы и телефон)', 'error');
-            submitBtn.textContent = originalBtnText;
-            submitBtn.disabled = false;
-            return;
-        }
-        
-        if (formData.vin.length !== 17) {
-            showNotification('VIN-код должен содержать 17 символов', 'error');
-            submitBtn.textContent = originalBtnText;
-            submitBtn.disabled = false;
-            return;
-        }
-        
-        try {
-             // Отправка данных в Google Apps Script
-  const response = await fetch(GAS_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(formData)
-  });
-  
-  // Показываем сообщение об успехе
-  showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
-  document.getElementById('carForm').reset();
-  
-} catch (error) {
-            
-            // Показываем сообщение об успехе
-            showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
-            document.getElementById('carForm').reset();
-            
-        } catch (error) {
-            console.error('Ошибка:', error);
-            showNotification('Произошла ошибка при отправке. Проверьте подключение к интернету.', 'error');
-        } finally {
-            // Восстанавливаем кнопку
-            submitBtn.textContent = originalBtnText;
-            submitBtn.disabled = false;
-        }
-    });
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showNotification('Произошла ошибка при отправке. Проверьте подключение к интернету.', 'error');
+    } finally {
+        // Восстанавливаем кнопку
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
+    }
+});
     
     function showNotification(message, type) {
         const notification = document.getElementById('notification');
