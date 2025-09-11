@@ -296,7 +296,8 @@
             <form id="carForm">
                 <div class="form-group">
                     <label for="vin" class="required">VIN-код автомобиля</label>
-                    <input type="text" id="vin" name="vin" placeholder="Введите 17-значный VIN-код" required>
+                    <input type="text" id="vin" name="vin" placeholder="Введите 17-значный VIN-код" required pattern="[A-HJ-NPR-Z0-9]{17}" title="Введите 17-значный VIN-код (буквы I, O, Q не допускаются)">
+                    <p class="optional">Буквы I, O и Q не используются в VIN-кодах</p>
                 </div>
                 
                 <div class="form-group">
@@ -322,7 +323,7 @@
 
                 <div class="form-group">
                     <label for="phone" class="required">Ваш телефон для связи</label>
-                    <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
+                    <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required pattern="\+7\s?\([0-9]{3}\)\s?[0-9]{3}-[0-9]{2}-[0-9]{2}" title="Формат: +7 (XXX) XXX-XX-XX">
                 </div>
                 
                 <button type="submit" id="submitBtn">Отправить заявку</button>
@@ -390,16 +391,22 @@ document.getElementById('carForm').addEventListener('submit', async function(e) 
             body: JSON.stringify(formData)
         });
         
-        // Показываем сообщение об успехе
-        showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
-        document.getElementById('carForm').reset();
+        const result = await response.json();
+        
+        if (result.result === "success") {
+            // Показываем сообщение об успехе
+            showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
+            document.getElementById('carForm').reset();
+        } else {
+            throw new Error(result.message || "Ошибка сервера");
+        }
         
     } catch (error) {
         console.error('Ошибка:', error);
-        showNotification('Произошла ошибка при отправке. Проверьте подключение к интернету.', 'error');
+        showNotification('Произошла ошибка при отправке: ' + error.message, 'error');
     } finally {
         // Восстанавливаем кнопку
-        submitBtn.textContent = originalBtnText;
+        submitBtn.innerHTML = originalBtnText;
         submitBtn.disabled = false;
     }
 });
@@ -435,6 +442,30 @@ document.getElementById('phone').addEventListener('input', function(e) {
 if (window.self !== window.top || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
     document.body.classList.add('mini-app-mode');
 }
-</script>
+
+// Автозаполнение марки по VIN (упрощенная версия)
+document.getElementById('vin').addEventListener('blur', function() {
+    if (this.value.length === 17 && !document.getElementById('brand').value) {
+        // Простая логика определения марки по первому символу VIN
+        const firstChar = this.value.charAt(0).toUpperCase();
+        const brandMap = {
+            'J': 'Jeep',
+            'S': 'Subaru',
+            'V': 'Volkswagen',
+            'W': 'Volkswagen',
+            'Z': 'BMW',
+            '1': 'Chevrolet',
+            '2': 'Pontiac',
+            '3': 'Oldsmobile',
+            '4': 'Buick',
+            '5': 'GMC'
+        };
+        
+        if (brandMap[firstChar]) {
+            document.getElementById('brand').value = brandMap[firstChar];
+        }
+    }
+});
+    </script>
 </body>
 </html>
