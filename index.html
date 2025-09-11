@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
     <title>Форма заявки на автозапчасти</title>
     <style>
         * {
@@ -277,6 +276,20 @@
         .mini-app-mode .footer {
             padding: 10px;
         }
+        
+        /* Стили для выбора метода отправки */
+        .method-selector {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .method-selector label {
+            display: inline;
+            margin-right: 15px;
+        }
     </style>
 </head>
 <body>
@@ -293,6 +306,13 @@
         </div>
         
         <div class="form-container">
+            <!-- Выбор метода отправки (для тестирования) -->
+            <div class="method-selector">
+                <label>Метод отправки:</label>
+                <label><input type="radio" name="method" value="direct" checked> Прямой</label>
+                <label><input type="radio" name="method" value="proxy"> Через прокси</label>
+            </div>
+            
             <form id="carForm">
                 <div class="form-group">
                     <label for="vin" class="required">VIN-код автомобиля</label>
@@ -343,11 +363,14 @@
     </div>
 
     <script>
-// Замените этот URL на актуальный URL вашего Google Apps Script
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwNX_2M8MsNzhOWdXTc0AiqkorQKbPe2mDrX14SjbSMo06RPW943ixG77OexJ8z0iVXWg/exec';
+// URL вашего Google Apps Script
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz15tav_wUIVBNUPUBhOWNUP5Vbakz2KGKQxFUcdp7QldPK3KS7ww1C6rabYR_bZHmxmg/exec';
+
+// Прокси-сервер для обхода CORS (для тестирования)
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
 
 document.getElementById('carForm').addEventListener('submit', async function(e) {
-    e.preventDefault(); // Важная строка - предотвращает обновление страницы
+    e.preventDefault();
     
     const submitBtn = document.getElementById('submitBtn');
     const originalBtnText = submitBtn.textContent;
@@ -382,34 +405,55 @@ document.getElementById('carForm').addEventListener('submit', async function(e) 
     }
     
     try {
+        // Определяем метод отправки
+        const useProxy = document.querySelector('input[name="method"]:checked').value === 'proxy';
+        const targetUrl = useProxy ? CORS_PROXY + GAS_URL : GAS_URL;
+        
+        // Формируем данные для отправки
+        const urlEncodedData = new URLSearchParams();
+        for (const key in formData) {
+            urlEncodedData.append(key, formData[key]);
+        }
+        
         // Отправка данных в Google Apps Script
-        const response = await fetch(GAS_URL, {
+        const response = await fetch(targetUrl, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify(formData)
+            body: urlEncodedData.toString()
         });
         
-        const result = await response.json();
-        
-        if (result.result === "success") {
-            // Показываем сообщение об успехе
-            showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
-            document.getElementById('carForm').reset();
+        // Проверяем ответ
+        if (response.redirected) {
+            // Если произошло перенаправление (типично для Google Apps Script)
+            const redirectedResponse = await fetch(response.url);
+            const result = await redirectedResponse.json();
+            handleResponse(result);
         } else {
-            throw new Error(result.message || "Ошибка сервера");
+            // Если ответ получен напрямую
+            const result = await response.json();
+            handleResponse(result);
         }
         
     } catch (error) {
         console.error('Ошибка:', error);
-        showNotification('Произошла ошибка при отправке: ' + error.message, 'error');
+        showNotification('Произошла ошибка при отправке. Проверьте подключение к интернету.', 'error');
     } finally {
         // Восстанавливаем кнопку
         submitBtn.innerHTML = originalBtnText;
         submitBtn.disabled = false;
     }
 });
+
+function handleResponse(result) {
+    if (result.result === "success") {
+        showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
+        document.getElementById('carForm').reset();
+    } else {
+        showNotification('Ошибка сервера: ' + (result.message || 'неизвестная ошибка'), 'error');
+    }
+}
 
 function showNotification(message, type) {
     const notification = document.getElementById('notification');
