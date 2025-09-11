@@ -380,15 +380,21 @@
         }
         
         try {
-            // Отправка данных в Google Apps Script
-            const response = await fetch(GAS_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
+             // Отправка данных в Google Apps Script
+  const response = await fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  });
+  
+  // Показываем сообщение об успехе
+  showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
+  document.getElementById('carForm').reset();
+  
+} catch (error) {
             
             // Показываем сообщение об успехе
             showNotification('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
