@@ -581,43 +581,51 @@ function copyOrderId() {
 
 // Функция проверки статуса заказа
 async function checkStatus() {
-    const orderId = document.getElementById('statusCheckInput').value.trim();
-    if (!orderId) {
-        showNotification('Введите номер заказа', 'error', 3000, 'statusResult');
-        return;
+  const orderId = document.getElementById('statusCheckInput').value.trim();
+  if (!orderId) {
+    showNotification('Введите номер заказа', 'error', 3000, 'statusResult');
+    return;
+  }
+  
+  try {
+    showNotification('Проверяем статус...', 'info', 0, 'statusResult');
+    
+    // Формируем URL для запроса
+    const url = `${GAS_URL}?orderId=${encodeURIComponent(orderId)}`;
+    
+    // Выполняем запрос
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Ошибка сервера: ${response.status}`);
     }
     
-    try {
-        showNotification('Проверяем статус...', 'info', 0, 'statusResult');
-        
-        // Формируем URL для запроса с добавлением orderId
-        const url = `${GAS_URL}?orderId=${encodeURIComponent(orderId)}`;
-        
-        // Выполняем запрос (без no-cors, чтобы видеть ответ)
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-            throw new Error(`Ошибка сервера: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        // Обрабатываем ответ от GAS
-        if (data.status === "success") {
-            displayStatusResult(data.data);
-        } else {
-            displayStatusResult({
-                orderId: orderId,
-                status: "не найден",
-                description: data.message || "Заказ с таким номером не найден",
-                timestamp: new Date().toLocaleDateString('ru-RU')
-            });
-        }
-        
-    } catch (error) {
-        console.error('Ошибка при проверке статуса:', error);
-        showNotification('Не удалось проверить статус. Попробуйте позже.', 'error', 5000, 'statusResult');
+    const data = await response.json();
+    
+    if (data.status === "success") {
+      displayStatusResult(data.data);
+    } else {
+      displayStatusResult({
+        orderId: orderId,
+        status: "не найден",
+        description: data.message || "Заказ с таким номером не найден",
+        timestamp: new Date().toLocaleDateString('ru-RU')
+      });
     }
+    
+  } catch (error) {
+    console.error('Ошибка при проверке статуса:', error);
+    
+    // Уточняем сообщение об ошибке
+    let errorMessage = 'Не удалось проверить статус. ';
+    if (error.name === 'TypeError') {
+      errorMessage += 'Проблема с сетью или CORS. Проверьте подключение к интернету.';
+    } else {
+      errorMessage += error.message;
+    }
+    
+    showNotification(errorMessage, 'error', 5000, 'statusResult');
+  }
 }
 
 // Функция для отображения результата
