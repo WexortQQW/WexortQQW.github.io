@@ -342,11 +342,11 @@
     </div>
 
     <script>
-    // Замените этот URL на актуальный URL вашего Google Apps Script
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbywX4yZPo7f-WYw9sWmaVZE-Cx9pCJSjLmm-eIQyBaDuOosOYC9baOEtLZ6a1ktnr0UNQ/exec';
-    
-    document.getElementById('carForm').addEventListener('submit', async function(e) {
-    e.preventDefault(); // Добавьте эту строку!
+// Замените этот URL на актуальный URL вашего Google Apps Script
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbywX4yZPo7f-WYw9sWmaVZE-Cx9pCJSjLmm-eIQyBaDuOosOYC9baOEtLZ6a1ktnr0UNQ/exec';
+
+document.getElementById('carForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Важная строка - предотвращает обновление страницы
     
     const submitBtn = document.getElementById('submitBtn');
     const originalBtnText = submitBtn.textContent;
@@ -355,7 +355,7 @@
     submitBtn.innerHTML = '<span class="loading"></span> Отправка...';
     submitBtn.disabled = true;
     
-    // Остальной код без изменений...
+    // Собираем данные из формы
     const formData = {
         vin: document.getElementById('vin').value,
         brand: document.getElementById('brand').value,
@@ -384,7 +384,6 @@
         // Отправка данных в Google Apps Script
         const response = await fetch(GAS_URL, {
             method: 'POST',
-            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -404,38 +403,38 @@
         submitBtn.disabled = false;
     }
 });
-    
-    function showNotification(message, type) {
-        const notification = document.getElementById('notification');
-        notification.textContent = message;
-        notification.className = 'notification ' + type;
-        notification.style.display = 'block';
-        
-        // Скрыть уведомление через 5 секунд
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 5000);
-    }
 
-    // Маска для телефона
-    document.getElementById('phone').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.startsWith('7') || value.startsWith('8')) {
-            value = value.substring(1);
-        }
-        if (value.length > 0) {
-            value = '+7 (' + value;
-            if (value.length > 7) value = value.substring(0, 7) + ') ' + value.substring(7);
-            if (value.length > 12) value = value.substring(0, 12) + '-' + value.substring(12);
-            if (value.length > 15) value = value.substring(0, 15) + '-' + value.substring(15);
-        }
-        e.target.value = value;
-    });
+function showNotification(message, type) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = 'notification ' + type;
+    notification.style.display = 'block';
     
-    // Автоматическое определение мини-приложений и применение соответствующего стиля
-    if (window.self !== window.top || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        document.body.classList.add('mini-app-mode');
+    // Скрыть уведомление через 5 секунд
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 5000);
+}
+
+// Маска для телефона
+document.getElementById('phone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.startsWith('7') || value.startsWith('8')) {
+        value = value.substring(1);
     }
+    if (value.length > 0) {
+        value = '+7 (' + value;
+        if (value.length > 7) value = value.substring(0, 7) + ') ' + value.substring(7);
+        if (value.length > 12) value = value.substring(0, 12) + '-' + value.substring(12);
+        if (value.length > 15) value = value.substring(0, 15) + '-' + value.substring(15);
+    }
+    e.target.value = value;
+});
+
+// Автоматическое определение мини-приложений и применение соответствующего стиля
+if (window.self !== window.top || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    document.body.classList.add('mini-app-mode');
+}
 </script>
 </body>
 </html>
