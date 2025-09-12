@@ -6,13 +6,266 @@
     <title>Заказ авто деталей</title>
     <style>
         /* Ваши стили остаются без изменений */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .full-width {
+            grid-column: span 2;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .required::after {
+            content: '*';
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            font-size: 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .full-width {
+                grid-column: span 1;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Ваша HTML-разметка остается без изменений -->
-    </div>
-
+        <header>
+            <h1>Заказ авто деталей</h1>
+            <p class="subtitle">Заполните форму, и мы найдем нужные детали для вашего автомобиля</p>
+        </header>
+        
+        <div class="form-container">
+            <div id="successMessage" class="message success">
+                Заказ успешно отправлен! Мы свяжемся с вами в ближайшее время.
+            </div>
+            
+            <div id="errorMessage" class="message error">
+                Произошла ошибка при отправке заказа. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.
+            </div>
+            
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Отправка данных...</p>
+            </div>
+            
+            <form id="orderForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name" class="required">ФИО:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone" class="required">Телефон:</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="required">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carBrand" class="required">Марка автомобиля:</label>
+                        <input type="text" id="carBrand" name="carBrand" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carModel" class="required">Модель автомобиля:</label>
+                        <input type="text" id="carModel" name="carModel" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="year" class="required">Год выпуска:</label>
+                        <input type="number" id="year" name="year" min="1950" max="2023" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partName" class="required">Название детали:</label>
+                        <input type="text" id="partName" name="partName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partNumber">Номер детали (если известен):</label>
+                        <input type="text" id="partNumber" name="partNumber">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantity" class="required">Количество:</label>
+                        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="comments">Дополнительные комментарии:</label>
+                        <textarea id="comments" name="comments"></textarea>
+                    </div>
+                </div>
+                
+                <button type="submit">Отправить заказ</button>
+            </form>
     <script>
         // Простая функция для отправки данных
         function submitToGoogleAppsScript(formData) {
