@@ -72,6 +72,17 @@
       font-size: 16px;
     }
     
+    input.error, textarea.error {
+      border-color: var(--accent-color);
+    }
+    
+    .error-text {
+      color: var(--accent-color);
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+    
     button {
       background-color: var(--primary-color);
       color: white;
@@ -86,6 +97,11 @@
     
     button:hover {
       background-color: #2980b9;
+    }
+    
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
     }
     
     .btn-export {
@@ -155,9 +171,33 @@
       margin-top: 20px;
     }
     
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
     @media (max-width: 768px) {
       .col {
         flex: 100%;
+      }
+      
+      .actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .actions button {
+        width: 100%;
       }
     }
   </style>
@@ -179,21 +219,25 @@
             <div class="form-group">
               <label for="fio">ФИО:</label>
               <input type="text" id="fio" name="fio" required>
+              <div class="error-text" id="fio-error">Пожалуйста, введите ФИО</div>
             </div>
             
             <div class="form-group">
               <label for="phone">Телефон:</label>
-              <input type="tel" id="phone" name="phone" required>
+              <input type="tel" id="phone" name="phone" required pattern="^\+?[0-9\s\-\(\)]+$">
+              <div class="error-text" id="phone-error">Пожалуйста, введите корректный номер телефона</div>
             </div>
             
             <div class="form-group">
               <label for="email">Email:</label>
               <input type="email" id="email" name="email" required>
+              <div class="error-text" id="email-error">Пожалуйста, введите корректный email</div>
             </div>
             
             <div class="form-group">
               <label for="vin">VIN код автомобиля:</label>
-              <input type="text" id="vin" name="vin" required>
+              <input type="text" id="vin" name="vin" required minlength="17" maxlength="17">
+              <div class="error-text" id="vin-error">VIN код должен содержать 17 символов</div>
             </div>
           </div>
           
@@ -201,16 +245,19 @@
             <div class="form-group">
               <label for="brandModel">Марка и модель:</label>
               <input type="text" id="brandModel" name="brandModel" required>
+              <div class="error-text" id="brandModel-error">Пожалуйста, введите марку и модель автомобиля</div>
             </div>
             
             <div class="form-group">
               <label for="year">Год выпуска:</label>
               <input type="number" id="year" name="year" min="1950" max="2030" required>
+              <div class="error-text" id="year-error">Пожалуйста, введите корректный год выпуска</div>
             </div>
             
             <div class="form-group">
               <label for="part">Название детали:</label>
               <input type="text" id="part" name="part" required>
+              <div class="error-text" id="part-error">Пожалуйста, введите название детали</div>
             </div>
             
             <div class="form-group">
@@ -223,6 +270,7 @@
         <div class="form-group">
           <label for="quantity">Количество:</label>
           <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+          <div class="error-text" id="quantity-error">Пожалуйста, введите корректное количество</div>
         </div>
         
         <div class="form-group">
@@ -230,7 +278,7 @@
           <textarea id="comment" name="comment" rows="4"></textarea>
         </div>
         
-        <button type="submit">Отправить заказ</button>
+        <button type="submit" id="submitBtn">Отправить заказ</button>
       </form>
     </div>
     
@@ -251,13 +299,25 @@
       const refreshBtn = document.getElementById('refreshBtn');
       const exportBtn = document.getElementById('exportBtn');
       const ordersTable = document.getElementById('ordersTable');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      // Инициализация данных
+      initStorage();
       
       // Загрузить данные при загрузке страницы
       loadOrders();
       
+      // Валидация формы
+      setupFormValidation();
+      
       // Обработка отправки формы
       form.addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        if (!validateForm()) {
+          showMessage('Пожалуйста, исправьте ошибки в форме', 'error');
+          return;
+        }
         
         const formData = new FormData(form);
         const data = {
@@ -270,71 +330,157 @@
           part: formData.get('part'),
           article: formData.get('article'),
           quantity: formData.get('quantity'),
-          comment: formData.get('comment')
+          comment: formData.get('comment'),
+          date: new Date().toISOString()
         };
         
-        google.script.run
-          .withSuccessHandler(function(response) {
-            showMessage(response, 'success');
+        // Показать индикатор загрузки
+        submitBtn.innerHTML = '<div class="loading"></div> Отправка...';
+        submitBtn.disabled = true;
+        
+        // В реальном приложении здесь будет вызов google.script.run
+        setTimeout(() => {
+          try {
+            submitData(data);
+            showMessage('Заказ успешно отправлен!', 'success');
             form.reset();
             loadOrders();
-          })
-          .withFailureHandler(function(error) {
-            showMessage(error.message, 'error');
-          })
-          .submitData(data);
+          } catch (error) {
+            showMessage('Ошибка при отправке заказа: ' + error.message, 'error');
+          } finally {
+            submitBtn.innerHTML = 'Отправить заказ';
+            submitBtn.disabled = false;
+          }
+        }, 1000);
       });
       
       // Обновление списка заказов
-      refreshBtn.addEventListener('click', loadOrders);
+      refreshBtn.addEventListener('click', function() {
+        refreshBtn.innerHTML = '<div class="loading"></div> Обновление...';
+        refreshBtn.disabled = true;
+        
+        setTimeout(() => {
+          loadOrders();
+          refreshBtn.innerHTML = 'Обновить список';
+          refreshBtn.disabled = false;
+        }, 800);
+      });
       
       // Экспорт в Excel
       exportBtn.addEventListener('click', function() {
-        google.script.run
-          .withSuccessHandler(function(url) {
-            window.open(url, '_blank');
-          })
-          .withFailureHandler(function(error) {
-            showMessage(error.message, 'error');
-          })
-          .exportData();
+        exportBtn.innerHTML = '<div class="loading"></div> Экспорт...';
+        exportBtn.disabled = true;
+        
+        setTimeout(() => {
+          try {
+            exportData();
+            showMessage('Данные успешно экспортированы', 'success');
+          } catch (error) {
+            showMessage('Ошибка при экспорте: ' + error.message, 'error');
+          } finally {
+            exportBtn.innerHTML = 'Экспорт в Excel';
+            exportBtn.disabled = false;
+          }
+        }, 1500);
       });
+      
+      // Функция валидации формы
+      function validateForm() {
+        let isValid = true;
+        
+        // Простая валидация обязательных полей
+        const requiredFields = ['fio', 'phone', 'email', 'vin', 'brandModel', 'year', 'part', 'quantity'];
+        
+        requiredFields.forEach(field => {
+          const input = document.getElementById(field);
+          const error = document.getElementById(`${field}-error`);
+          
+          if (!input.value.trim()) {
+            input.classList.add('error');
+            error.style.display = 'block';
+            isValid = false;
+          } else {
+            input.classList.remove('error');
+            error.style.display = 'none';
+          }
+        });
+        
+        // Специфическая валидация VIN
+        const vinInput = document.getElementById('vin');
+        const vinError = document.getElementById('vin-error');
+        if (vinInput.value.length !== 17) {
+          vinInput.classList.add('error');
+          vinError.style.display = 'block';
+          isValid = false;
+        }
+        
+        return isValid;
+      }
+      
+      // Настройка валидации формы
+      function setupFormValidation() {
+        const inputs = form.querySelectorAll('input[required]');
+        
+        inputs.forEach(input => {
+          input.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+              this.classList.add('error');
+              document.getElementById(`${this.id}-error`).style.display = 'block';
+            } else {
+              this.classList.remove('error');
+              document.getElementById(`${this.id}-error`).style.display = 'none';
+            }
+          });
+        });
+      }
       
       // Функция загрузки заказов
       function loadOrders() {
-        google.script.run
-          .withSuccessHandler(function(data) {
-            renderOrders(data);
-          })
-          .withFailureHandler(function(error) {
-            showMessage(error.message, 'error');
-          })
-          .getData();
+        // В реальном приложении здесь будет вызов google.script.run
+        try {
+          const data = getData();
+          renderOrders(data);
+        } catch (error) {
+          showMessage('Ошибка при загрузке заказов: ' + error.message, 'error');
+        }
       }
       
       // Функция отображения заказов в таблице
       function renderOrders(data) {
-        if (data.length <= 1) {
+        if (!data || data.length === 0) {
           ordersTable.innerHTML = '<p>Заказов пока нет.</p>';
           return;
         }
         
-        let tableHtml = '<table><thead><tr>';
-        tableHtml += '<th>ФИО</th><th>Телефон</th><th>Email</th><th>Марка</th><th>Деталь</th><th>Дата</th>';
-        tableHtml += '</tr></thead><tbody>';
+        let tableHtml = `
+          <table>
+            <thead>
+              <tr>
+                <th>ФИО</th>
+                <th>Телефон</th>
+                <th>Email</th>
+                <th>Марка</th>
+                <th>Деталь</th>
+                <th>Количество</th>
+                <th>Дата</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
         
-        // Пропускаем заголовок (первую строку)
-        for (let i = 1; i < data.length; i++) {
-          const row = data[i];
-          tableHtml += `<tr>
-            <td>${row[0] || ''}</td>
-            <td>${row[1] || ''}</td>
-            <td>${row[2] || ''}</td>
-            <td>${row[4] || ''}</td>
-            <td>${row[6] || ''}</td>
-            <td>${formatDate(row[10])}</td>
-          </tr>`;
-        }
+        data.forEach(order => {
+          tableHtml += `
+            <tr>
+              <td>${escapeHtml(order.fio)}</td>
+              <td>${escapeHtml(order.phone)}</td>
+              <td>${escapeHtml(order.email)}</td>
+              <td>${escapeHtml(order.brandModel)}</td>
+              <td>${escapeHtml(order.part)}</td>
+              <td>${escapeHtml(order.quantity)}</td>
+              <td>${formatDate(order.date)}</td>
+            </tr>
+          `;
+        });
         
         tableHtml += '</tbody></table>';
         ordersTable.innerHTML = tableHtml;
@@ -357,6 +503,46 @@
         setTimeout(() => {
           messageDiv.style.display = 'none';
         }, 5000);
+      }
+      
+      // Экранирование HTML для безопасности
+      function escapeHtml(unsafe) {
+        if (unsafe === null || unsafe === undefined) return '';
+        return String(unsafe)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+      
+      // Заглушки для серверных функций (в реальном приложении будут заменены на google.script.run)
+      function initStorage() {
+        if (!localStorage.getItem('orders')) {
+          localStorage.setItem('orders', JSON.stringify([]));
+        }
+      }
+      
+      function submitData(data) {
+        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        orders.push(data);
+        localStorage.setItem('orders', JSON.stringify(orders));
+        return { success: true };
+      }
+      
+      function getData() {
+        return JSON.parse(localStorage.getItem('orders') || '[]');
+      }
+      
+      function exportData() {
+        const data = getData();
+        if (data.length === 0) {
+          throw new Error('Нет данных для экспорта');
+        }
+        
+        // В реальном приложении здесь будет создание и скачивание Excel файла
+        alert('В реальном приложении здесь будет экспорт в Excel. Данные готовы к экспорту: ' + data.length + ' заказов.');
+        return { success: true };
       }
     });
   </script>
