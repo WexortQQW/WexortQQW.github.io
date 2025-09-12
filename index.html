@@ -14,67 +14,40 @@
     </div>
 
     <script>
-        // Функция для отправки данных через создание скрытой формы
+        // Простая функция для отправки данных
         function submitToGoogleAppsScript(formData) {
             return new Promise((resolve, reject) => {
-                // Замените на ваш URL Google Apps Script
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbzCnsB_sFpBVyUW6R-JN320ysbwfJXZur9OZlxLW6107gtz6_wuoBF8h1-DG3PC9_ftoQ/exec';
+                // Замените на ваш реальный URL Google Apps Script
+                const scriptUrl = 'https://script.google.com/macros/s/ВАШ_ИДЕНТИФИКАТОР/exec';
                 
-                // Создаем скрытую форму
-                const hiddenForm = document.createElement('form');
-                hiddenForm.method = 'POST';
-                hiddenForm.action = scriptUrl;
-                hiddenForm.target = 'hiddenFrame';
-                hiddenForm.style.display = 'none';
+                // Создаем временную форму
+                const tempForm = document.createElement('form');
+                tempForm.method = 'POST';
+                tempForm.action = scriptUrl;
+                tempForm.style.display = 'none';
                 
-                // Добавляем поля в форму
-                const fields = [
-                    { name: 'name', value: formData.name },
-                    { name: 'phone', value: formData.phone },
-                    { name: 'email', value: formData.email },
-                    { name: 'carBrand', value: formData.carBrand },
-                    { name: 'carModel', value: formData.carModel },
-                    { name: 'year', value: formData.year },
-                    { name: 'partName', value: formData.partName },
-                    { name: 'partNumber', value: formData.partNumber },
-                    { name: 'quantity', value: formData.quantity },
-                    { name: 'comments', value: formData.comments },
-                    { name: 'timestamp', value: new Date().toLocaleString('ru-RU') }
-                ];
-                
-                fields.forEach(field => {
+                // Добавляем данные в форму
+                Object.keys(formData).forEach(key => {
                     const input = document.createElement('input');
                     input.type = 'hidden';
-                    input.name = field.name;
-                    input.value = field.value || '';
-                    hiddenForm.appendChild(input);
+                    input.name = key;
+                    input.value = formData[key];
+                    tempForm.appendChild(input);
                 });
                 
-                // Создаем скрытый iframe для обработки ответа
-                const hiddenFrame = document.createElement('iframe');
-                hiddenFrame.name = 'hiddenFrame';
-                hiddenFrame.style.display = 'none';
+                // Добавляем временную форму в body
+                document.body.appendChild(tempForm);
                 
-                // Добавляем обработчик загрузки iframe
-                hiddenFrame.onload = () => {
-                    // Предполагаем, что отправка прошла успешно
-                    resolve();
-                    document.body.removeChild(hiddenForm);
-                    document.body.removeChild(hiddenFrame);
-                };
+                // Отправляем форму
+                tempForm.submit();
                 
-                hiddenFrame.onerror = () => {
-                    reject(new Error('Ошибка отправки формы'));
-                    document.body.removeChild(hiddenForm);
-                    document.body.removeChild(hiddenFrame);
-                };
+                // Удаляем форму после отправки
+                setTimeout(() => {
+                    document.body.removeChild(tempForm);
+                }, 1000);
                 
-                // ВАЖНО: Сначала добавляем форму и iframe в DOM
-                document.body.appendChild(hiddenForm);
-                document.body.appendChild(hiddenFrame);
-                
-                // Теперь можно отправлять форму
-                hiddenForm.submit();
+                // Считаем отправку успешной
+                resolve();
             });
         }
         
@@ -98,11 +71,12 @@
                 partName: document.getElementById('partName').value,
                 partNumber: document.getElementById('partNumber').value,
                 quantity: document.getElementById('quantity').value,
-                comments: document.getElementById('comments').value
+                comments: document.getElementById('comments').value,
+                timestamp: new Date().toLocaleString('ru-RU')
             };
             
             try {
-                // Отправляем данные через Google Apps Script
+                // Отправляем данные
                 await submitToGoogleAppsScript(formData);
                 
                 // Показать сообщение об успехе
