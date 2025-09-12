@@ -293,6 +293,9 @@
   </div>
 
   <script>
+    // Конфигурация
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxRjKJadvepuBGR8Ymg0f846pwr61-224Hpy4atd5mV0tfYdn5DWJU1ESWcrWMy3czGuw/exec';
+    
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('orderForm');
       const messageDiv = document.getElementById('message');
@@ -300,9 +303,6 @@
       const exportBtn = document.getElementById('exportBtn');
       const ordersTable = document.getElementById('ordersTable');
       const submitBtn = document.getElementById('submitBtn');
-      
-      // Инициализация данных
-      initStorage();
       
       // Загрузить данные при загрузке страницы
       loadOrders();
@@ -338,20 +338,31 @@
         submitBtn.innerHTML = '<div class="loading"></div> Отправка...';
         submitBtn.disabled = true;
         
-        // В реальном приложении здесь будет вызов google.script.run
-        setTimeout(() => {
-          try {
-            submitData(data);
+        // Отправка данных в Google Sheets
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({action: 'addOrder', data: data})
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
             showMessage('Заказ успешно отправлен!', 'success');
             form.reset();
             loadOrders();
-          } catch (error) {
-            showMessage('Ошибка при отправке заказа: ' + error.message, 'error');
-          } finally {
-            submitBtn.innerHTML = 'Отправить заказ';
-            submitBtn.disabled = false;
+          } else {
+            showMessage('Ошибка при отправке заказа: ' + result.message, 'error');
           }
-        }, 1000);
+        })
+        .catch(error => {
+          showMessage('Ошибка при отправке заказа: ' + error.message, 'error');
+        })
+        .finally(() => {
+          submitBtn.innerHTML = 'Отправить заказ';
+          submitBtn.disabled = false;
+        });
       });
       
       // Обновление списка заказов
@@ -359,8 +370,9 @@
         refreshBtn.innerHTML = '<div class="loading"></div> Обновление...';
         refreshBtn.disabled = true;
         
+        loadOrders();
+        
         setTimeout(() => {
-          loadOrders();
           refreshBtn.innerHTML = 'Обновить список';
           refreshBtn.disabled = false;
         }, 800);
@@ -371,17 +383,23 @@
         exportBtn.innerHTML = '<div class="loading"></div> Экспорт...';
         exportBtn.disabled = true;
         
-        setTimeout(() => {
-          try {
-            exportData();
-            showMessage('Данные успешно экспортированы', 'success');
-          } catch (error) {
+        fetch(SCRIPT_URL + '?action=export')
+          .then(response => response.json())
+          .then(result => {
+            if (result.success) {
+              window.open(result.url, '_blank');
+              showMessage('Данные успешно экспортированы', 'success');
+            } else {
+              showMessage('Ошибка при экспорте: ' + result.message, 'error');
+            }
+          })
+          .catch(error => {
             showMessage('Ошибка при экспорте: ' + error.message, 'error');
-          } finally {
+          })
+          .finally(() => {
             exportBtn.innerHTML = 'Экспорт в Excel';
             exportBtn.disabled = false;
-          }
-        }, 1500);
+          });
       });
       
       // Функция валидации формы
@@ -436,18 +454,23 @@
       
       // Функция загрузки заказов
       function loadOrders() {
-        // В реальном приложении здесь будет вызов google.script.run
-        try {
-          const data = getData();
-          renderOrders(data);
-        } catch (error) {
-          showMessage('Ошибка при загрузке заказов: ' + error.message, 'error');
-        }
+        fetch(SCRIPT_URL + '?action=getOrders')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              renderOrders(data.orders);
+            } else {
+              showMessage('Ошибка при загрузке заказов: ' + data.message, 'error');
+            }
+          })
+          .catch(error => {
+            showMessage('Ошибка при загрузке заказов: ' + error.message, 'error');
+          });
       }
       
       // Функция отображения заказов в таблице
-      function renderOrders(data) {
-        if (!data || data.length === 0) {
+      function renderOrders(orders) {
+        if (!orders || orders.length === 0) {
           ordersTable.innerHTML = '<p>Заказов пока нет.</p>';
           return;
         }
@@ -468,7 +491,7 @@
             <tbody>
         `;
         
-        data.forEach(order => {
+        orders.forEach(order => {
           tableHtml += `
             <tr>
               <td>${escapeHtml(order.fio)}</td>
@@ -514,35 +537,6 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#039;");
-      }
-      
-      // Заглушки для серверных функций (в реальном приложении будут заменены на google.script.run)
-      function initStorage() {
-        if (!localStorage.getItem('orders')) {
-          localStorage.setItem('orders', JSON.stringify([]));
-        }
-      }
-      
-      function submitData(data) {
-        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-        orders.push(data);
-        localStorage.setItem('orders', JSON.stringify(orders));
-        return { success: true };
-      }
-      
-      function getData() {
-        return JSON.parse(localStorage.getItem('orders') || '[]');
-      }
-      
-      function exportData() {
-        const data = getData();
-        if (data.length === 0) {
-          throw new Error('Нет данных для экспорта');
-        }
-        
-        // В реальном приложении здесь будет создание и скачивание Excel файла
-        alert('В реальном приложении здесь будет экспорт в Excel. Данные готовы к экспорту: ' + data.length + ' заказов.');
-        return { success: true };
       }
     });
   </script>
