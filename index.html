@@ -3,31 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заказ авто деталей</title>
+    <title>Система управления заказами запчастей</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
     <style>
-        /* Ваши стили остаются без изменений */
-         {
+        * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
+            font-family: 'Roboto', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            color: #333;
+            line-height: 1.6;
             padding: 20px;
+            min-height: 100vh;
         }
         
         .container {
-            width: 100%;
-            max-width: 800px;
+            max-width: 1400px;
+            margin: 0 auto;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
         
@@ -40,6 +39,7 @@
         
         h1 {
             font-size: 28px;
+            font-weight: 700;
             margin-bottom: 10px;
         }
         
@@ -48,144 +48,222 @@
             opacity: 0.8;
         }
         
-        .form-container {
-            padding: 30px;
+        .content {
+            display: flex;
+            flex-wrap: wrap;
         }
         
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .form-section {
+            flex: 1;
+            min-width: 350px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-right: 1px solid #eaeaea;
+        }
+        
+        .table-section {
+            flex: 2;
+            min-width: 500px;
+            padding: 25px;
+            background: white;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            color: #2c3e50;
         }
         
         .form-group {
             margin-bottom: 20px;
         }
         
-        .full-width {
-            grid-column: span 2;
-        }
-        
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 500;
             color: #2c3e50;
         }
         
-        input, select, textarea {
+        input, textarea, select {
             width: 100%;
-            padding: 14px;
+            padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            font-size: 16px;
-            transition: border 0.3s;
+            font-size: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
         
-        input:focus, select:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #3498db;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
-        
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .required::after {
-            content: '*';
-            color: #e74c3c;
-            margin-left: 4px;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
         
         button {
             background: #3498db;
             color: white;
             border: none;
-            padding: 16px 30px;
-            font-size: 18px;
+            padding: 14px 25px;
             border-radius: 6px;
             cursor: pointer;
-            width: 100%;
-            font-weight: 600;
-            transition: background 0.3s;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         
         button:hover {
             background: #2980b9;
+            transform: translateY(-2px);
         }
         
-        .message {
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .status-message {
             padding: 15px;
-            margin: 20px 0;
             border-radius: 6px;
-            text-align: center;
+            margin-bottom: 20px;
             display: none;
+            font-weight: 500;
         }
         
         .success {
-            background: #d4edda;
+            background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
         
         .error {
-            background: #f8d7da;
+            background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
         
-        .instructions {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 6px;
-            margin-top: 30px;
-            border-left: 4px solid #3498db;
-        }
-        
-        .instructions h3 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        
-        .instructions ol {
-            padding-left: 20px;
-            line-height: 1.6;
-        }
-        
-        .instructions li {
-            margin-bottom: 8px;
-        }
-        
         .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
         }
         
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
         
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 14px;
+        }
+        
+        th {
+            background-color: #f2f6fc;
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e8f4fc;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .search-box {
+            display: flex;
+            max-width: 400px;
+        }
+        
+        .search-box input {
+            border-radius: 6px 0 0 6px;
+            margin: 0;
+        }
+        
+        .search-box button {
+            border-radius: 0 6px 6px 0;
+            padding: 12px 18px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+            gap: 8px;
+        }
+        
+        .pagination button {
+            padding: 8px 14px;
+            background-color: #f1f1f1;
+            color: #333;
+            min-width: 40px;
+        }
+        
+        .pagination button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        @media (max-width: 900px) {
+            .content {
+                flex-direction: column;
             }
             
-            .full-width {
-                grid-column: span 1;
+            .form-section {
+                border-right: none;
+                border-bottom: 1px solid #eaeaea;
             }
         }
     </style>
@@ -193,175 +271,372 @@
 <body>
     <div class="container">
         <header>
-            <h1>Заказ авто деталей</h1>
-            <p class="subtitle">Заполните форму, и мы найдем нужные детали для вашего автомобиля</p>
+            <h1>Система управления заказами запчастей</h1>
+            <p class="subtitle">Добавление и отслеживание заказов автозапчастей</p>
         </header>
         
-        <div class="form-container">
-            <div id="successMessage" class="message success">
-                Заказ успешно отправлен! Мы свяжемся с вами в ближайшее время.
+        <div class="content">
+            <div class="form-section">
+                <h2 class="section-title">Добавить новый заказ</h2>
+                <div id="statusMessage" class="status-message"></div>
+                
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="fio">ФИО:</label>
+                        <input type="text" id="fio" name="fio" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Телефон:</label>
+                        <input type="text" id="phone" name="phone" required placeholder="+7 (XXX) XXX-XX-XX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" placeholder="example@mail.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vin">VIN-код автомобиля:</label>
+                        <input type="text" id="vin" name="vin" required placeholder="WAUZZZ8TZJAXXXXXX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="brandModel">Марка и модель автомобиля:</label>
+                        <input type="text" id="brandModel" name="brandModel" required placeholder="Audi A4">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="year">Год выпуска:</label>
+                        <input type="number" id="year" name="year" required min="1990" max="2025" placeholder="2020">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="part">Название детали:</label>
+                        <input type="text" id="part" name="part" required placeholder="Тормозной диск">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="article">Артикул:</label>
+                        <input type="text" id="article" name="article" required placeholder="8W0615301M">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantity">Количество:</label>
+                        <input type="number" id="quantity" name="quantity" required min="1" value="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="comment">Дополнительная информация:</label>
+                        <textarea id="comment" name="comment" rows="3" placeholder="Особые пожелания или комментарии"></textarea>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn">
+                        <span id="submitText">Добавить заказ</span>
+                    </button>
+                </form>
             </div>
             
-            <div id="errorMessage" class="message error">
-                Произошла ошибка при отправке заказа. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.
-            </div>
-            
-            <div id="loading" class="loading">
-                <div class="loading-spinner"></div>
-                <p>Отправка данных...</p>
-            </div>
-            
-            <form id="orderForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="name" class="required">ФИО:</label>
-                        <input type="text" id="name" name="name" required>
+            <div class="table-section">
+                <h2 class="section-title">Существующие заказы</h2>
+                
+                <div class="controls">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Поиск по детали или VIN-коду...">
+                        <button id="searchBtn">Поиск</button>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="phone" class="required">Телефон:</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email" class="required">Email:</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="carBrand" class="required">Марка автомобиля:</label>
-                        <input type="text" id="carBrand" name="carBrand" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="carModel" class="required">Модель автомобиля:</label>
-                        <input type="text" id="carModel" name="carModel" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="year" class="required">Год выпуска:</label>
-                        <input type="number" id="year" name="year" min="1950" max="2023" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="partName" class="required">Название детали:</label>
-                        <input type="text" id="partName" name="partName" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="partNumber">Номер детали (если известен):</label>
-                        <input type="text" id="partNumber" name="partNumber">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="quantity" class="required">Количество:</label>
-                        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
-                    </div>
-                    
-                    <div class="form-group full-width">
-                        <label for="comments">Дополнительные комментарии:</label>
-                        <textarea id="comments" name="comments"></textarea>
+                    <div class="actions">
+                        <button id="refreshBtn" class="btn-secondary">Обновить</button>
+                        <button id="exportBtn">Экспорт</button>
                     </div>
                 </div>
                 
-                <button type="submit">Отправить заказ</button>
-            </form>
+                <div id="tableWrapper">
+                    <p style="text-align: center; padding: 20px;">Загрузка данных...</p>
+                </div>
+                
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Простая функция для отправки данных
-        function submitToGoogleAppsScript(formData) {
-            return new Promise((resolve, reject) => {
-                // Замените на ваш реальный URL Google Apps Script
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbx_-ymxh_2TxNzsSvd_qj5qn-u2l1AsQQ8LiOvYLRzIyyycG7n_hX7-H_uCkrnUp0Z5gQ/exec';
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('orderForm');
+            const statusMessage = document.getElementById('statusMessage');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const searchBtn = document.getElementById('searchBtn');
+            const searchInput = document.getElementById('searchInput');
+            const tableWrapper = document.getElementById('tableWrapper');
+            const pagination = document.getElementById('pagination');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            
+            let currentPage = 1;
+            const rowsPerPage = 10;
+            let allData = [];
+            let filteredData = [];
+            
+            // Загрузка данных при открытии страницы
+            loadData();
+            
+            // Обработка отправки формы
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
                 
-                // Создаем временную форму
-                const tempForm = document.createElement('form');
-                tempForm.method = 'POST';
-                tempForm.action = scriptUrl;
-                tempForm.style.display = 'none';
-                
-                // Добавляем данные в форму
-                Object.keys(formData).forEach(key => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = formData[key];
-                    tempForm.appendChild(input);
+                const formData = new FormData(form);
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
                 });
                 
-                // Добавляем временную форму в body
-                document.body.appendChild(tempForm);
+                // Добавляем текущую дату
+                data.date = new Date().toLocaleDateString('ru-RU');
                 
-                // Отправляем форму
-                tempForm.submit();
+                submitBtn.disabled = true;
+                submitText.innerHTML = '<div class="loading"></div> Отправка...';
                 
-                // Удаляем форму после отправки
+                // Здесь должен быть вызов Google Apps Script
+                // Для демонстрации используем setTimeout
                 setTimeout(() => {
-                    document.body.removeChild(tempForm);
-                }, 1000);
-                
-                // Считаем отправку успешной
-                resolve();
+                    showStatus('Данные успешно добавлены!', 'success');
+                    form.reset();
+                    submitBtn.disabled = false;
+                    submitText.innerHTML = 'Добавить заказ';
+                    loadData(); // Обновляем таблицу
+                    
+                    // В реальном коде замените на:
+                    /*
+                    google.script.run
+                        .withSuccessHandler(function(response) {
+                            showStatus(response, 'success');
+                            form.reset();
+                            submitBtn.disabled = false;
+                            submitText.innerHTML = 'Добавить заказ';
+                            loadData(); // Обновляем таблицу
+                        })
+                        .withFailureHandler(function(error) {
+                            showStatus('Ошибка: ' + error.message, 'error');
+                            submitBtn.disabled = false;
+                            submitText.innerHTML = 'Добавить заказ';
+                        })
+                        .submitData(data);
+                    */
+                }, 1500);
             });
-        }
-        
-        // Обработчик отправки формы
-        document.getElementById('orderForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
             
-            // Показать индикатор загрузки
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
+            // Обновление данных
+            refreshBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                loadData();
+            });
             
-            // Собрать данные формы
-            const formData = {
-                name: document.getElementById('name').value,
-                phone: document.getElementById('phone').value.replace(/\D/g, ''),
-                email: document.getElementById('email').value,
-                carBrand: document.getElementById('carBrand').value,
-                carModel: document.getElementById('carModel').value,
-                year: document.getElementById('year').value,
-                partName: document.getElementById('partName').value,
-                partNumber: document.getElementById('partNumber').value,
-                quantity: document.getElementById('quantity').value,
-                comments: document.getElementById('comments').value,
-                timestamp: new Date().toLocaleString('ru-RU')
+            // Поиск данных
+            searchBtn.addEventListener('click', function() {
+                applyFilter();
+            });
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    applyFilter();
+                }
+            });
+            
+            // Экспорт данных
+            exportBtn.addEventListener('click', function() {
+                // В реальном коде здесь будет вызов Google Apps Script для экспорта
+                showStatus('Функция экспорта будет реализована в Google Apps Script', 'success');
+            });
+            
+            function loadData() {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = 'Загрузка...';
+                tableWrapper.innerHTML = '<p style="text-align: center; padding: 20px;">Загрузка данных...</p>';
+                
+                // Здесь должен быть вызов Google Apps Script
+                // Для демонстрации используем mock данные
+                setTimeout(() => {
+                    // Mock данные для демонстрации
+                    const mockData = [
+                        ['ФИО', 'Телефон', 'Email', 'VIN-код', 'Марка и модель', 'Год', 'Деталь', 'Артикул', 'Кол-во', 'Комментарий', 'Дата'],
+                        ['Иванов А.В.', '+7 (912) 345-67-89', 'ivanov@mail.com', 'WAUZZZ8TZJA123456', 'Audi A4', '2020', 'Тормозной диск', '8W0615301M', '2', 'Передние', '12.09.2025'],
+                        ['Петров С.И.', '+7 (923) 456-78-90', 'petrov@gmail.com', 'XW8BF2FKXDR654321', 'Volkswagen Tiguan', '2019', 'Масляный фильтр', '045115562B', '1', 'Оригинал', '11.09.2025'],
+                        ['Сидорова Е.К.', '+7 (934) 567-89-01', 'sidorova@yandex.ru', 'Z94CB41SAGR321987', 'Hyundai Solaris', '2021', 'Воздушный фильтр', '28113M20000', '1', '', '10.09.2025']
+                    ];
+                    
+                    allData = mockData;
+                    filteredData = allData.slice(1); // Пропускаем заголовок
+                    displayData(currentPage);
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = 'Обновить';
+                    
+                    // В реальном коде замените на:
+                    /*
+                    google.script.run
+                        .withSuccessHandler(function(data) {
+                            allData = data;
+                            filteredData = allData.slice(1); // Пропускаем заголовок
+                            displayData(currentPage);
+                            refreshBtn.disabled = false;
+                            refreshBtn.innerHTML = 'Обновить';
+                        })
+                        .withFailureHandler(function(error) {
+                            showStatus('Ошибка загрузки данных: ' + error.message, 'error');
+                            refreshBtn.disabled = false;
+                            refreshBtn.innerHTML = 'Обновить';
+                        })
+                        .getData();
+                    */
+                }, 1000);
+            }
+            
+            function applyFilter() {
+                const searchText = searchInput.value.toLowerCase();
+                
+                if (searchText === '') {
+                    filteredData = allData.slice(1);
+                } else {
+                    filteredData = allData.slice(1).filter(row => {
+                        return row[3].toLowerCase().includes(searchText) || // VIN-код
+                               row[6].toLowerCase().includes(searchText);   // Деталь
+                    });
+                }
+                
+                currentPage = 1;
+                displayData(currentPage);
+            }
+            
+            function displayData(page) {
+                // Вычисляем индексы для отображаемых строк
+                const startIndex = (page - 1) * rowsPerPage;
+                const endIndex = startIndex + rowsPerPage;
+                const pageData = filteredData.slice(startIndex, endIndex);
+                
+                // Создаем таблицу
+                let tableHtml = `
+                    <table>
+                        <thead>
+                            <tr>
+                                ${allData[0].map(header => `<th>${header}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                if (pageData.length === 0) {
+                    tableHtml += `
+                        <tr>
+                            <td colspan="${allData[0].length}" style="text-align: center;">
+                                Нет данных для отображения
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    pageData.forEach(row => {
+                        tableHtml += `
+                            <tr>
+                                ${row.map(cell => `<td>${cell}</td>`).join('')}
+                            </tr>
+                        `;
+                    });
+                }
+                
+                tableHtml += `
+                        </tbody>
+                    </table>
+                `;
+                
+                tableWrapper.innerHTML = tableHtml;
+                
+                // Создаем пагинацию
+                createPagination(filteredData.length, page);
+            }
+            
+            function createPagination(totalRows, currentPage) {
+                const totalPages = Math.ceil(totalRows / rowsPerPage);
+                
+                if (totalPages <= 1) {
+                    pagination.innerHTML = '';
+                    return;
+                }
+                
+                let paginationHtml = '';
+                
+                // Кнопка "Назад"
+                if (currentPage > 1) {
+                    paginationHtml += `<button onclick="changePage(${currentPage - 1})">←</button>`;
+                }
+                
+                // Нумерация страниц
+                for (let i = 1; i <= totalPages; i++) {
+                    if (
+                        i === 1 || 
+                        i === totalPages || 
+                        (i >= currentPage - 1 && i <= currentPage + 1)
+                    ) {
+                        paginationHtml += `
+                            <button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>
+                                ${i}
+                            </button>
+                        `;
+                    } else if (
+                        i === currentPage - 2 ||
+                        i === currentPage + 2
+                    ) {
+                        paginationHtml += `<span style="padding: 8px 14px;">...</span>`;
+                    }
+                }
+                
+                // Кнопка "Вперед"
+                if (currentPage < totalPages) {
+                    paginationHtml += `<button onclick="changePage(${currentPage + 1})">→</button>`;
+                }
+                
+                pagination.innerHTML = paginationHtml;
+            }
+            
+            // Глобальная функция для изменения страницы (нужна для обработки onclick)
+            window.changePage = function(page) {
+                currentPage = page;
+                displayData(currentPage);
             };
             
-            try {
-                // Отправляем данные
-                await submitToGoogleAppsScript(formData);
+            function showStatus(message, type) {
+                statusMessage.textContent = message;
+                statusMessage.className = 'status-message ' + type;
+                statusMessage.style.display = 'block';
                 
-                // Показать сообщение об успехе
-                document.getElementById('successMessage').style.display = 'block';
-                document.getElementById('orderForm').reset();
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('errorMessage').style.display = 'block';
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-            }
-        });
-        
-        // Добавляем маску для телефона
-        document.getElementById('phone').addEventListener('input', function(e) {
-            const value = e.target.value.replace(/\D/g, '');
-            let formattedValue = '';
-            
-            if (value.length > 0) {
-                formattedValue = '+7 (' + value.substring(1, 4);
-            }
-            if (value.length >= 4) {
-                formattedValue += ') ' + value.substring(4, 7);
-            }
-            if (value.length >= 7) {
-                formattedValue += '-' + value.substring(7, 9);
-            }
-            if (value.length >= 9) {
-                formattedValue += '-' + value.substring(9, 11);
+                // Скрываем сообщение через 5 секунд
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
             }
             
-            e.target.value = formattedValue;
+            // Маска для телефона
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', function(e) {
+                const value = e.target.value.replace(/\D/g, '');
+                let formattedValue = '';
+                
+                if (value.length > 0) {
+                    formattedValue = '+7 (';
+                    if (value.length > 1) {
+                        formattedValue += value.substring(1, Math.min(4, value.length));
+                    }
+                    if (value.length >= 4) {
+                        formattedValue += ') ' + value.substring(4, Math.min(7, value.length));
+                    }
+                    if (value.length >= 7) {
+                        formattedValue += '-' + value.substring(7, Math.min(9, value.length));
+                    }
+                    if (value.length >= 9) {
+                        formattedValue += '-' + value.substring(9, Math.min(11, value.length));
+                    }
+                }
+                
+                e.target.value = formattedValue;
+            });
         });
     </script>
 </body>
