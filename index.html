@@ -160,7 +160,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            min-height: 44px; /* Минимальная высота для удобного касания на мобильных */
+            min-height: 44px;
         }
         
         button:hover {
@@ -360,7 +360,7 @@
             
             input, textarea, select {
                 padding: 16px;
-                font-size: 16px; /* Увеличиваем для удобства на мобильных */
+                font-size: 16px;
             }
             
             button {
@@ -385,7 +385,7 @@
                 display: block;
                 overflow-x: auto;
                 white-space: nowrap;
-                -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+                -webkit-overflow-scrolling: touch;
             }
             
             th, td {
@@ -450,14 +450,14 @@
         /* Специфические настройки для iOS */
         @supports (-webkit-touch-callout: none) {
             input, textarea, select {
-                font-size: 16px; /* Предотвращает масштабирование в iOS */
+                font-size: 16px;
             }
         }
         
         /* Специфические настройки для Android */
         @media screen and (-webkit-min-device-pixel-ratio:0) {
             select, textarea, input {
-                font-size: 16px; /* Улучшает отображение на Android */
+                font-size: 16px;
             }
         }
         
@@ -620,17 +620,9 @@
                 submitBtn.disabled = true;
                 submitText.innerHTML = 'Отправка...';
                 
-                // Здесь должен быть вызов Google Apps Script
-                // Для демонстрации используем setTimeout
-                setTimeout(() => {
-                    showStatus('Данные успешно добавлены!', 'success');
-                    form.reset();
-                    submitBtn.disabled = false;
-                    submitText.innerHTML = 'Добавить заказ';
-                    loadData(); // Обновляем таблицу
-                    
-                    // В реальном коде замените на:
-                    
+                // Проверяем, запущено ли в Google Apps Script
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    // Реальный вызов Google Apps Script
                     google.script.run
                         .withSuccessHandler(function(response) {
                             showStatus(response, 'success');
@@ -645,8 +637,41 @@
                             submitText.innerHTML = 'Добавить заказ';
                         })
                         .submitData(data);
-                    
-                }, 1500);
+                } else {
+                    // Демо-режим (для тестирования вне Google Apps Script)
+                    setTimeout(() => {
+                        showStatus('Данные успешно добавлены! (демо-режим)', 'success');
+                        form.reset();
+                        submitBtn.disabled = false;
+                        submitText.innerHTML = 'Добавить заказ';
+                        
+                        // Добавляем данные в таблицу для демонстрации
+                        const newRow = [
+                            data.fio,
+                            data.phone,
+                            data.email,
+                            data.vin,
+                            data.brandModel,
+                            data.year,
+                            data.part,
+                            data.article,
+                            data.quantity,
+                            data.comment,
+                            data.date
+                        ];
+                        
+                        if (allData.length === 0) {
+                            // Если нет данных, создаем заголовки
+                            allData = [
+                                ['ФИО', 'Телефон', 'Email', 'VIN-код', 'Марка и модель', 'Год', 'Деталь', 'Артикул', 'Кол-во', 'Комментарий', 'Дата']
+                            ];
+                        }
+                        
+                        allData.push(newRow);
+                        filteredData = allData.slice(1);
+                        displayData(currentPage);
+                    }, 1500);
+                }
             });
             
             // Обновление данных
@@ -668,8 +693,20 @@
             
             // Экспорт данных
             exportBtn.addEventListener('click', function() {
-                // В реальном коде здесь будет вызов Google Apps Script для экспорта
-                showStatus('Функция экспорта будет реализована в Google Apps Script', 'success');
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    // Реальный вызов Google Apps Script для экспорта
+                    google.script.run
+                        .withSuccessHandler(function(url) {
+                            showStatus('Данные экспортированы. Скачать можно по <a href="' + url + '" target="_blank">ссылке</a>', 'success');
+                        })
+                        .withFailureHandler(function(error) {
+                            showStatus('Ошибка экспорта: ' + error.message, 'error');
+                        })
+                        .exportData();
+                } else {
+                    // Демо-режим
+                    showStatus('Функция экспорта будет работать при подключении к Google Apps Script', 'success');
+                }
             });
             
             // Мобильное меню
@@ -682,41 +719,45 @@
                 refreshBtn.querySelector('.btn-text').textContent = 'Загрузка...';
                 tableWrapper.innerHTML = '<p style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Загрузка данных...</p>';
                 
-                // Здесь должен быть вызов Google Apps Script
-                // Для демонстрации используем mock данные
-                setTimeout(() => {
-                    // Mock данные для демонстрации
-                    const mockData = [
-                        ['ФИО', 'Телефон', 'Email', 'VIN-код', 'Марка и модель', 'Год', 'Деталь', 'Артикул', 'Кол-во', 'Комментарий', 'Дата'],
-                        ['Иванов А.В.', '+7 (912) 345-67-89', 'ivanov@mail.com', 'WAUZZZ8TZJA123456', 'Audi A4', '2020', 'Тормозной диск', '8W0615301M', '2', 'Передние', '12.09.2025'],
-                        ['Петров С.И.', '+7 (923) 456-78-90', 'petrov@gmail.com', 'XW8BF2FKXDR654321', 'Volkswagen Tiguan', '2019', 'Масляный фильтр', '045115562B', '1', 'Оригинал', '11.09.2025'],
-                        ['Сидорова Е.К.', '+7 (934) 567-89-01', 'sidorova@yandex.ru', 'Z94CB41SAGR321987', 'Hyundai Solaris', '2021', 'Воздушный фильтр', '28113M20000', '1', '', '10.09.2025']
-                    ];
-                    
-                    allData = mockData;
-                    filteredData = allData.slice(1); // Пропускаем заголовок
-                    displayData(currentPage);
-                    refreshBtn.disabled = false;
-                    refreshBtn.querySelector('.btn-text').textContent = 'Обновить';
-                    
-                    // В реальном коде замените на:
-                    
+                // Проверяем, запущено ли в Google Apps Script
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    // Реальный вызов Google Apps Script
                     google.script.run
                         .withSuccessHandler(function(data) {
                             allData = data;
-                            filteredData = allData.slice(1); // Пропускаем заголовок
+                            if (allData.length > 0) {
+                                filteredData = allData.slice(1); // Пропускаем заголовок
+                            } else {
+                                filteredData = [];
+                            }
                             displayData(currentPage);
                             refreshBtn.disabled = false;
-                            refreshBtn.innerHTML = 'Обновить';
+                            refreshBtn.querySelector('.btn-text').textContent = 'Обновить';
                         })
                         .withFailureHandler(function(error) {
                             showStatus('Ошибка загрузки данных: ' + error.message, 'error');
                             refreshBtn.disabled = false;
-                            refreshBtn.innerHTML = 'Обновить';
+                            refreshBtn.querySelector('.btn-text').textContent = 'Обновить';
                         })
                         .getData();
-                    
-                }, 1000);
+                } else {
+                    // Демо-режим (для тестирования вне Google Apps Script)
+                    setTimeout(() => {
+                        // Mock данные для демонстрации
+                        const mockData = [
+                            ['ФИО', 'Телефон', 'Email', 'VIN-код', 'Марка и модель', 'Год', 'Деталь', 'Артикул', 'Кол-во', 'Комментарий', 'Дата'],
+                            ['Иванов А.В.', '+7 (912) 345-67-89', 'ivanov@mail.com', 'WAUZZZ8TZJA123456', 'Audi A4', '2020', 'Тормозной диск', '8W0615301M', '2', 'Передние', '12.09.2025'],
+                            ['Петров С.И.', '+7 (923) 456-78-90', 'petrov@gmail.com', 'XW8BF2FKXDR654321', 'Volkswagen Tiguan', '2019', 'Масляный фильтр', '045115562B', '1', 'Оригинал', '11.09.2025'],
+                            ['Сидорова Е.К.', '+7 (934) 567-89-01', 'sidorova@yandex.ru', 'Z94CB41SAGR321987', 'Hyundai Solaris', '2021', 'Воздушный фильтр', '28113M20000', '1', '', '10.09.2025']
+                        ];
+                        
+                        allData = mockData;
+                        filteredData = allData.slice(1); // Пропускаем заголовок
+                        displayData(currentPage);
+                        refreshBtn.disabled = false;
+                        refreshBtn.querySelector('.btn-text').textContent = 'Обновить';
+                    }, 1000);
+                }
             }
             
             function applyFilter() {
@@ -746,7 +787,7 @@
                     <table>
                         <thead>
                             <tr>
-                                ${allData[0].map(header => `<th>${header}</th>`).join('')}
+                                ${allData.length > 0 ? allData[0].map(header => `<th>${header}</th>`).join('') : ''}
                             </tr>
                         </thead>
                         <tbody>
@@ -755,7 +796,7 @@
                 if (pageData.length === 0) {
                     tableHtml += `
                         <tr>
-                            <td colspan="${allData[0].length}" style="text-align: center;">
+                            <td colspan="${allData.length > 0 ? allData[0].length : 11}" style="text-align: center;">
                                 Нет данных для отображения
                             </td>
                         </tr>
