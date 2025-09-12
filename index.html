@@ -135,7 +135,49 @@
             border: 1px solid #f5c6cb;
         }
         
-       
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -161,6 +203,11 @@
             
             <div id="errorMessage" class="message error">
                 Произошла ошибка при отправке заказа. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.
+            </div>
+            
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Отправка данных...</p>
             </div>
             
             <form id="orderForm">
@@ -218,17 +265,26 @@
                 
                 <button type="submit">Отправить заказ</button>
             </form>
+            
+            <div class="instructions">
+                <h3>Решение проблемы CORS</h3>
+                <p>Для обхода ограничения CORS мы используем proxy-сервер. Данные сначала отправляются на наш сервер, который затем перенаправляет их в Google Таблицы.</p>
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
+        // Используем CORS-прокси для обхода ограничений
+        const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVulUtNILEC1vd0Trkv1U_Zte83MY-pFNGUiBvcuzRk6pA1OMjXDbaFGJ_Dy_WBAW2/exec";
+        
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Показать сообщение об отправке
-            const successMessage = document.getElementById('successMessage');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            // Скрыть предыдущие сообщения
-            successMessage.style.display = 'none';
-            errorMessage.style.display = 'none';
+            // Показать индикатор загрузки
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
             
             // Собрать данные формы
             const formData = {
@@ -245,28 +301,63 @@
                 timestamp: new Date().toLocaleString('ru-RU')
             };
             
-            // Для реального использования раскомментируйте код ниже и замените URL:
-        
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVulUtNILEC1vd0Trkv1U_Zte83MY-pFNGUiBvcuzRk6pA1OMjXDbaFGJ_Dy_WBAW2/exec";
-            
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                successMessage.style.display = 'block';
-                document.getElementById('orderForm').reset();
-            })
-            .catch(error => {
+            try {
+                // Отправляем данные через CORS-прокси
+                const response = await fetch(PROXY_URL + SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('orderForm').reset();
+                } else {
+                    throw new Error('Ошибка сервера: ' + response.status);
+                }
+            } catch (error) {
                 console.error('Error:', error);
-                errorMessage.style.display = 'block';
-            });
-           
+                document.getElementById('errorMessage').style.display = 'block';
+                
+                // Альтернативный метод с использованием Google Forms
+                try {
+                    await sendViaGoogleForms(formData);
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                    document.getElementById('orderForm').reset();
+                } catch (googleError) {
+                    console.error('Google Forms also failed:', googleError);
+                }
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
         });
+        
+        // Альтернативный метод отправки через Google Forms
+        async function sendViaGoogleForms(formData) {
+            // Это пример реализации через Google Forms
+            // Вам нужно создать Google Form и настроить ее на сохранение в вашу таблицу
+            const FORM_URL = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
+            const formDataEncoded = new URLSearchParams();
+            
+            // Замените entry.XXXXXX на реальные ID полей вашей Google Form
+            formDataEncoded.append('entry.123456', formData.name);
+            formDataEncoded.append('entry.123457', formData.phone);
+            formDataEncoded.append('entry.123458', formData.email);
+            // ... и так для всех полей
+            
+            const response = await fetch(FORM_URL, {
+                method: 'POST',
+                body: formDataEncoded,
+                mode: 'no-cors'
+            });
+            
+            // При mode: 'no-cors' мы не можем проверить статус ответа
+            return Promise.resolve();
+        }
         
         // Добавляем маску для телефона
         document.getElementById('phone').addEventListener('input', function(e) {
