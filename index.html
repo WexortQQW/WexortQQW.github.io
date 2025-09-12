@@ -321,16 +321,16 @@
         
         const formData = new FormData(form);
         const data = {
-          fio: formData.get('fio'),
-          phone: formData.get('phone'),
+          fio: formData.get('ФИО'),
+          phone: formData.get('Телефон'),
           email: formData.get('email'),
-          vin: formData.get('vin'),
-          brandModel: formData.get('brandModel'),
-          year: formData.get('year'),
-          part: formData.get('part'),
-          article: formData.get('article'),
-          quantity: formData.get('quantity'),
-          comment: formData.get('comment'),
+          vin: formData.get('Vin-code'),
+          brandModel: formData.get('Модель автомобиля'),
+          year: formData.get('Год выпуска'),
+          part: formData.get('Название детали'),
+          article: formData.get('Артикул'),
+          quantity: formData.get('Количество'),
+          comment: formData.get('Дополнительные комменатрии '),
           date: new Date().toISOString()
         };
         
