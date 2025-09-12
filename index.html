@@ -239,19 +239,6 @@
                 
                 <button type="submit">Отправить заказ</button>
             </form>
-            
-            <div class="instructions">
-                <h3>Инструкция по настройке Google Таблицы:</h3>
-                <ol>
-                    <li>Создайте скрипт в <a href="https://script.google.com/" target="_blank">Google Apps Script</a></li>
-                    <li>Вставьте код из инструкции (полный код в описании)</li>
-                    <li>Настройте развертывание как веб-приложение</li>
-                    <li>Замените URL в переменной SCRIPT_URL на полученный</li>
-                </ol>
-            </div>
-        </div>
-    </div>
-
     <script>
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -278,19 +265,6 @@
                 comments: document.getElementById('comments').value,
                 timestamp: new Date().toLocaleString('ru-RU')
             };
-            
-            // Эмуляция успешной отправки (замените на реальный код)
-            setTimeout(() => {
-                // В реальном коде здесь будет fetch запрос к Google Apps Script
-                const isSuccess = Math.random() > 0.2; // 80% шанс успеха для демонстрации
-                
-                if (isSuccess) {
-                    successMessage.style.display = 'block';
-                    document.getElementById('orderForm').reset();
-                } else {
-                    errorMessage.style.display = 'block';
-                }
-            }, 1000);
             
             // Для реального использования раскомментируйте код ниже и замените URL:
         
