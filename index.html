@@ -630,7 +630,7 @@
                     loadData(); // Обновляем таблицу
                     
                     // В реальном коде замените на:
-                    /*
+                    
                     google.script.run
                         .withSuccessHandler(function(response) {
                             showStatus(response, 'success');
@@ -645,7 +645,7 @@
                             submitText.innerHTML = 'Добавить заказ';
                         })
                         .submitData(data);
-                    */
+                    
                 }, 1500);
             });
             
@@ -700,7 +700,7 @@
                     refreshBtn.querySelector('.btn-text').textContent = 'Обновить';
                     
                     // В реальном коде замените на:
-                    /*
+                    
                     google.script.run
                         .withSuccessHandler(function(data) {
                             allData = data;
@@ -715,7 +715,7 @@
                             refreshBtn.innerHTML = 'Обновить';
                         })
                         .getData();
-                    */
+                    
                 }, 1000);
             }
             
