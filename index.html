@@ -1,933 +1,364 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Система управления заказами запчастей</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        :root {
-            --primary-color: #3498db;
-            --primary-dark: #2980b9;
-            --secondary-color: #2c3e50;
-            --accent-color: #e74c3c;
-            --light-gray: #f5f7fa;
-            --medium-gray: #ddd;
-            --dark-gray: #7f8c8d;
-            --success-color: #2ecc71;
-            --error-color: #e74c3c;
-            --text-color: #333;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: 15px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-        
-        header {
-            background: var(--secondary-color);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .mobile-menu-btn {
-            display: none;
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .content {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        
-        .form-section {
-            flex: 1;
-            min-width: 350px;
-            padding: 25px;
-            background: var(--light-gray);
-            border-right: 1px solid var(--medium-gray);
-            transition: all 0.3s ease;
-        }
-        
-        .table-section {
-            flex: 2;
-            min-width: 500px;
-            padding: 25px;
-            background: white;
-            transition: all 0.3s ease;
-        }
-        
-        .section-title {
-            font-size: 20px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--primary-color);
-            color: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-title i {
-            font-size: 22px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--secondary-color);
-        }
-        
-        input, textarea, select {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid var(--medium-gray);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            background: white;
-        }
-        
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-        
-        button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 16px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 44px;
-        }
-        
-        button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .status-message {
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            font-weight: 500;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .success {
-            background-color: rgba(46, 204, 113, 0.15);
-            color: #27ae60;
-            border: 1px solid #2ecc71;
-        }
-        
-        .error {
-            background-color: rgba(231, 76, 60, 0.15);
-            color: #c0392b;
-            border: 1px solid #e74c3c;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        th, td {
-            border: 1px solid var(--medium-gray);
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 15px;
-        }
-        
-        th {
-            background-color: #f2f6fc;
-            position: sticky;
-            top: 0;
-            font-weight: 600;
-            color: var(--secondary-color);
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        
-        tr:hover {
-            background-color: #e8f4fc;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        
-        .search-box {
-            display: flex;
-            flex: 1;
-            max-width: 500px;
-            min-width: 250px;
-        }
-        
-        .search-box input {
-            border-radius: 8px 0 0 8px;
-            margin: 0;
-            flex: 1;
-        }
-        
-        .search-box button {
-            border-radius: 0 8px 8px 0;
-            padding: 14px 18px;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 25px;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .pagination button {
-            padding: 10px 16px;
-            background-color: #f1f1f1;
-            color: #333;
-            min-width: 44px;
-            min-height: 44px;
-        }
-        
-        .pagination button.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .actions {
-            display: flex;
-            gap: 12px;
-        }
-        
-        .btn-secondary {
-            background: var(--dark-gray);
-        }
-        
-        .btn-secondary:hover {
-            background: #6c7a7d;
-        }
-        
-        .btn-danger {
-            background: var(--accent-color);
-        }
-        
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-        
-        /* Адаптивность для планшетов */
-        @media (max-width: 1024px) {
-            .form-section, .table-section {
-                min-width: 100%;
-            }
-            
-            .form-section {
-                border-right: none;
-                border-bottom: 1px solid var(--medium-gray);
-            }
-            
-            .content {
-                flex-direction: column;
-            }
-            
-            table {
-                font-size: 14px;
-            }
-            
-            th, td {
-                padding: 12px 14px;
-            }
-        }
-        
-        /* Адаптивность для мобильных устройств */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            header {
-                padding: 16px;
-            }
-            
-            h1 {
-                font-size: 20px;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .form-section, .table-section {
-                padding: 20px;
-            }
-            
-            .section-title {
-                font-size: 18px;
-            }
-            
-            input, textarea, select {
-                padding: 16px;
-                font-size: 16px;
-            }
-            
-            button {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .search-box {
-                max-width: 100%;
-            }
-            
-            .actions {
-                flex-direction: column;
-            }
-            
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            th, td {
-                padding: 12px;
-                font-size: 14px;
-            }
-            
-            .pagination {
-                gap: 5px;
-            }
-            
-            .pagination button {
-                padding: 8px 12px;
-                min-width: 40px;
-                min-height: 40px;
-            }
-        }
-        
-        /* Адаптивность для маленьких мобильных устройств */
-        @media (max-width: 480px) {
-            header {
-                padding: 14px;
-            }
-            
-            h1 {
-                font-size: 18px;
-            }
-            
-            .subtitle {
-                font-size: 12px;
-            }
-            
-            .form-section, .table-section {
-                padding: 16px;
-            }
-            
-            .section-title {
-                font-size: 16px;
-            }
-            
-            .form-group {
-                margin-bottom: 16px;
-            }
-            
-            input, textarea, select {
-                padding: 14px;
-            }
-            
-            th, td {
-                padding: 10px;
-                font-size: 12px;
-            }
-            
-            .pagination button {
-                padding: 6px 10px;
-                min-width: 36px;
-                min-height: 36px;
-                font-size: 14px;
-            }
-        }
-        
-        /* Специфические настройки для iOS */
-        @supports (-webkit-touch-callout: none) {
-            input, textarea, select {
-                font-size: 16px;
-            }
-        }
-        
-        /* Специфические настройки для Android */
-        @media screen and (-webkit-min-device-pixel-ratio:0) {
-            select, textarea, input {
-                font-size: 16px;
-            }
-        }
-        
-        /* Улучшение для очень высоких устройств */
-        @media (min-height: 1000px) {
-            .container {
-                margin: 20px auto;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Система управления заказами запчастей</title>
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2c3e50;
+      --accent-color: #e74c3c;
+      --light-color: #ecf0f1;
+      --success-color: #2ecc71;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background-color: var(--secondary-color);
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      margin-bottom: 30px;
+      border-radius: 5px;
+    }
+    
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-export {
+      background-color: var(--success-color);
+    }
+    
+    .btn-export:hover {
+      background-color: #27ae60;
+    }
+    
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -10px;
+    }
+    
+    .col {
+      flex: 1;
+      padding: 0 10px;
+      min-width: 300px;
+    }
+    
+    .message {
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+      text-align: center;
+      display: none;
+    }
+    
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .col {
+        flex: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
-                <i class="fas fa-bars"></i>
-            </button>
-            <h1>Система управления заказами запчастей</h1>
-            <p class="subtitle">Добавление и отслеживание заказов автозапчастей</p>
-        </header>
-        
-        <div class="content">
-            <div class="form-section" id="formSection">
-                <h2 class="section-title">
-                    <i class="fas fa-plus-circle"></i>
-                    Добавить новый заказ
-                </h2>
-                <div id="statusMessage" class="status-message"></div>
-                
-                <form id="orderForm">
-                    <div class="form-group">
-                        <label for="fio">ФИО:</label>
-                        <input type="text" id="fio" name="fio" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="phone">Телефон:</label>
-                        <input type="tel" id="phone" name="phone" required placeholder="+7 (XXX) XXX-XX-XX">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" placeholder="example@mail.com">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="vin">VIN-код автомобиля:</label>
-                        <input type="text" id="vin" name="vin" required placeholder="WAUZZZ8TZJAXXXXXX">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="brandModel">Марка и модель автомобиля:</label>
-                        <input type="text" id="brandModel" name="brandModel" required placeholder="Audi A4">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="year">Год выпуска:</label>
-                        <input type="number" id="year" name="year" required min="1990" max="2025" placeholder="2020">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="part">Название детали:</label>
-                        <input type="text" id="part" name="part" required placeholder="Тормозной диск">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="article">Артикул:</label>
-                        <input type="text" id="article" name="article" required placeholder="8W0615301M">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="quantity">Количество:</label>
-                        <input type="number" id="quantity" name="quantity" required min="1" value="1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="comment">Дополнительная информация:</label>
-                        <textarea id="comment" name="comment" rows="3" placeholder="Особые пожелания или комментарии"></textarea>
-                    </div>
-                    
-                    <button type="submit" id="submitBtn">
-                        <i class="fas fa-paper-plane"></i>
-                        <span id="submitText">Добавить заказ</span>
-                    </button>
-                </form>
+  <div class="container">
+    <header>
+      <h1>Система управления заказами запчастей</h1>
+      <p>Заполните форму для оформления заказа</p>
+    </header>
+    
+    <div class="card">
+      <h2>Форма заказа</h2>
+      <div id="message" class="message"></div>
+      
+      <form id="orderForm">
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="fio">ФИО:</label>
+              <input type="text" id="fio" name="fio" required>
             </div>
             
-            <div class="table-section">
-                <h2 class="section-title">
-                    <i class="fas fa-list-alt"></i>
-                    Существующие заказы
-                </h2>
-                
-                <div class="controls">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Поиск по детали или VIN-коду...">
-                        <button id="searchBtn">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                    <div class="actions">
-                        <button id="refreshBtn" class="btn-secondary">
-                            <i class="fas fa-sync-alt"></i>
-                            <span class="btn-text">Обновить</span>
-                        </button>
-                        <button id="exportBtn">
-                            <i class="fas fa-download"></i>
-                            <span class="btn-text">Экспорт</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="tableWrapper">
-                    <p style="text-align: center; padding: 20px;">
-                        <i class="fas fa-spinner fa-spin"></i> Загрузка данных...
-                    </p>
-                </div>
-                
-                <div class="pagination" id="pagination"></div>
+            <div class="form-group">
+              <label for="phone">Телефон:</label>
+              <input type="tel" id="phone" name="phone" required>
             </div>
+            
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="vin">VIN код автомобиля:</label>
+              <input type="text" id="vin" name="vin" required>
+            </div>
+          </div>
+          
+          <div class="col">
+            <div class="form-group">
+              <label for="brandModel">Марка и модель:</label>
+              <input type="text" id="brandModel" name="brandModel" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="year">Год выпуска:</label>
+              <input type="number" id="year" name="year" min="1950" max="2030" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="part">Название детали:</label>
+              <input type="text" id="part" name="part" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="article">Артикул:</label>
+              <input type="text" id="article" name="article">
+            </div>
+          </div>
         </div>
+        
+        <div class="form-group">
+          <label for="quantity">Количество:</label>
+          <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="comment">Комментарий:</label>
+          <textarea id="comment" name="comment" rows="4"></textarea>
+        </div>
+        
+        <button type="submit">Отправить заказ</button>
+      </form>
     </div>
+    
+    <div class="card">
+      <h2>Существующие заказы</h2>
+      <div class="actions">
+        <button id="refreshBtn">Обновить список</button>
+        <button id="exportBtn" class="btn-export">Экспорт в Excel</button>
+      </div>
+      <div id="ordersTable"></div>
+    </div>
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('orderForm');
-            const statusMessage = document.getElementById('statusMessage');
-            const refreshBtn = document.getElementById('refreshBtn');
-            const exportBtn = document.getElementById('exportBtn');
-            const searchBtn = document.getElementById('searchBtn');
-            const searchInput = document.getElementById('searchInput');
-            const tableWrapper = document.getElementById('tableWrapper');
-            const pagination = document.getElementById('pagination');
-            const submitBtn = document.getElementById('submitBtn');
-            const submitText = document.getElementById('submitText');
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const formSection = document.getElementById('formSection');
-            
-            let currentPage = 1;
-            const rowsPerPage = 10;
-            let allData = [];
-            let filteredData = [];
-            
-            // Загрузка данных при открытии страницы
-            loadData();
-            
-            // Обработка отправки формы
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(form);
-                const data = {};
-                formData.forEach((value, key) => {
-                    data[key] = value;
-                });
-                
-                // Добавляем текущую дату
-                data.date = new Date().toLocaleDateString('ru-RU');
-                
-                submitBtn.disabled = true;
-                submitText.innerHTML = 'Отправка...';
-                
-                // Проверяем, запущено ли в Google Apps Script
-                if (typeof google !== 'undefined' && google.script && google.script.run) {
-                    // Реальный вызов Google Apps Script
-                    google.script.run
-                        .withSuccessHandler(function(response) {
-                            showStatus(response, 'success');
-                            form.reset();
-                            submitBtn.disabled = false;
-                            submitText.innerHTML = 'Добавить заказ';
-                            loadData(); // Обновляем таблицу
-                        })
-                        .withFailureHandler(function(error) {
-                            showStatus('Ошибка: ' + error.message, 'error');
-                            submitBtn.disabled = false;
-                            submitText.innerHTML = 'Добавить заказ';
-                        })
-                        .submitData(data);
-                } else {
-                    // Демо-режим (для тестирования вне Google Apps Script)
-                    setTimeout(() => {
-                        showStatus('Данные успешно добавлены! (демо-режим)', 'success');
-                        form.reset();
-                        submitBtn.disabled = false;
-                        submitText.innerHTML = 'Добавить заказ';
-                        
-                        // Добавляем данные в таблицу для демонстрации
-                        const newRow = [
-                            data.fio,
-                            data.phone,
-                            data.email,
-                            data.vin,
-                            data.brandModel,
-                            data.year,
-                            data.part,
-                            data.article,
-                            data.quantity,
-                            data.comment,
-                            data.date
-                        ];
-                        
-                        if (allData.length === 0) {
-                            // Если нет данных, создаем заголовки
-                            allData = [
-                                ['ФИО', 'Телефон', 'Email', 'VIN-код', 'Марка и модель', 'Год', 'Деталь', 'Артикул', 'Кол-во', 'Комментарий', 'Дата']
-                            ];
-                        }
-                        
-                        allData.push(newRow);
-                        filteredData = allData.slice(1);
-                        displayData(currentPage);
-                    }, 1500);
-                }
-            });
-            
-            // Обновление данных
-            refreshBtn.addEventListener('click', function() {
-                searchInput.value = '';
-                loadData();
-            });
-            
-            // Поиск данных
-            searchBtn.addEventListener('click', function() {
-                applyFilter();
-            });
-            
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    applyFilter();
-                }
-            });
-            
-            // Экспорт данных
-            exportBtn.addEventListener('click', function() {
-                if (typeof google !== 'undefined' && google.script && google.script.run) {
-                    // Реальный вызов Google Apps Script для экспорта
-                    google.script.run
-                        .withSuccessHandler(function(url) {
-                            showStatus('Данные экспортированы. Скачать можно по <a href="' + url + '" target="_blank">ссылке</a>', 'success');
-                        })
-                        .withFailureHandler(function(error) {
-                            showStatus('Ошибка экспорта: ' + error.message, 'error');
-                        })
-                        .exportData();
-                } else {
-                    // Демо-режим
-                    showStatus('Функция экспорта будет работать при подключении к Google Apps Script', 'success');
-                }
-            });
-            
-            // Мобильное меню
-            mobileMenuBtn.addEventListener('click', function() {
-                formSection.classList.toggle('active');
-            });
-            
-            function loadData() {
-                refreshBtn.disabled = true;
-                refreshBtn.querySelector('.btn-text').textContent = 'Загрузка...';
-                tableWrapper.innerHTML = '<p style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Загрузка данных...</p>';
-                
-                // Проверяем, запущено ли в Google Apps Script
-                if (typeof google !== 'undefined' && google.script && google.script.run) {
-                    // Реальный вызов Google Apps Script
-                    google.script.run
-                        .withSuccessHandler(function(data) {
-                            allData = data;
-                            if (allData.length > 0) {
-                                filteredData = allData.slice(1); // Пропускаем заголовок
-                            } else {
-                                filteredData = [];
-                            }
-                            displayData(currentPage);
-                            refreshBtn.disabled = false;
-                            refreshBtn.querySelector('.btn-text').textContent = 'Обновить';
-                        })
-                        .withFailureHandler(function(error) {
-                            showStatus('Ошибка загрузки данных: ' + error.message, 'error');
-                            refreshBtn.disabled = false;
-                            refreshBtn.querySelector('.btn-text').textContent = 'Обновить';
-                        })
-                        .getData();
-                } else {
-                    // Демо-режим (для тестирования вне Google Apps Script)
-                    setTimeout(() => {
-                        // Mock данные для демонстрации
-                        const mockData = [
-                            ['ФИО', 'Телефон', 'Email', 'VIN-код', 'Марка и модель', 'Год', 'Деталь', 'Артикул', 'Кол-во', 'Комментарий', 'Дата'],
-                            ['Иванов А.В.', '+7 (912) 345-67-89', 'ivanov@mail.com', 'WAUZZZ8TZJA123456', 'Audi A4', '2020', 'Тормозной диск', '8W0615301M', '2', 'Передние', '12.09.2025'],
-                            ['Петров С.И.', '+7 (923) 456-78-90', 'petrov@gmail.com', 'XW8BF2FKXDR654321', 'Volkswagen Tiguan', '2019', 'Масляный фильтр', '045115562B', '1', 'Оригинал', '11.09.2025'],
-                            ['Сидорова Е.К.', '+7 (934) 567-89-01', 'sidorova@yandex.ru', 'Z94CB41SAGR321987', 'Hyundai Solaris', '2021', 'Воздушный фильтр', '28113M20000', '1', '', '10.09.2025']
-                        ];
-                        
-                        allData = mockData;
-                        filteredData = allData.slice(1); // Пропускаем заголовок
-                        displayData(currentPage);
-                        refreshBtn.disabled = false;
-                        refreshBtn.querySelector('.btn-text').textContent = 'Обновить';
-                    }, 1000);
-                }
-            }
-            
-            function applyFilter() {
-                const searchText = searchInput.value.toLowerCase();
-                
-                if (searchText === '') {
-                    filteredData = allData.slice(1);
-                } else {
-                    filteredData = allData.slice(1).filter(row => {
-                        return row[3].toLowerCase().includes(searchText) || // VIN-код
-                               row[6].toLowerCase().includes(searchText);   // Деталь
-                    });
-                }
-                
-                currentPage = 1;
-                displayData(currentPage);
-            }
-            
-            function displayData(page) {
-                // Вычисляем индексы для отображаемых строк
-                const startIndex = (page - 1) * rowsPerPage;
-                const endIndex = startIndex + rowsPerPage;
-                const pageData = filteredData.slice(startIndex, endIndex);
-                
-                // Создаем таблицу
-                let tableHtml = `
-                    <table>
-                        <thead>
-                            <tr>
-                                ${allData.length > 0 ? allData[0].map(header => `<th>${header}</th>`).join('') : ''}
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                if (pageData.length === 0) {
-                    tableHtml += `
-                        <tr>
-                            <td colspan="${allData.length > 0 ? allData[0].length : 11}" style="text-align: center;">
-                                Нет данных для отображения
-                            </td>
-                        </tr>
-                    `;
-                } else {
-                    pageData.forEach(row => {
-                        tableHtml += `
-                            <tr>
-                                ${row.map(cell => `<td>${cell}</td>`).join('')}
-                            </tr>
-                        `;
-                    });
-                }
-                
-                tableHtml += `
-                        </tbody>
-                    </table>
-                `;
-                
-                tableWrapper.innerHTML = tableHtml;
-                
-                // Создаем пагинацию
-                createPagination(filteredData.length, page);
-            }
-            
-            function createPagination(totalRows, currentPage) {
-                const totalPages = Math.ceil(totalRows / rowsPerPage);
-                
-                if (totalPages <= 1) {
-                    pagination.innerHTML = '';
-                    return;
-                }
-                
-                let paginationHtml = '';
-                
-                // Кнопка "Назад"
-                if (currentPage > 1) {
-                    paginationHtml += `<button onclick="changePage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
-                }
-                
-                // Нумерация страниц
-                for (let i = 1; i <= totalPages; i++) {
-                    if (
-                        i === 1 || 
-                        i === totalPages || 
-                        (i >= currentPage - 1 && i <= currentPage + 1)
-                    ) {
-                        paginationHtml += `
-                            <button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>
-                                ${i}
-                            </button>
-                        `;
-                    } else if (
-                        i === currentPage - 2 ||
-                        i === currentPage + 2
-                    ) {
-                        paginationHtml += `<span style="padding: 10px 6px;">...</span>`;
-                    }
-                }
-                
-                // Кнопка "Вперед"
-                if (currentPage < totalPages) {
-                    paginationHtml += `<button onclick="changePage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
-                }
-                
-                pagination.innerHTML = paginationHtml;
-            }
-            
-            // Глобальная функция для изменения страницы (нужна для обработки onclick)
-            window.changePage = function(page) {
-                currentPage = page;
-                displayData(currentPage);
-                // Прокрутка к верху таблицы
-                tableWrapper.scrollIntoView({ behavior: 'smooth' });
-            };
-            
-            function showStatus(message, type) {
-                statusMessage.innerHTML = type === 'success' 
-                    ? `<i class="fas fa-check-circle"></i> ${message}`
-                    : `<i class="fas fa-exclamation-circle"></i> ${message}`;
-                
-                statusMessage.className = 'status-message ' + type;
-                statusMessage.style.display = 'flex';
-                
-                // Скрываем сообщение через 5 секунд
-                setTimeout(() => {
-                    statusMessage.style.display = 'none';
-                }, 5000);
-            }
-            
-            // Маска для телефона
-            const phoneInput = document.getElementById('phone');
-            phoneInput.addEventListener('input', function(e) {
-                const value = e.target.value.replace(/\D/g, '');
-                let formattedValue = '';
-                
-                if (value.length > 0) {
-                    formattedValue = '+7 (';
-                    if (value.length > 1) {
-                        formattedValue += value.substring(1, Math.min(4, value.length));
-                    }
-                    if (value.length >= 4) {
-                        formattedValue += ') ' + value.substring(4, Math.min(7, value.length));
-                    }
-                    if (value.length >= 7) {
-                        formattedValue += '-' + value.substring(7, Math.min(9, value.length));
-                    }
-                    if (value.length >= 9) {
-                        formattedValue += '-' + value.substring(9, Math.min(11, value.length));
-                    }
-                }
-                
-                e.target.value = formattedValue;
-            });
-            
-            // Адаптация размера шрифта на мобильных устройствах
-            function adjustFontSize() {
-                const width = window.innerWidth;
-                if (width < 480) {
-                    document.documentElement.style.fontSize = '14px';
-                } else if (width < 768) {
-                    document.documentElement.style.fontSize = '15px';
-                } else {
-                    document.documentElement.style.fontSize = '16px';
-                }
-            }
-            
-            // Вызываем при загрузке и изменении размера окна
-            adjustFontSize();
-            window.addEventListener('resize', adjustFontSize);
-        });
-    </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('orderForm');
+      const messageDiv = document.getElementById('message');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const exportBtn = document.getElementById('exportBtn');
+      const ordersTable = document.getElementById('ordersTable');
+      
+      // Загрузить данные при загрузке страницы
+      loadOrders();
+      
+      // Обработка отправки формы
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = {
+          fio: formData.get('fio'),
+          phone: formData.get('phone'),
+          email: formData.get('email'),
+          vin: formData.get('vin'),
+          brandModel: formData.get('brandModel'),
+          year: formData.get('year'),
+          part: formData.get('part'),
+          article: formData.get('article'),
+          quantity: formData.get('quantity'),
+          comment: formData.get('comment')
+        };
+        
+        google.script.run
+          .withSuccessHandler(function(response) {
+            showMessage(response, 'success');
+            form.reset();
+            loadOrders();
+          })
+          .withFailureHandler(function(error) {
+            showMessage(error.message, 'error');
+          })
+          .submitData(data);
+      });
+      
+      // Обновление списка заказов
+      refreshBtn.addEventListener('click', loadOrders);
+      
+      // Экспорт в Excel
+      exportBtn.addEventListener('click', function() {
+        google.script.run
+          .withSuccessHandler(function(url) {
+            window.open(url, '_blank');
+          })
+          .withFailureHandler(function(error) {
+            showMessage(error.message, 'error');
+          })
+          .exportData();
+      });
+      
+      // Функция загрузки заказов
+      function loadOrders() {
+        google.script.run
+          .withSuccessHandler(function(data) {
+            renderOrders(data);
+          })
+          .withFailureHandler(function(error) {
+            showMessage(error.message, 'error');
+          })
+          .getData();
+      }
+      
+      // Функция отображения заказов в таблице
+      function renderOrders(data) {
+        if (data.length <= 1) {
+          ordersTable.innerHTML = '<p>Заказов пока нет.</p>';
+          return;
+        }
+        
+        let tableHtml = '<table><thead><tr>';
+        tableHtml += '<th>ФИО</th><th>Телефон</th><th>Email</th><th>Марка</th><th>Деталь</th><th>Дата</th>';
+        tableHtml += '</tr></thead><tbody>';
+        
+        // Пропускаем заголовок (первую строку)
+        for (let i = 1; i < data.length; i++) {
+          const row = data[i];
+          tableHtml += `<tr>
+            <td>${row[0] || ''}</td>
+            <td>${row[1] || ''}</td>
+            <td>${row[2] || ''}</td>
+            <td>${row[4] || ''}</td>
+            <td>${row[6] || ''}</td>
+            <td>${formatDate(row[10])}</td>
+          </tr>`;
+        }
+        
+        tableHtml += '</tbody></table>';
+        ordersTable.innerHTML = tableHtml;
+      }
+      
+      // Функция форматирования даты
+      function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ru-RU');
+      }
+      
+      // Функция показа сообщений
+      function showMessage(text, type) {
+        messageDiv.textContent = text;
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+        
+        // Скрыть сообщение через 5 секунд
+        setTimeout(() => {
+          messageDiv.style.display = 'none';
+        }, 5000);
+      }
+    });
+  </script>
 </body>
 </html>
