@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Система управления заказами запчастей</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -12,40 +13,72 @@
             padding: 0;
         }
         
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-gray: #f5f7fa;
+            --medium-gray: #ddd;
+            --dark-gray: #7f8c8d;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --text-color: #333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
         body {
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #333;
+            color: var(--text-color);
             line-height: 1.6;
-            padding: 20px;
+            padding: 15px;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         .container {
+            width: 100%;
             max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
             overflow: hidden;
         }
         
         header {
-            background: #2c3e50;
+            background: var(--secondary-color);
             color: white;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
+            position: relative;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
         }
         
         h1 {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .subtitle {
-            font-size: 16px;
-            opacity: 0.8;
+            font-size: 14px;
+            opacity: 0.9;
         }
         
         .content {
@@ -57,8 +90,9 @@
             flex: 1;
             min-width: 350px;
             padding: 25px;
-            background: #f8f9fa;
-            border-right: 1px solid #eaeaea;
+            background: var(--light-gray);
+            border-right: 1px solid var(--medium-gray);
+            transition: all 0.3s ease;
         }
         
         .table-section {
@@ -66,15 +100,23 @@
             min-width: 500px;
             padding: 25px;
             background: white;
+            transition: all 0.3s ease;
         }
         
         .section-title {
             font-size: 20px;
             font-weight: 500;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #3498db;
-            color: #2c3e50;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            font-size: 22px;
         }
         
         .form-group {
@@ -85,42 +127,46 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #2c3e50;
+            color: var(--secondary-color);
         }
         
         input, textarea, select {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
+            padding: 14px 16px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            font-size: 16px;
             transition: border-color 0.3s, box-shadow 0.3s;
+            background: white;
         }
         
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #3498db;
+            border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
         
         button {
-            background: #3498db;
+            background: var(--primary-color);
             color: white;
             border: none;
-            padding: 14px 25px;
-            border-radius: 6px;
+            padding: 16px 24px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 500;
-            transition: background 0.3s, transform 0.2s;
+            transition: all 0.3s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
+            min-height: 44px; /* Минимальная высота для удобного касания на мобильных */
         }
         
         button:hover {
-            background: #2980b9;
+            background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
         
         button:active {
@@ -128,23 +174,25 @@
         }
         
         .status-message {
-            padding: 15px;
-            border-radius: 6px;
+            padding: 16px;
+            border-radius: 8px;
             margin-bottom: 20px;
             display: none;
             font-weight: 500;
+            align-items: center;
+            gap: 10px;
         }
         
         .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background-color: rgba(46, 204, 113, 0.15);
+            color: #27ae60;
+            border: 1px solid #2ecc71;
         }
         
         .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background-color: rgba(231, 76, 60, 0.15);
+            color: #c0392b;
+            border: 1px solid #e74c3c;
         }
         
         .loading {
@@ -155,7 +203,6 @@
             border-radius: 50%;
             border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
         }
         
         @keyframes spin {
@@ -165,15 +212,15 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
         th, td {
-            border: 1px solid #e0e0e0;
-            padding: 12px 15px;
+            border: 1px solid var(--medium-gray);
+            padding: 14px 16px;
             text-align: left;
-            font-size: 14px;
+            font-size: 15px;
         }
         
         th {
@@ -181,7 +228,7 @@
             position: sticky;
             top: 0;
             font-weight: 600;
-            color: #2c3e50;
+            color: var(--secondary-color);
         }
         
         tr:nth-child(even) {
@@ -198,22 +245,25 @@
             align-items: center;
             margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
         
         .search-box {
             display: flex;
-            max-width: 400px;
+            flex: 1;
+            max-width: 500px;
+            min-width: 250px;
         }
         
         .search-box input {
-            border-radius: 6px 0 0 6px;
+            border-radius: 8px 0 0 8px;
             margin: 0;
+            flex: 1;
         }
         
         .search-box button {
-            border-radius: 0 6px 6px 0;
-            padding: 12px 18px;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
         }
         
         .pagination {
@@ -221,49 +271,200 @@
             justify-content: center;
             margin-top: 25px;
             gap: 8px;
+            flex-wrap: wrap;
         }
         
         .pagination button {
-            padding: 8px 14px;
+            padding: 10px 16px;
             background-color: #f1f1f1;
             color: #333;
-            min-width: 40px;
+            min-width: 44px;
+            min-height: 44px;
         }
         
         .pagination button.active {
-            background-color: #3498db;
+            background-color: var(--primary-color);
             color: white;
         }
         
         .actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
         
         .btn-secondary {
-            background: #95a5a6;
+            background: var(--dark-gray);
         }
         
         .btn-secondary:hover {
-            background: #7f8c8d;
+            background: #6c7a7d;
         }
         
         .btn-danger {
-            background: #e74c3c;
+            background: var(--accent-color);
         }
         
         .btn-danger:hover {
             background: #c0392b;
         }
         
-        @media (max-width: 900px) {
-            .content {
-                flex-direction: column;
+        /* Адаптивность для планшетов */
+        @media (max-width: 1024px) {
+            .form-section, .table-section {
+                min-width: 100%;
             }
             
             .form-section {
                 border-right: none;
-                border-bottom: 1px solid #eaeaea;
+                border-bottom: 1px solid var(--medium-gray);
+            }
+            
+            .content {
+                flex-direction: column;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 12px 14px;
+            }
+        }
+        
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 16px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .form-section, .table-section {
+                padding: 20px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+            }
+            
+            input, textarea, select {
+                padding: 16px;
+                font-size: 16px; /* Увеличиваем для удобства на мобильных */
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+            }
+            
+            th, td {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .pagination {
+                gap: 5px;
+            }
+            
+            .pagination button {
+                padding: 8px 12px;
+                min-width: 40px;
+                min-height: 40px;
+            }
+        }
+        
+        /* Адаптивность для маленьких мобильных устройств */
+        @media (max-width: 480px) {
+            header {
+                padding: 14px;
+            }
+            
+            h1 {
+                font-size: 18px;
+            }
+            
+            .subtitle {
+                font-size: 12px;
+            }
+            
+            .form-section, .table-section {
+                padding: 16px;
+            }
+            
+            .section-title {
+                font-size: 16px;
+            }
+            
+            .form-group {
+                margin-bottom: 16px;
+            }
+            
+            input, textarea, select {
+                padding: 14px;
+            }
+            
+            th, td {
+                padding: 10px;
+                font-size: 12px;
+            }
+            
+            .pagination button {
+                padding: 6px 10px;
+                min-width: 36px;
+                min-height: 36px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Специфические настройки для iOS */
+        @supports (-webkit-touch-callout: none) {
+            input, textarea, select {
+                font-size: 16px; /* Предотвращает масштабирование в iOS */
+            }
+        }
+        
+        /* Специфические настройки для Android */
+        @media screen and (-webkit-min-device-pixel-ratio:0) {
+            select, textarea, input {
+                font-size: 16px; /* Улучшает отображение на Android */
+            }
+        }
+        
+        /* Улучшение для очень высоких устройств */
+        @media (min-height: 1000px) {
+            .container {
+                margin: 20px auto;
             }
         }
     </style>
@@ -271,13 +472,19 @@
 <body>
     <div class="container">
         <header>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
             <h1>Система управления заказами запчастей</h1>
             <p class="subtitle">Добавление и отслеживание заказов автозапчастей</p>
         </header>
         
         <div class="content">
-            <div class="form-section">
-                <h2 class="section-title">Добавить новый заказ</h2>
+            <div class="form-section" id="formSection">
+                <h2 class="section-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Добавить новый заказ
+                </h2>
                 <div id="statusMessage" class="status-message"></div>
                 
                 <form id="orderForm">
@@ -288,7 +495,7 @@
                     
                     <div class="form-group">
                         <label for="phone">Телефон:</label>
-                        <input type="text" id="phone" name="phone" required placeholder="+7 (XXX) XXX-XX-XX">
+                        <input type="tel" id="phone" name="phone" required placeholder="+7 (XXX) XXX-XX-XX">
                     </div>
                     
                     <div class="form-group">
@@ -332,27 +539,41 @@
                     </div>
                     
                     <button type="submit" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i>
                         <span id="submitText">Добавить заказ</span>
                     </button>
                 </form>
             </div>
             
             <div class="table-section">
-                <h2 class="section-title">Существующие заказы</h2>
+                <h2 class="section-title">
+                    <i class="fas fa-list-alt"></i>
+                    Существующие заказы
+                </h2>
                 
                 <div class="controls">
                     <div class="search-box">
                         <input type="text" id="searchInput" placeholder="Поиск по детали или VIN-коду...">
-                        <button id="searchBtn">Поиск</button>
+                        <button id="searchBtn">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </div>
                     <div class="actions">
-                        <button id="refreshBtn" class="btn-secondary">Обновить</button>
-                        <button id="exportBtn">Экспорт</button>
+                        <button id="refreshBtn" class="btn-secondary">
+                            <i class="fas fa-sync-alt"></i>
+                            <span class="btn-text">Обновить</span>
+                        </button>
+                        <button id="exportBtn">
+                            <i class="fas fa-download"></i>
+                            <span class="btn-text">Экспорт</span>
+                        </button>
                     </div>
                 </div>
                 
                 <div id="tableWrapper">
-                    <p style="text-align: center; padding: 20px;">Загрузка данных...</p>
+                    <p style="text-align: center; padding: 20px;">
+                        <i class="fas fa-spinner fa-spin"></i> Загрузка данных...
+                    </p>
                 </div>
                 
                 <div class="pagination" id="pagination"></div>
@@ -372,6 +593,8 @@
             const pagination = document.getElementById('pagination');
             const submitBtn = document.getElementById('submitBtn');
             const submitText = document.getElementById('submitText');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const formSection = document.getElementById('formSection');
             
             let currentPage = 1;
             const rowsPerPage = 10;
@@ -395,7 +618,7 @@
                 data.date = new Date().toLocaleDateString('ru-RU');
                 
                 submitBtn.disabled = true;
-                submitText.innerHTML = '<div class="loading"></div> Отправка...';
+                submitText.innerHTML = 'Отправка...';
                 
                 // Здесь должен быть вызов Google Apps Script
                 // Для демонстрации используем setTimeout
@@ -449,10 +672,15 @@
                 showStatus('Функция экспорта будет реализована в Google Apps Script', 'success');
             });
             
+            // Мобильное меню
+            mobileMenuBtn.addEventListener('click', function() {
+                formSection.classList.toggle('active');
+            });
+            
             function loadData() {
                 refreshBtn.disabled = true;
-                refreshBtn.innerHTML = 'Загрузка...';
-                tableWrapper.innerHTML = '<p style="text-align: center; padding: 20px;">Загрузка данных...</p>';
+                refreshBtn.querySelector('.btn-text').textContent = 'Загрузка...';
+                tableWrapper.innerHTML = '<p style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Загрузка данных...</p>';
                 
                 // Здесь должен быть вызов Google Apps Script
                 // Для демонстрации используем mock данные
@@ -469,7 +697,7 @@
                     filteredData = allData.slice(1); // Пропускаем заголовок
                     displayData(currentPage);
                     refreshBtn.disabled = false;
-                    refreshBtn.innerHTML = 'Обновить';
+                    refreshBtn.querySelector('.btn-text').textContent = 'Обновить';
                     
                     // В реальном коде замените на:
                     /*
@@ -565,7 +793,7 @@
                 
                 // Кнопка "Назад"
                 if (currentPage > 1) {
-                    paginationHtml += `<button onclick="changePage(${currentPage - 1})">←</button>`;
+                    paginationHtml += `<button onclick="changePage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
                 }
                 
                 // Нумерация страниц
@@ -584,13 +812,13 @@
                         i === currentPage - 2 ||
                         i === currentPage + 2
                     ) {
-                        paginationHtml += `<span style="padding: 8px 14px;">...</span>`;
+                        paginationHtml += `<span style="padding: 10px 6px;">...</span>`;
                     }
                 }
                 
                 // Кнопка "Вперед"
                 if (currentPage < totalPages) {
-                    paginationHtml += `<button onclick="changePage(${currentPage + 1})">→</button>`;
+                    paginationHtml += `<button onclick="changePage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
                 }
                 
                 pagination.innerHTML = paginationHtml;
@@ -600,12 +828,17 @@
             window.changePage = function(page) {
                 currentPage = page;
                 displayData(currentPage);
+                // Прокрутка к верху таблицы
+                tableWrapper.scrollIntoView({ behavior: 'smooth' });
             };
             
             function showStatus(message, type) {
-                statusMessage.textContent = message;
+                statusMessage.innerHTML = type === 'success' 
+                    ? `<i class="fas fa-check-circle"></i> ${message}`
+                    : `<i class="fas fa-exclamation-circle"></i> ${message}`;
+                
                 statusMessage.className = 'status-message ' + type;
-                statusMessage.style.display = 'block';
+                statusMessage.style.display = 'flex';
                 
                 // Скрываем сообщение через 5 секунд
                 setTimeout(() => {
@@ -637,6 +870,22 @@
                 
                 e.target.value = formattedValue;
             });
+            
+            // Адаптация размера шрифта на мобильных устройствах
+            function adjustFontSize() {
+                const width = window.innerWidth;
+                if (width < 480) {
+                    document.documentElement.style.fontSize = '14px';
+                } else if (width < 768) {
+                    document.documentElement.style.fontSize = '15px';
+                } else {
+                    document.documentElement.style.fontSize = '16px';
+                }
+            }
+            
+            // Вызываем при загрузке и изменении размера окна
+            adjustFontSize();
+            window.addEventListener('resize', adjustFontSize);
         });
     </script>
 </body>
