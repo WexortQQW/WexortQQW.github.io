@@ -267,17 +267,21 @@
             </form>
             
             <div class="instructions">
-                <h3>Решение проблемы CORS</h3>
-                <p>Для обхода ограничения CORS мы используем Google Forms как промежуточное решение. Данные сначала отправляются в Google Forms, который затем сохраняет их в Google Таблицы.</p>
+                <h3>Инструкция по настройке:</h3>
+                <ol>
+                    <li>Замените SCRIPT_URL в коде на URL вашего Google Apps Script</li>
+                    <li>Убедитесь, что ваш скрипт развернут как веб-приложение</li>
+                    <li>Проверьте, что доступ установлен "Все пользователи, включая анонимных"</li>
+                </ol>
             </div>
         </div>
     </div>
 
     <script>
-        // Альтернативное решение с использованием Google Forms
-        const FORM_ACTION = "https://docs.google.com/forms/d/e/1wS8ufu519pSB-a-D4_KMHCBaXwX4z-IMpkXDyLfkC4U/formResponse";
+        // Замените этот URL на URL вашего веб-приложения Google Apps Script
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM9h2qb2zvVt4R1ZkhzYoD4g2PEEUGh_E52I2MI6Y08CUGbmirM6IIdd_VfMFhox3a1g/exec";
         
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Показать индикатор загрузки
@@ -296,62 +300,36 @@
                 partName: document.getElementById('partName').value,
                 partNumber: document.getElementById('partNumber').value,
                 quantity: document.getElementById('quantity').value,
-                comments: document.getElementById('comments').value,
-                timestamp: new Date().toLocaleString('ru-RU')
+                comments: document.getElementById('comments').value
             };
             
-            // Создать скрытую форму для отправки в Google Forms
-            const hiddenForm = document.createElement('form');
-            hiddenForm.style.display = 'none';
-            hiddenForm.method = 'POST';
-            hiddenForm.action = FORM_ACTION;
-            hiddenForm.target = 'hiddenFrame';
-            
-            // Добавить поля в форму (замените entry.XXX на реальные имена полей вашей Google Form)
-            addHiddenField(hiddenForm, 'entry.ФИО', formData.name); // ФИО
-            addHiddenField(hiddenForm, 'entry.Телефон', formData.phone); // Телефон
-            addHiddenField(hiddenForm, 'entry.Email', formData.email); // Email
-            addHiddenField(hiddenForm, 'entry.Марка автомобиля', formData.carBrand); // Марка автомобиля
-            addHiddenField(hiddenForm, 'entry.Модель автомобиля', formData.carModel); // Модель автомобиля
-            addHiddenField(hiddenForm, 'entry.Год выпуска', formData.year); // Год выпуска
-            addHiddenField(hiddenForm, 'entry.Название детали', formData.partName); // Название детали
-            addHiddenField(hiddenForm, 'entry.Артикул', formData.partNumber); // Номер детали
-            addHiddenField(hiddenForm, 'entry.Количество', formData.quantity); // Количество
-            addHiddenField(hiddenForm, 'entry.Дополнительные комменатрии ', formData.comments); // Комментарии
-            addHiddenField(hiddenForm, 'entry.Дата', formData.timestamp); // Временная метка
-            
-            // Создать скрытый iframe для обработки ответа
-            const hiddenFrame = document.createElement('iframe');
-            hiddenFrame.name = 'hiddenFrame';
-            hiddenFrame.style.display = 'none';
-            
-            // Добавить форму и iframe в документ
-            document.body.appendChild(hiddenForm);
-            document.body.appendChild(hiddenFrame);
-            
-            // Отправить форму
-            hiddenForm.submit();
-            
-            // Показать сообщение об успехе (это предположение, так как мы не можем перехватить ответ)
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('successMessage').style.display = 'block';
-                document.getElementById('orderForm').reset();
+            try {
+                // Отправляем данные
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
                 
-                // Удалить временные элементы
-                document.body.removeChild(hiddenForm);
-                document.body.removeChild(hiddenFrame);
-            }, 2000);
+                const result = await response.json();
+                
+                if (result.result === "success") {
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('orderForm').reset();
+                } else {
+                    throw new Error(result.message || "Ошибка сервера");
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').textContent = 
+                    "Ошибка при отправке: " + error.message;
+                document.getElementById('errorMessage').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
         });
-        
-        // Вспомогательная функция для добавления скрытых полей в форму
-        function addHiddenField(form, name, value) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = name;
-            input.value = value || '';
-            form.appendChild(input);
-        }
         
         // Добавляем маску для телефона
         document.getElementById('phone').addEventListener('input', function(e) {
