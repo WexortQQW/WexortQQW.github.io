@@ -5,177 +5,335 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Заказ авто деталей</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
         .container {
-            max-width: 600px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 800px;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
         }
-        h1 {
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
             text-align: center;
-            color: #333;
         }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
+        
+        .full-width {
+            grid-column: span 2;
+        }
+        
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
         }
-        input, textarea, select {
+        
+        input, select, textarea {
             width: 100%;
-            padding: 10px;
+            padding: 14px;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
         }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .required::after {
+            content: '*';
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+        
         button {
-            width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
+            background: #3498db;
             color: white;
             border: none;
-            border-radius: 4px;
+            padding: 16px 30px;
+            font-size: 18px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            width: 100%;
+            font-weight: 600;
+            transition: background 0.3s;
         }
+        
         button:hover {
-            background-color: #45a049;
+            background: #2980b9;
         }
-        .success-message {
-            background-color: #dff0d8;
-            color: #3c763d;
+        
+        .message {
             padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            text-align: center;
             display: none;
         }
-        .error-message {
-            background-color: #f2dede;
-            color: #a94442;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: none;
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .full-width {
+                grid-column: span 1;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Форма заказа авто деталей</h1>
+        <header>
+            <h1>Заказ авто деталей</h1>
+            <p class="subtitle">Заполните форму, и мы найдем нужные детали для вашего автомобиля</p>
+        </header>
         
-        <div id="successMessage" class="success-message">
-            Заказ успешно отправлен! Мы свяжемся с вами в ближайшее время.
+        <div class="form-container">
+            <div id="successMessage" class="message success">
+                Заказ успешно отправлен! Мы свяжемся с вами в ближайшее время.
+            </div>
+            
+            <div id="errorMessage" class="message error">
+                Произошла ошибка при отправке заказа. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.
+            </div>
+            
+            <form id="orderForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name" class="required">ФИО:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone" class="required">Телефон:</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="required">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carBrand" class="required">Марка автомобиля:</label>
+                        <input type="text" id="carBrand" name="carBrand" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carModel" class="required">Модель автомобиля:</label>
+                        <input type="text" id="carModel" name="carModel" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="year" class="required">Год выпуска:</label>
+                        <input type="number" id="year" name="year" min="1950" max="2023" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partName" class="required">Название детали:</label>
+                        <input type="text" id="partName" name="partName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partNumber">Номер детали (если известен):</label>
+                        <input type="text" id="partNumber" name="partNumber">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantity" class="required">Количество:</label>
+                        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="comments">Дополнительные комментарии:</label>
+                        <textarea id="comments" name="comments"></textarea>
+                    </div>
+                </div>
+                
+                <button type="submit">Отправить заказ</button>
+            </form>
+            
+            <div class="instructions">
+                <h3>Инструкция по настройке Google Таблицы:</h3>
+                <ol>
+                    <li>Создайте скрипт в <a href="https://script.google.com/" target="_blank">Google Apps Script</a></li>
+                    <li>Вставьте код из инструкции (полный код в описании)</li>
+                    <li>Настройте развертывание как веб-приложение</li>
+                    <li>Замените URL в переменной SCRIPT_URL на полученный</li>
+                </ol>
+            </div>
         </div>
-        
-        <div id="errorMessage" class="error-message">
-            Произошла ошибка при отправке заказа. Пожалуйста, попробуйте еще раз.
-        </div>
-        
-        <form id="orderForm">
-            <div class="form-group">
-                <label for="name">ФИО:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">Телефон:</label>
-                <input type="tel" id="phone" name="phone" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="carBrand">Марка автомобиля:</label>
-                <input type="text" id="carBrand" name="carBrand" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="carModel">Модель автомобиля:</label>
-                <input type="text" id="carModel" name="carModel" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="year">Год выпуска:</label>
-                <input type="number" id="year" name="year" min="1950" max="2023" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="partName">Название детали:</label>
-                <input type="text" id="partName" name="partName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="partNumber">Номер детали (если известен):</label>
-                <input type="text" id="partNumber" name="partNumber">
-            </div>
-            
-            <div class="form-group">
-                <label for="quantity">Количество:</label>
-                <input type="number" id="quantity" name="quantity" min="1" value="1" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="comments">Дополнительные комментарии:</label>
-                <textarea id="comments" name="comments" rows="4"></textarea>
-            </div>
-            
-            <button type="submit">Отправить заказ</button>
-        </form>
     </div>
 
     <script>
-        // Замените этот URL на URL вашего веб-приложения Google Apps Script
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxmkWqUvSBLVfr_iX_C838jS0iq2fSRN2k8rtC4uXDZ52PXqvb_zYljNILqNHY_wXWi/exec";
-        
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Собираем данные формы
-            const formData = new FormData(this);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
+            // Показать сообщение об отправке
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
             
-            // Добавляем временную метку
-            data.timestamp = new Date().toLocaleString();
+            // Скрыть предыдущие сообщения
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
             
-            // Отправляем данные
+            // Собрать данные формы
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                carBrand: document.getElementById('carBrand').value,
+                carModel: document.getElementById('carModel').value,
+                year: document.getElementById('year').value,
+                partName: document.getElementById('partName').value,
+                partNumber: document.getElementById('partNumber').value,
+                quantity: document.getElementById('quantity').value,
+                comments: document.getElementById('comments').value,
+                timestamp: new Date().toLocaleString('ru-RU')
+            };
+            
+            // Эмуляция успешной отправки (замените на реальный код)
+            setTimeout(() => {
+                // В реальном коде здесь будет fetch запрос к Google Apps Script
+                const isSuccess = Math.random() > 0.2; // 80% шанс успеха для демонстрации
+                
+                if (isSuccess) {
+                    successMessage.style.display = 'block';
+                    document.getElementById('orderForm').reset();
+                } else {
+                    errorMessage.style.display = 'block';
+                }
+            }, 1000);
+            
+            // Для реального использования раскомментируйте код ниже и замените URL:
+            /*
+            const SCRIPT_URL = "https://script.google.com/macros/s/ВАШ_ID_СКРИПТА/exec";
+            
             fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(formData)
             })
-            .then(() => {
-                // Показываем сообщение об успехе
-                document.getElementById('successMessage').style.display = 'block';
-                document.getElementById('errorMessage').style.display = 'none';
-                
-                // Очищаем форму
+            .then(response => response.json())
+            .then(data => {
+                successMessage.style.display = 'block';
                 document.getElementById('orderForm').reset();
             })
             .catch(error => {
-                // Показываем сообщение об ошибке
-                document.getElementById('errorMessage').style.display = 'block';
-                document.getElementById('successMessage').style.display = 'none';
                 console.error('Error:', error);
+                errorMessage.style.display = 'block';
             });
+            */
+        });
+        
+        // Добавляем маску для телефона
+        document.getElementById('phone').addEventListener('input', function(e) {
+            const value = e.target.value.replace(/\D/g, '');
+            let formattedValue = '';
+            
+            if (value.length > 0) {
+                formattedValue = '+7 (' + value.substring(1, 4);
+            }
+            if (value.length >= 4) {
+                formattedValue += ') ' + value.substring(4, 7);
+            }
+            if (value.length >= 7) {
+                formattedValue += '-' + value.substring(7, 9);
+            }
+            if (value.length >= 9) {
+                formattedValue += '-' + value.substring(9, 11);
+            }
+            
+            e.target.value = formattedValue;
         });
     </script>
 </body>
