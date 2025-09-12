@@ -268,17 +268,16 @@
             
             <div class="instructions">
                 <h3>Решение проблемы CORS</h3>
-                <p>Для обхода ограничения CORS мы используем proxy-сервер. Данные сначала отправляются на наш сервер, который затем перенаправляет их в Google Таблицы.</p>
+                <p>Для обхода ограничения CORS мы используем Google Forms как промежуточное решение. Данные сначала отправляются в Google Forms, который затем сохраняет их в Google Таблицы.</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Используем CORS-прокси для обхода ограничений
-        const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVulUtNILEC1vd0Trkv1U_Zte83MY-pFNGUiBvcuzRk6pA1OMjXDbaFGJ_Dy_WBAW2/exec";
+        // Альтернативное решение с использованием Google Forms
+        const FORM_ACTION = "https://docs.google.com/forms/d/e/1wS8ufu519pSB-a-D4_KMHCBaXwX4z-IMpkXDyLfkC4U/formResponse";
         
-        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Показать индикатор загрузки
@@ -301,62 +300,57 @@
                 timestamp: new Date().toLocaleString('ru-RU')
             };
             
-            try {
-                // Отправляем данные через CORS-прокси
-                const response = await fetch(PROXY_URL + SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                if (response.ok) {
-                    document.getElementById('successMessage').style.display = 'block';
-                    document.getElementById('orderForm').reset();
-                } else {
-                    throw new Error('Ошибка сервера: ' + response.status);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('errorMessage').style.display = 'block';
-                
-                // Альтернативный метод с использованием Google Forms
-                try {
-                    await sendViaGoogleForms(formData);
-                    document.getElementById('successMessage').style.display = 'block';
-                    document.getElementById('errorMessage').style.display = 'none';
-                    document.getElementById('orderForm').reset();
-                } catch (googleError) {
-                    console.error('Google Forms also failed:', googleError);
-                }
-            } finally {
+            // Создать скрытую форму для отправки в Google Forms
+            const hiddenForm = document.createElement('form');
+            hiddenForm.style.display = 'none';
+            hiddenForm.method = 'POST';
+            hiddenForm.action = FORM_ACTION;
+            hiddenForm.target = 'hiddenFrame';
+            
+            // Добавить поля в форму (замените entry.XXX на реальные имена полей вашей Google Form)
+            addHiddenField(hiddenForm, 'entry.ФИО', formData.name); // ФИО
+            addHiddenField(hiddenForm, 'entry.Телефон', formData.phone); // Телефон
+            addHiddenField(hiddenForm, 'entry.Email', formData.email); // Email
+            addHiddenField(hiddenForm, 'entry.Марка автомобиля', formData.carBrand); // Марка автомобиля
+            addHiddenField(hiddenForm, 'entry.Модель автомобиля', formData.carModel); // Модель автомобиля
+            addHiddenField(hiddenForm, 'entry.Год выпуска', formData.year); // Год выпуска
+            addHiddenField(hiddenForm, 'entry.Название детали', formData.partName); // Название детали
+            addHiddenField(hiddenForm, 'entry.Артикул', formData.partNumber); // Номер детали
+            addHiddenField(hiddenForm, 'entry.Количество', formData.quantity); // Количество
+            addHiddenField(hiddenForm, 'entry.Дополнительные комменатрии ', formData.comments); // Комментарии
+            addHiddenField(hiddenForm, 'entry.Дата', formData.timestamp); // Временная метка
+            
+            // Создать скрытый iframe для обработки ответа
+            const hiddenFrame = document.createElement('iframe');
+            hiddenFrame.name = 'hiddenFrame';
+            hiddenFrame.style.display = 'none';
+            
+            // Добавить форму и iframe в документ
+            document.body.appendChild(hiddenForm);
+            document.body.appendChild(hiddenFrame);
+            
+            // Отправить форму
+            hiddenForm.submit();
+            
+            // Показать сообщение об успехе (это предположение, так как мы не можем перехватить ответ)
+            setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-            }
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('orderForm').reset();
+                
+                // Удалить временные элементы
+                document.body.removeChild(hiddenForm);
+                document.body.removeChild(hiddenFrame);
+            }, 2000);
         });
         
-        // Альтернативный метод отправки через Google Forms
-        async function sendViaGoogleForms(formData) {
-            // Это пример реализации через Google Forms
-            // Вам нужно создать Google Form и настроить ее на сохранение в вашу таблицу
-            const FORM_URL = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
-            const formDataEncoded = new URLSearchParams();
-            
-            // Замените entry.XXXXXX на реальные ID полей вашей Google Form
-            formDataEncoded.append('entry.123456', formData.name);
-            formDataEncoded.append('entry.123457', formData.phone);
-            formDataEncoded.append('entry.123458', formData.email);
-            // ... и так для всех полей
-            
-            const response = await fetch(FORM_URL, {
-                method: 'POST',
-                body: formDataEncoded,
-                mode: 'no-cors'
-            });
-            
-            // При mode: 'no-cors' мы не можем проверить статус ответа
-            return Promise.resolve();
+        // Вспомогательная функция для добавления скрытых полей в форму
+        function addHiddenField(form, name, value) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value || '';
+            form.appendChild(input);
         }
         
         // Добавляем маску для телефона
