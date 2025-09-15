@@ -305,6 +305,33 @@
         // Глобальная переменная для отладки
         let debugLog = [];
         
+        // Глобальная функция для обработки ответов JSONP
+        window.handleJsonpResponse = function(response) {
+            addDebugMessage(`Получен ответ от сервера: ${JSON.stringify(response)}`);
+            
+            const submitBtn = document.querySelector('#orderForm button[type="submit"]');
+            
+            if (response.success) {
+                showAlert('Заказ успешно отправлен! Данные сохранены в таблице.', 'success');
+                addDebugMessage('Данные успешно отправлены в Google Sheets');
+                
+                // Сбрасываем форму
+                document.getElementById('orderForm').reset();
+                
+                // Устанавливаем текущую дату снова после сброса формы
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0];
+                document.getElementById('date').value = formattedDate;
+            } else {
+                showAlert('Произошла ошибка при отправке данных: ' + response.message, 'error');
+                addDebugMessage('Ошибка при отправке данных в Google Sheets: ' + response.message, 'error');
+            }
+            
+            // Восстанавливаем кнопку отправки
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
+            submitBtn.disabled = false;
+        };
+        
         // Функция для добавления сообщений в журнал отладки
         function addDebugMessage(message, type = 'info') {
             const timestamp = new Date().toLocaleTimeString();
@@ -365,47 +392,43 @@
             }, 5000);
         }
         
-        // Функция для отправки данных в Google Sheets через Google Apps Script
-        async function sendToGoogleSheets(data) {
+        // Функция для отправки данных в Google Sheets через Google Apps Script с использованием JSONP
+        function sendToGoogleSheets(data) {
             // Замените этот URL на URL вашего веб-приложения Google Apps Script
             const scriptURL = 'https://script.google.com/macros/s/1YOaatXh3Gn3xaEe7ID1F6Iz2IzDN0dJv87SvOF-_iZlNauvEHKAdVK7H/exec';
             
-            try {
-                // Формируем параметры для GET-запроса
-                const params = new URLSearchParams();
-                params.append('data', JSON.stringify({
-                    action: 'addOrder',
-                    data: data
-                }));
+            // Формируем параметры для GET-запроса
+            const params = new URLSearchParams();
+            params.append('data', JSON.stringify({
+                action: 'addOrder',
+                data: data
+            }));
+            params.append('callback', 'handleJsonpResponse');
+            
+            // Создаем тег script для JSONP
+            const script = document.createElement('script');
+            script.src = `${scriptURL}?${params.toString()}`;
+            
+            // Добавляем скрипт на страницу для выполнения запроса
+            document.body.appendChild(script);
+            
+            // Удаляем скрипт после выполнения
+            script.onload = function() {
+                document.body.removeChild(script);
+                addDebugMessage('JSONP запрос выполнен');
+            };
+            
+            script.onerror = function() {
+                document.body.removeChild(script);
+                addDebugMessage('Ошибка при выполнении JSONP запроса', 'error');
                 
-                // Отправляем GET-запрос
-                const response = await fetch(`${scriptURL}?${params.toString()}`, {
-                    method: 'GET'
-                });
+                const submitBtn = document.querySelector('#orderForm button[type="submit"]');
+                showAlert('Произошла ошибка при отправке данных', 'error');
                 
-                // Для JSONP-ответа нам нужно обработать его как текст
-                const responseText = await response.text();
-                
-                // Пытаемся распарсить JSONP ответ
-                try {
-                    // Если ответ в формате JSONP, извлекаем JSON
-                    const jsonpMatch = responseText.match(/^\w+\((.*)\)$/);
-                    if (jsonpMatch && jsonpMatch[1]) {
-                        const result = JSON.parse(jsonpMatch[1]);
-                        return result.success;
-                    } else {
-                        // Если это обычный JSON
-                        const result = JSON.parse(responseText);
-                        return result.success;
-                    }
-                } catch (e) {
-                    addDebugMessage(`Ошибка парсинга ответа: ${e}`, 'error');
-                    return false;
-                }
-            } catch (error) {
-                addDebugMessage(`Ошибка при отправке: ${error}`, 'error');
-                return false;
-            }
+                // Восстанавливаем кнопку отправки
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
+                submitBtn.disabled = false;
+            };
         }
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -418,7 +441,7 @@
             addDebugMessage(`Установлена дата по умолчанию: ${formattedDate}`);
             
             // Обработка отправки формы
-            document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            document.getElementById('orderForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 addDebugMessage('Форма отправлена, начинается обработка');
                 
@@ -457,26 +480,8 @@
                 
                 addDebugMessage(`Данные формы: ${JSON.stringify(data)}`);
                 
-                // Отправляем данные в Google Sheets
-                const isSuccess = await sendToGoogleSheets(data);
-                
-                if (isSuccess) {
-                    showAlert('Заказ успешно отправлен! Данные сохранены в таблице.', 'success');
-                    addDebugMessage('Данные успешно отправлены в Google Sheets');
-                    
-                    // Сбрасываем форму
-                    this.reset();
-                    
-                    // Устанавливаем текущую дату снова после сброса формы
-                    document.getElementById('date').value = formattedDate;
-                } else {
-                    showAlert('Произошла ошибка при отправке данных', 'error');
-                    addDebugMessage('Ошибка при отправке данных в Google Sheets', 'error');
-                }
-                
-                // Восстанавливаем кнопку отправки
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
-                submitBtn.disabled = false;
+                // Отправляем данные в Google Sheets с использованием JSONP
+                sendToGoogleSheets(data);
             });
         });
     </script>
