@@ -209,7 +209,7 @@
 
     <script>
         // URL вашего GAS веб-приложения
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycvq9X-fhLmfolL7lVly3L3R_3mYTJWFJw5TrLyXer6nIl-s1VSlbcIQWDlR6adyKH7A/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw18Wy82zoPKTLBeBPsjTXV5JvRsm8SSCXtYbtMf1ft57SzkRkoOjjfVoFqDGFF6z2HRw/exec";
         
         function switchTab(tabName) {
             // Скрыть все вкладки
@@ -230,7 +230,7 @@
             }
         }
         
-        // Обработка отправки формы с использованием CORS прокси
+        // Обработка отправки формы
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -245,12 +245,11 @@
             document.getElementById('submitBtn').disabled = true;
             
             try {
-                // Используем CORS прокси для обхода ограничений
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const response = await fetch(proxyUrl + SCRIPT_URL, {
+                // Используем прямой запрос к GAS
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain;charset=utf-8',
                     },
                     body: JSON.stringify(data)
                 });
@@ -291,9 +290,8 @@
                 if (email) url += `email=${encodeURIComponent(email)}`;
                 if (phone) url += `&phone=${encodeURIComponent(phone)}`;
                 
-                // Используем CORS прокси для обхода ограничений
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const response = await fetch(proxyUrl + url);
+                // Используем прямой запрос к GAS
+                const response = await fetch(url);
                 const result = await response.json();
                 
                 if (result.success) {
