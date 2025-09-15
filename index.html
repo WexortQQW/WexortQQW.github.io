@@ -472,11 +472,18 @@
                     const response = await fetch(scriptUrl, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
+                            'Content-Type': 'text/plain;charset=utf-8',
                         },
-                        body: JSON.stringify(formData)
+                        body: JSON.stringify(yourData),
+                        redirect: 'follow'
                     });
-                    
+                    .then(response => response.json())
+                        .then(data => {
+                          console.log('Успех:', data);
+                    })
+                        .catch(error => {
+                          console.error('Ошибка:', error);
+                    });
                     // Проверяем статус ответа
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
