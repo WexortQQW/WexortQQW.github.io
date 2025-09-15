@@ -54,6 +54,10 @@
         button:hover {
             background: #4cae4c;
         }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
         .tabs {
             display: flex;
             margin-bottom: 20px;
@@ -83,6 +87,7 @@
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 4px;
+            background-color: #f9f9f9;
         }
         .alert {
             padding: 10px;
@@ -107,10 +112,14 @@
             border-radius: 50%;
             border-top: 3px solid #3498db;
             animation: spin 1s linear infinite;
+            margin-left: 10px;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -176,7 +185,7 @@
                 </div>
                 
                 <button type="submit" id="submitBtn">Отправить заказ</button>
-                <span id="loadingIndicator" style="display:none; margin-left: 10px;" class="loading"></span>
+                <span id="loadingIndicator" class="loading hidden"></span>
             </form>
         </div>
         
@@ -192,15 +201,15 @@
             </div>
             
             <button onclick="loadOrderHistory()" id="historyBtn">Загрузить историю заказов</button>
-            <span id="historyLoading" style="display:none; margin-left: 10px;" class="loading"></span>
+            <span id="historyLoading" class="loading hidden"></span>
             
             <div id="orderHistory" class="order-history"></div>
         </div>
     </div>
 
     <script>
-        // Замените на URL вашего GAS веб-приложения
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyY7OyzrvhBTwq014Izo8NGVAGH_Q9SJ--0hEb5P3Pvu-mGzRniYtLA2zjlzywgUtDZrQ/exec";
+        // URL вашего GAS веб-приложения
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxc8AejoFRM6uiuXCUJVew5EUu_yiDzNs1vzP4DvWN6lRXnnqqWlInMaPXE3_nI7YocJw/exec";
         
         function switchTab(tabName) {
             // Скрыть все вкладки
@@ -221,8 +230,8 @@
             }
         }
         
-        // Обработка отправки формы с использованием JSONP для обхода CORS
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
+        // Обработка отправки формы с использованием CORS прокси
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
@@ -232,32 +241,39 @@
             });
             
             // Показываем индикатор загрузки
-            document.getElementById('loadingIndicator').style.display = 'inline-block';
+            document.getElementById('loadingIndicator').classList.remove('hidden');
             document.getElementById('submitBtn').disabled = true;
             
-            // Используем JSONP для обхода CORS
-            const url = SCRIPT_URL + '?callback=handleResponse&data=' + encodeURIComponent(JSON.stringify(data));
-            const script = document.createElement('script');
-            script.src = url;
-            document.body.appendChild(script);
+            try {
+                // Используем CORS прокси для обхода ограничений
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const response = await fetch(proxyUrl + SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Заказ успешно отправлен!', 'success');
+                    document.getElementById('orderForm').reset();
+                } else {
+                    showAlert('Ошибка: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Ошибка соединения: ' + error.message, 'error');
+            } finally {
+                // Скрываем индикатор загрузки
+                document.getElementById('loadingIndicator').classList.add('hidden');
+                document.getElementById('submitBtn').disabled = false;
+            }
         });
         
-        // Обработчик ответа от GAS
-        function handleResponse(response) {
-            // Убираем индикатор загрузки
-            document.getElementById('loadingIndicator').style.display = 'none';
-            document.getElementById('submitBtn').disabled = false;
-            
-            if (response.success) {
-                showAlert('Заказ успешно отправлен!', 'success');
-                document.getElementById('orderForm').reset();
-            } else {
-                showAlert('Ошибка: ' + response.error, 'error');
-            }
-        }
-        
-        // Загрузка истории заказов с использованием JSONP
-        function loadOrderHistory() {
+        // Загрузка истории заказов
+        async function loadOrderHistory() {
             const email = document.getElementById('searchEmail').value;
             const phone = document.getElementById('searchPhone').value;
             
@@ -267,28 +283,30 @@
             }
             
             // Показываем индикатор загрузки
-            document.getElementById('historyLoading').style.display = 'inline-block';
+            document.getElementById('historyLoading').classList.remove('hidden');
             document.getElementById('historyBtn').disabled = true;
             
-            let url = SCRIPT_URL + '?callback=handleHistoryResponse';
-            if (email) url += `&email=${encodeURIComponent(email)}`;
-            if (phone) url += `&phone=${encodeURIComponent(phone)}`;
-            
-            const script = document.createElement('script');
-            script.src = url;
-            document.body.appendChild(script);
-        }
-        
-        // Обработчик ответа для истории заказов
-        function handleHistoryResponse(response) {
-            // Убираем индикатор загрузки
-            document.getElementById('historyLoading').style.display = 'none';
-            document.getElementById('historyBtn').disabled = false;
-            
-            if (response.success) {
-                displayOrders(response.orders);
-            } else {
-                showAlert('Ошибка: ' + response.error, 'error', 'historyTab');
+            try {
+                let url = SCRIPT_URL + '?';
+                if (email) url += `email=${encodeURIComponent(email)}`;
+                if (phone) url += `&phone=${encodeURIComponent(phone)}`;
+                
+                // Используем CORS прокси для обхода ограничений
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const response = await fetch(proxyUrl + url);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayOrders(result.orders);
+                } else {
+                    showAlert('Ошибка: ' + result.error, 'error', 'historyTab');
+                }
+            } catch (error) {
+                showAlert('Ошибка соединения: ' + error.message, 'error', 'historyTab');
+            } finally {
+                // Скрываем индикатор загрузки
+                document.getElementById('historyLoading').classList.add('hidden');
+                document.getElementById('historyBtn').disabled = false;
             }
         }
         
@@ -296,25 +314,40 @@
         function displayOrders(orders) {
             const container = document.getElementById('orderHistory');
             
-            if (orders.length === 0) {
+            if (!orders || orders.length === 0) {
                 container.innerHTML = '<p>Заказы не найдены</p>';
                 return;
             }
             
-            container.innerHTML = orders.map(order => `
+            container.innerHTML = orders.map(order => {
+                // Форматируем дату
+                let orderDate = 'Не указана';
+                if (order.Дата) {
+                    try {
+                        orderDate = new Date(order.Дата).toLocaleString('ru-RU');
+                    } catch (e) {
+                        orderDate = order.Дата;
+                    }
+                }
+                
+                return `
                 <div class="order-item">
-                    <p><strong>Дата:</strong> ${new Date(order.Даta).toLocaleString()}</p>
+                    <p><strong>Дата:</strong> ${orderDate}</p>
                     <p><strong>ФИО:</strong> ${order.ФИО || 'Не указано'}</p>
                     <p><strong>Деталь:</strong> ${order['Название детали'] || 'Не указано'}</p>
                     <p><strong>Артикул:</strong> ${order.Артикул || 'Не указано'}</p>
                     <p><strong>Количество:</strong> ${order.Количество || '1'}</p>
-                    <p><strong>Статус:</strong> Обрабатывается</p>
+                    <p><strong>Комментарии:</strong> ${order['Дополнительные комментарии'] || 'Нет'}</p>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
         
         // Показать уведомление
         function showAlert(message, type, parentElement = 'orderTab') {
+            // Удаляем существующие уведомления
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+            
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
