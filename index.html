@@ -6,6 +6,7 @@
     <title>Auto Parts Order Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Ваши стили остаются без изменений */
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
@@ -507,29 +508,23 @@
             
             addDebugMessage(`Отправляемые данные: ${requestData}`);
             
-            // Отправляем данные через fetch API
-            fetch('https://script.google.com/macros/s/AKfycbx9y2TxXCYah7SG3ClICRZG3gDTaPoKg8AhsSPj9BAjDDjKWcSayrQwC0kewRP6lHGPSA/exec', {
-                method: 'POST',
-                body: requestData,
-                headers: {
-                    'Content-Type': 'text/plain; charset=utf-8'
-                }
-            })
-            .then(response => {
-                addDebugMessage(`Получен ответ от сервера: ${response.status} ${response.statusText}`);
-                return response.text();
-            })
-            .then(text => {
-                addDebugMessage(`Тело ответа: ${text}`);
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    addDebugMessage(`Ошибка парсинга JSON: ${e.message}`, 'error');
-                    throw new Error('Некорректный JSON в ответе сервера');
-                }
-            })
-            .then(result => {
-                if (result.success) {
+            // Используем JSONP подход для обхода CORS
+            const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+            const script = document.createElement('script');
+            
+            // Формируем URL с параметром callback
+            const url = 'https://script.google.com/macros/s/AKfycbx9y2TxXCYah7SG3ClICRZG3gDTaPoKg8AhsSPj9BAjDDjKWcSayrQwC0kewRP6lHGPSA/exec' +
+                '?data=' + encodeURIComponent(requestData) +
+                '&callback=' + callbackName;
+            
+            // Создаем callback функцию
+            window[callbackName] = function(response) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                
+                addDebugMessage(`Получен ответ от сервера: ${JSON.stringify(response)}`);
+                
+                if (response.success) {
                     showAlert('Заказ успешно добавлен! Данные сохранены в таблице.', 'success');
                     addDebugMessage('Заказ успешно обработан сервером');
                     form.reset();
@@ -539,19 +534,30 @@
                     const formattedDate = today.toISOString().split('T')[0];
                     document.getElementById('date').value = formattedDate;
                 } else {
-                    showAlert('Ошибка: ' + result.message, 'error');
-                    addDebugMessage(`Ошибка сервера: ${result.message}`, 'error');
+                    showAlert('Ошибка: ' + response.message, 'error');
+                    addDebugMessage(`Ошибка сервера: ${response.message}`, 'error');
                 }
-            })
-            .catch(error => {
-                showAlert('Ошибка при отправке данных: ' + error.message, 'error');
-                addDebugMessage(`Ошибка сети: ${error.message}`, 'error');
-            })
-            .finally(() => {
+                
                 // Восстанавливаем кнопку отправки
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
                 submitBtn.disabled = false;
-            });
+            };
+            
+            // Обработка ошибок
+            script.onerror = function() {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                
+                showAlert('Ошибка при отправке данных', 'error');
+                addDebugMessage('Ошибка сети при выполнении JSONP запроса', 'error');
+                
+                // Восстанавливаем кнопку отправки
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
+                submitBtn.disabled = false;
+            };
+            
+            script.src = url;
+            document.body.appendChild(script);
         }
     </script>
 </body>
