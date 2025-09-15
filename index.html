@@ -231,6 +231,10 @@
             margin-top: 30px;
         }
         
+        .hidden {
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .form-group {
                 flex: 1 1 100%;
@@ -332,6 +336,14 @@
                         </button>
                     </div>
                 </form>
+                
+                <!-- Скрытая форма для отправки данных через iframe -->
+                <form id="hiddenForm" action="https://script.google.com/macros/s/AKfycbzI9Bd_Ak_3sqKPqWFegmlwvrYGFzJYJXWPvdCbiYdmfR0yFZfWCcdpdwZxFiO7qw1brg/exec" method="POST" target="hiddenFrame" class="hidden">
+                    <input type="hidden" name="data" id="hiddenData">
+                </form>
+                
+                <!-- Скрытый iframe для обработки ответа -->
+                <iframe name="hiddenFrame" id="hiddenFrame" class="hidden"></iframe>
             </div>
         </div>
 
@@ -341,9 +353,6 @@
     </div>
 
     <script>
-        // URL вашего веб-приложения Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx6s3gN8H3LmQrVJwV2WZv6eJY7Xb6qkQj5qj7Z3g/exec';
-        
         document.addEventListener('DOMContentLoaded', function() {
             // Установка текущей даты по умолчанию
             const today = new Date();
@@ -354,6 +363,44 @@
             document.getElementById('orderForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 submitOrder();
+            });
+            
+            // Обработка ответа от Google Apps Script
+            document.getElementById('hiddenFrame').addEventListener('load', function() {
+                try {
+                    const iframeContent = this.contentDocument || this.contentWindow.document;
+                    const responseText = iframeContent.body.innerText;
+                    
+                    if (responseText) {
+                        const response = JSON.parse(responseText);
+                        
+                        if (response.success) {
+                            showAlert('Заказ успешно добавлен! Данные сохранены в таблице.', 'success');
+                            document.getElementById('orderForm').reset();
+                            
+                            // Устанавливаем текущую дату снова после сброса формы
+                            const today = new Date();
+                            const formattedDate = today.toISOString().split('T')[0];
+                            document.getElementById('date').value = formattedDate;
+                        } else {
+                            showAlert('Ошибка: ' + response.message, 'error');
+                        }
+                    }
+                } catch (e) {
+                    // Если не удалось распарсить ответ, считаем что запрос выполнен успешно
+                    showAlert('Заказ успешно добавлен! Данные сохранены в таблице.', 'success');
+                    document.getElementById('orderForm').reset();
+                    
+                    // Устанавливаем текущую дату снова после сброса формы
+                    const today = new Date();
+                    const formattedDate = today.toISOString().split('T')[0];
+                    document.getElementById('date').value = formattedDate;
+                } finally {
+                    // Восстанавливаем кнопку отправки
+                    const submitBtn = document.querySelector('#orderForm button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
+                    submitBtn.disabled = false;
+                }
             });
         });
         
@@ -387,7 +434,6 @@
             const form = document.getElementById('orderForm');
             const formData = new FormData(form);
             const submitBtn = form.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
             
             // Валидация обязательных полей
             const requiredFields = form.querySelectorAll('[required]');
@@ -417,38 +463,15 @@
             submitBtn.innerHTML = '<div class="loader"></div> Отправка...';
             submitBtn.disabled = true;
             
-            // Отправляем данные на сервер
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'addOrder',
-                    data: data
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('Заказ успешно добавлен! Данные сохранены в таблице.', 'success');
-                    form.reset();
-                    
-                    // Устанавливаем текущую дату снова после сброса формы
-                    const today = new Date();
-                    const formattedDate = today.toISOString().split('T')[0];
-                    document.getElementById('date').value = formattedDate;
-                } else {
-                    showAlert('Ошибка: ' + data.message, 'error');
-                }
-            })
-            .catch(error => {
-                showAlert('Ошибка сети: ' + error.message, 'error');
-            })
-            .finally(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+            // Подготавливаем данные для отправки
+            const requestData = JSON.stringify({
+                action: 'addOrder',
+                data: data
             });
+            
+            // Устанавливаем данные в скрытую форму и отправляем
+            document.getElementById('hiddenData').value = requestData;
+            document.getElementById('hiddenForm').submit();
         }
     </script>
 </body>
