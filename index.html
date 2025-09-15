@@ -301,65 +301,76 @@
                 
                 <div id="alertBox"></div>
                 
-                <form id="orderForm">
+                <form id="orderForm" action="https://docs.google.com/forms/d/e/ВАШ_ID_ФОРМЫ/formResponse" method="POST" target="hiddenFrame">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="fio" class="required">ФИО клиента</label>
-                            <input type="text" id="fio" name="fio" required>
+                            <input type="text" id="fio" name="entry.123456789" required>
+                            <!-- Замените entry.123456789 на реальный ID поля из вашей Google Form -->
                         </div>
                         <div class="form-group">
                             <label for="phone" class="required">Телефон</label>
-                            <input type="tel" id="phone" name="phone" required>
+                            <input type="tel" id="phone" name="entry.987654321" required>
+                            <!-- Замените entry.987654321 на реальный ID поля из вашей Google Form -->
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="email" class="required">Email</label>
-                            <input type="email" id="email" name="email" required>
+                            <input type="email" id="email" name="entry.111111111" required>
+                            <!-- Замените entry.111111111 на реальный ID поля из вашей Google Form -->
                         </div>
                         <div class="form-group">
                             <label for="vin" class="required">VIN код автомобиля</label>
-                            <input type="text" id="vin" name="vin" required>
+                            <input type="text" id="vin" name="entry.222222222" required>
+                            <!-- Замените entry.222222222 на реальный ID поля из вашей Google Form -->
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="brandModel" class="required">Марка и модель</label>
-                            <input type="text" id="brandModel" name="brandModel" required>
+                            <label for="brandModel" class="required">Марка и модели</label>
+                            <input type="text" id="brandModel" name="entry.333333333" required>
+                            <!-- Замените entry.333333333 на реальный ID поля из вашей Google Form -->
                         </div>
                         <div class="form-group">
                             <label for="year" class="required">Год выпуска</label>
-                            <input type="number" id="year" name="year" min="1950" max="2030" required>
+                            <input type="number" id="year" name="entry.444444444" min="1950" max="2030" required>
+                            <!-- Замените entry.444444444 на реальный ID поля из вашей Google Form -->
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="part" class="required">Название запчасти</label>
-                            <input type="text" id="part" name="part" required>
+                            <input type="text" id="part" name="entry.555555555" required>
+                            <!-- Замените entry.555555555 на реальный ID поля из вашей Google Form -->
                         </div>
                         <div class="form-group">
                             <label for="article">Артикул</label>
-                            <input type="text" id="article" name="article">
+                            <input type="text" id="article" name="entry.666666666">
+                            <!-- Замените entry.666666666 на реальный ID поля из вашей Google Form -->
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="quantity" class="required">Количество</label>
-                            <input type="number" id="quantity" name="quantity" min="1" required>
+                            <input type="number" id="quantity" name="entry.777777777" min="1" required>
+                            <!-- Замените entry.777777777 на реальный ID поля из вашей Google Form -->
                         </div>
                         <div class="form-group">
                             <label for="date" class="required">Дата заказа</label>
-                            <input type="date" id="date" name="date" required>
+                            <input type="date" id="date" name="entry.888888888" required>
+                            <!-- Замените entry.888888888 на реальный ID поля из вашей Google Form -->
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="comment">Комментарий</label>
-                        <textarea id="comment" name="comment" placeholder="Дополнительная информация о заказе..."></textarea>
+                        <textarea id="comment" name="entry.999999999" placeholder="Дополнительная информация о заказе..."></textarea>
+                        <!-- Замените entry.999999999 на реальный ID поля из вашей Google Form -->
                     </div>
                     
                     <div class="actions">
@@ -371,6 +382,9 @@
                         </button>
                     </div>
                 </form>
+                
+                <!-- Скрытый iframe для обработки ответа -->
+                <iframe name="hiddenFrame" id="hiddenFrame" class="hidden" onload="onFormSubmit()"></iframe>
                 
                 <!-- Панель отладки -->
                 <div class="debug-panel">
@@ -421,6 +435,25 @@
             }
         }
         
+        // Функция, вызываемая после отправки формы
+        function onFormSubmit() {
+            addDebugMessage('Форма отправлена в Google Forms');
+            showAlert('Заказ успешно отправлен! Данные сохранены.', 'success');
+            
+            // Сбрасываем форму
+            document.getElementById('orderForm').reset();
+            
+            // Устанавливаем текущую дату снова после сброса формы
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById('date').value = formattedDate;
+            
+            // Восстанавливаем кнопку отправки
+            const submitBtn = document.querySelector('#orderForm button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
+            submitBtn.disabled = false;
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             addDebugMessage('Страница загружена');
             
@@ -432,9 +465,34 @@
             
             // Обработка отправки формы
             document.getElementById('orderForm').addEventListener('submit', function(e) {
-                e.preventDefault();
                 addDebugMessage('Форма отправлена, начинается обработка');
-                submitOrder();
+                
+                // Валидация обязательных полей
+                const requiredFields = this.querySelectorAll('[required]');
+                let isValid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.style.borderColor = '#e74c3c';
+                        addDebugMessage(`Обязательное поле не заполнено: ${field.name}`, 'error');
+                    } else {
+                        field.style.borderColor = '#ddd';
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    showAlert('Пожалуйста, заполните все обязательные поля', 'error');
+                    return;
+                }
+                
+                // Показываем индикатор загрузки
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<div class="loader"></div> Отправка...';
+                submitBtn.disabled = true;
+                
+                addDebugMessage('Данные валидны, отправляем в Google Forms');
             });
         });
         
@@ -462,102 +520,6 @@
                     }, 500);
                 }
             }, 5000);
-        }
-        
-        function submitOrder() {
-            const form = document.getElementById('orderForm');
-            const formData = new FormData(form);
-            const submitBtn = form.querySelector('button[type="submit"]');
-            
-            // Валидация обязательных полей
-            const requiredFields = form.querySelectorAll('[required]');
-            let isValid = true;
-            
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    isValid = false;
-                    field.style.borderColor = '#e74c3c';
-                    addDebugMessage(`Обязательное поле не заполнено: ${field.name}`, 'error');
-                } else {
-                    field.style.borderColor = '#ddd';
-                }
-            });
-            
-            if (!isValid) {
-                showAlert('Пожалуйста, заполните все обязательные поля', 'error');
-                return;
-            }
-            
-            // Преобразуем FormData в объект
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-            
-            addDebugMessage(`Данные формы: ${JSON.stringify(data)}`);
-            
-            // Показываем индикатор загрузки
-            submitBtn.innerHTML = '<div class="loader"></div> Отправка...';
-            submitBtn.disabled = true;
-            
-            // Подготавливаем данные для отправки
-            const requestData = JSON.stringify({
-                action: 'addOrder',
-                data: data
-            });
-            
-            addDebugMessage(`Отправляемые данные: ${requestData}`);
-            
-            // Используем JSONP подход для обхода CORS
-            const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-            const script = document.createElement('script');
-            
-            // Формируем URL с параметром callback
-            const url = 'https://script.google.com/macros/s/AKfycbx9y2TxXCYah7SG3ClICRZG3gDTaPoKg8AhsSPj9BAjDDjKWcSayrQwC0kewRP6lHGPSA/exec' +
-                '?data=' + encodeURIComponent(requestData) +
-                '&callback=' + callbackName;
-            
-            // Создаем callback функцию
-            window[callbackName] = function(response) {
-                delete window[callbackName];
-                document.body.removeChild(script);
-                
-                addDebugMessage(`Получен ответ от сервера: ${JSON.stringify(response)}`);
-                
-                if (response.success) {
-                    showAlert('Заказ успешно добавлен! Данные сохранены в таблице.', 'success');
-                    addDebugMessage('Заказ успешно обработан сервером');
-                    form.reset();
-                    
-                    // Устанавливаем текущую дату снова после сброса формы
-                    const today = new Date();
-                    const formattedDate = today.toISOString().split('T')[0];
-                    document.getElementById('date').value = formattedDate;
-                } else {
-                    showAlert('Ошибка: ' + response.message, 'error');
-                    addDebugMessage(`Ошибка сервера: ${response.message}`, 'error');
-                }
-                
-                // Восстанавливаем кнопку отправки
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
-                submitBtn.disabled = false;
-            };
-            
-            // Обработка ошибок
-            script.onerror = function() {
-                delete window[callbackName];
-                document.body.removeChild(script);
-                
-                showAlert('Ошибка при отправке данных', 'error');
-                addDebugMessage('Ошибка сети при выполнении JSONP запроса', 'error');
-                
-                // Восстанавливаем кнопку отправки
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
-                submitBtn.disabled = false;
-            };
-            
-            script.src = url;
-            document.body.appendChild(script);
         }
     </script>
 </body>
