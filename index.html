@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Заказ автозапчастей</title>
     <style>
+        /* Стили остаются без изменений */
         :root {
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
@@ -381,7 +382,14 @@
             const historyLoading = document.getElementById('history-loading');
             
             // URL веб-приложения Google Apps Script
+            // ЗАМЕНИТЕ НА ВАШ РЕАЛЬНЫЙ URL СКРИПТА
             const scriptUrl = 'https://script.google.com/macros/s/AKfycbw18Wy82zoPKTLBeBPsjTXV5JvRsm8SSCXtYbtMf1ft57SzkRkoOjjfVoFqDGFF6z2HRw/exec';
+            
+            // Проверяем, правильно ли установлен URL скрипта
+            if (scriptUrl.includes('ВAKfycbw18Wy82zoPKTLBeBPsjTXV5JvRsm8SSCXtYbtMf1ft57SzkRkoOjjfVoFqDGFF6z2HRw')) {
+                showError('Пожалуйста, настройте URL скрипта в коде HTML');
+                console.error('Замените "ВАШ_ИДЕНТИФИКАТОР_СКРИПТА" на реальный идентификатор вашего Google Apps Script');
+            }
             
             // Переключение вкладок
             tabs.forEach(tab => {
@@ -453,6 +461,12 @@
                     return;
                 }
                 
+                // Показываем индикатор загрузки
+                const submitButton = orderForm.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.textContent;
+                submitButton.textContent = 'Отправка...';
+                submitButton.disabled = true;
+                
                 // Отправка данных
                 try {
                     const response = await fetch(scriptUrl, {
@@ -462,6 +476,11 @@
                         },
                         body: JSON.stringify(formData)
                     });
+                    
+                    // Проверяем статус ответа
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
                     
                     const result = await response.json();
                     
@@ -475,8 +494,20 @@
                         }
                     }
                 } catch (error) {
-                    showError('Ошибка сети или сервера: ' + error.message);
                     console.error('Ошибка:', error);
+                    
+                    // Более детальные сообщения об ошибках
+                    if (error.message.includes('Failed to fetch')) {
+                        showError('Не удалось подключиться к серверу. Проверьте подключение к интернету и правильность URL скрипта.');
+                    } else if (error.message.includes('HTTP error')) {
+                        showError('Ошибка сервера. Пожалуйста, попробуйте позже.');
+                    } else {
+                        showError('Произошла непредвиденная ошибка: ' + error.message);
+                    }
+                } finally {
+                    // Восстанавливаем кнопку
+                    submitButton.textContent = originalButtonText;
+                    submitButton.disabled = false;
                 }
             });
             
@@ -497,12 +528,17 @@
                 
                 historyLoading.style.display = 'block';
                 ordersContainer.innerHTML = '';
+                searchOrdersBtn.disabled = true;
                 
                 try {
                     const response = await fetch(`${scriptUrl}?${params}`);
-                    const result = await response.json();
                     
-                    historyLoading.style.display = 'none';
+                    // Проверяем статус ответа
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
                     
                     if (result.success) {
                         if (result.orders.length === 0) {
@@ -514,9 +550,19 @@
                         showError(result.error || 'Произошла ошибка при поиске заказов');
                     }
                 } catch (error) {
-                    historyLoading.style.display = 'none';
-                    showError('Ошибка сети или сервера: ' + error.message);
                     console.error('Ошибка:', error);
+                    
+                    // Более детальные сообщения об ошибках
+                    if (error.message.includes('Failed to fetch')) {
+                        showError('Не удалось подключиться к серверу. Проверьте подключение к интернету и правильность URL скрипта.');
+                    } else if (error.message.includes('HTTP error')) {
+                        showError('Ошибка сервера. Пожалуйста, попробуйте позже.');
+                    } else {
+                        showError('Произошла непредвиденная ошибка: ' + error.message);
+                    }
+                } finally {
+                    historyLoading.style.display = 'none';
+                    searchOrdersBtn.disabled = false;
                 }
             });
             
@@ -524,21 +570,41 @@
             function displayOrders(orders) {
                 ordersContainer.innerHTML = '';
                 
+                // Сортируем заказы по дате (новые сначала)
+                orders.sort((a, b) => {
+                    const dateA = a['Дата'] ? new Date(a['Дата']) : new Date(0);
+                    const dateB = b['Дата'] ? new Date(b['Дата']) : new Date(0);
+                    return dateB - dateA;
+                });
+                
                 orders.forEach(order => {
                     const orderElement = document.createElement('div');
                     orderElement.className = 'order-item';
                     
-                    const orderDate = new Date(order['Дата']).toLocaleDateString('ru-RU', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
+                    let orderDate = 'Дата не указана';
+                    if (order['Дата']) {
+                        try {
+                            const date = new Date(order['Дата']);
+                            orderDate = date.toLocaleDateString('ru-RU', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        } catch (e) {
+                            console.error('Ошибка форматирования даты:', e);
+                        }
+                    }
+                    
+                    // Генерируем ID заказа на основе даты
+                    const orderId = order['Дата'] ? 
+                        `Заказ #${new Date(order['Дата']).getTime()}` : 
+                        'Заказ без даты';
                     
                     orderElement.innerHTML = `
                         <div class="order-header">
-                            <span class="order-id">Заказ #${order['Дата'] ? order['Дата'].getTime() : ''}</span>
+                            <span class="order-id">${orderId}</span>
                             <span class="order-date">${orderDate}</span>
                             <span class="order-status">${order['Статус'] || 'Новый'}</span>
                         </div>
