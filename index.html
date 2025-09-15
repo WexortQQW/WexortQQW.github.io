@@ -468,22 +468,21 @@
                 submitButton.disabled = true;
                 
                 // Отправка данных
-                try {
-                    const response = await fetch(scriptUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'text/plain;charset=utf-8',
-                        },
-                        body: JSON.stringify(yourData),
-                        redirect: 'follow'
-                    });
-                    .then(response => response.json())
-                        .then(data => {
-                          console.log('Успех:', data);
-                    })
-                        .catch(error => {
-                          console.error('Ошибка:', error);
-                    });
+               try {
+                  const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'text/plain;charset=utf-8',
+                    },
+                    body: JSON.stringify(yourData),
+                    redirect: 'follow'
+                  });
+  
+                  const data = await response.json(); // Декодируем JSON из ответа
+                  console.log('Успех:', data);
+                } catch (error) {
+                  console.error('Ошибка:', error);
+                }
                     // Проверяем статус ответа
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
