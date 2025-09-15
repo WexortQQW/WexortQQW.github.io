@@ -25,6 +25,7 @@
         }
         .form-group {
             margin-bottom: 15px;
+            position: relative;
         }
         label {
             display: block;
@@ -37,6 +38,12 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #4cae4c;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 174, 76, 0.3);
         }
         .required::after {
             content: " *";
@@ -50,6 +57,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            transition: background 0.3s;
         }
         button:hover {
             background: #4cae4c;
@@ -61,6 +69,7 @@
         .tabs {
             display: flex;
             margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
         }
         .tab {
             padding: 10px 20px;
@@ -68,16 +77,23 @@
             background: #eee;
             border-radius: 4px 4px 0 0;
             margin-right: 5px;
+            transition: background 0.3s;
+        }
+        .tab:hover {
+            background: #e0e0e0;
         }
         .tab.active {
             background: #fff;
+            border: 1px solid #ddd;
             border-bottom: 1px solid #fff;
+            margin-bottom: -1px;
         }
         .tab-content {
             display: none;
         }
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.5s;
         }
         .order-history {
             margin-top: 20px;
@@ -88,6 +104,11 @@
             margin-bottom: 10px;
             border-radius: 4px;
             background-color: #f9f9f9;
+            transition: transform 0.2s;
+        }
+        .order-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .alert {
             padding: 10px;
@@ -114,12 +135,56 @@
             animation: spin 1s linear infinite;
             margin-left: 10px;
         }
+        .error-message {
+            color: #a94442;
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: none;
+        }
+        .form-group.error input,
+        .form-group.error textarea,
+        .form-group.error select {
+            border-color: #a94442;
+        }
+        .form-group.error .error-message {
+            display: block;
+        }
+        .form-group.success input,
+        .form-group.success textarea,
+        .form-group.success select {
+            border-color: #3c763d;
+        }
+        .search-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
         .hidden {
             display: none;
+        }
+        @media (max-width: 600px) {
+            .search-fields {
+                grid-template-columns: 1fr;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                margin-bottom: 5px;
+                border-radius: 4px;
+            }
+            .tab.active {
+                border: 1px solid #ddd;
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
@@ -137,41 +202,46 @@
                 <div class="form-group">
                     <label for="name" class="required">ФИО</label>
                     <input type="text" id="name" name="name" required>
+                    <div class="error-message" id="nameError">Пожалуйста, введите ваше ФИО</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="phone" class="required">Телефон</label>
-                    <input type="tel" id="phone" name="phone" required>
+                    <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
+                    <div class="error-message" id="phoneError">Пожалуйста, введите корректный номер телефона</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="email" class="required">Email</label>
                     <input type="email" id="email" name="email" required>
+                    <div class="error-message" id="emailError">Пожалуйста, введите корректный email адрес</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="vin">Vin-code</label>
-                    <input type="text" id="vin" name="vin">
+                    <input type="text" id="vin" name="vin" placeholder="Пример: ZFA22300005556777">
+                    <div class="error-message" id="vinError">VIN-код должен содержать 17 символов</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="carModel">Модель автомобиля</label>
-                    <input type="text" id="carModel" name="carModel">
+                    <input type="text" id="carModel" name="carModel" placeholder="Пример: Toyota Camry">
                 </div>
                 
                 <div class="form-group">
                     <label for="year">Год выпуска</label>
-                    <input type="number" id="year" name="year" min="1900" max="2099">
+                    <input type="number" id="year" name="year" min="1900" max="2099" placeholder="Год выпуска">
                 </div>
                 
                 <div class="form-group">
-                    <label for="partName">Название детали</label>
-                    <input type="text" id="partName" name="partName">
+                    <label for="partName" class="required">Название детали</label>
+                    <input type="text" id="partName" name="partName" required>
+                    <div class="error-message" id="partNameError">Пожалуйста, укажите название детали</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="article">Артикул</label>
-                    <input type="text" id="article" name="article">
+                    <input type="text" id="article" name="article" placeholder="Артикул детали (если известен)">
                 </div>
                 
                 <div class="form-group">
@@ -181,7 +251,7 @@
                 
                 <div class="form-group">
                     <label for="comments">Дополнительные комментарии</label>
-                    <textarea id="comments" name="comments" rows="4"></textarea>
+                    <textarea id="comments" name="comments" rows="4" placeholder="Дополнительная информация о детали или автомобиле"></textarea>
                 </div>
                 
                 <button type="submit" id="submitBtn">Отправить заказ</button>
@@ -190,14 +260,18 @@
         </div>
         
         <div id="historyTab" class="tab-content">
-            <div class="form-group">
-                <label for="searchEmail">Email для поиска</label>
-                <input type="email" id="searchEmail" name="searchEmail">
-            </div>
-            
-            <div class="form-group">
-                <label for="searchPhone">Телефон для поиска</label>
-                <input type="tel" id="searchPhone" name="searchPhone">
+            <div class="search-fields">
+                <div class="form-group">
+                    <label for="searchEmail">Email для поиска</label>
+                    <input type="email" id="searchEmail" name="searchEmail">
+                    <div class="error-message" id="searchEmailError">Пожалуйста, введите корректный email адрес</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="searchPhone">Телефон для поиска</label>
+                    <input type="tel" id="searchPhone" name="searchPhone" placeholder="+7 (XXX) XXX-XX-XX">
+                    <div class="error-message" id="searchPhoneError">Пожалуйста, введите корректный номер телефона</div>
+                </div>
             </div>
             
             <button onclick="loadOrderHistory()" id="historyBtn">Загрузить историю заказов</button>
@@ -230,9 +304,156 @@
             }
         }
         
+        // Валидация email
+        function validateEmail(email) {
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+        
+        // Валидация телефона
+        function validatePhone(phone) {
+            // Удаляем все нецифровые символы, кроме плюса в начале
+            const cleaned = phone.replace(/(?!^\+)\D/g, '');
+            return cleaned.length >= 11;
+        }
+        
+        // Валидация VIN-кода
+        function validateVIN(vin) {
+            if (!vin) return true; // Необязательное поле
+            return vin.length === 17;
+        }
+        
+        // Форматирование телефона
+        function formatPhone(input) {
+            // Удаляем все нецифровые символы
+            let numbers = input.value.replace(/\D/g, '');
+            
+            // Если номер начинается с 7 или 8, заменяем на +7
+            if (numbers.startsWith('7') || numbers.startsWith('8')) {
+                numbers = '7' + numbers.substring(1);
+            }
+            
+            // Форматируем номер
+            let formatted = '';
+            if (numbers.length > 0) {
+                formatted = '+7 (';
+                if (numbers.length > 1) {
+                    formatted += numbers.substring(1, 4);
+                }
+                if (numbers.length > 4) {
+                    formatted += ') ' + numbers.substring(4, 7);
+                }
+                if (numbers.length > 7) {
+                    formatted += '-' + numbers.substring(7, 9);
+                }
+                if (numbers.length > 9) {
+                    formatted += '-' + numbers.substring(9, 11);
+                }
+            }
+            
+            input.value = formatted;
+        }
+        
+        // Настройка маски для телефона
+        document.getElementById('phone').addEventListener('input', function(e) {
+            formatPhone(e.target);
+            validateField(e.target);
+        });
+        
+        document.getElementById('searchPhone').addEventListener('input', function(e) {
+            formatPhone(e.target);
+            validateField(e.target);
+        });
+        
+        // Валидация поля при вводе
+        function validateField(field) {
+            const formGroup = field.parentElement;
+            let isValid = true;
+            let errorMessage = '';
+            
+            // Сбрасываем статус
+            formGroup.classList.remove('error');
+            formGroup.classList.remove('success');
+            
+            // Проверяем обязательные поля
+            if (field.hasAttribute('required') && !field.value.trim()) {
+                isValid = false;
+                errorMessage = field.parentElement.querySelector('.error-message').textContent;
+            } else if (field.type === 'email' && field.value && !validateEmail(field.value)) {
+                isValid = false;
+                errorMessage = 'Пожалуйста, введите корректный email адрес';
+            } else if (field.type === 'tel' && field.value && !validatePhone(field.value)) {
+                isValid = false;
+                errorMessage = 'Пожалуйста, введите корректный номер телефона';
+            } else if (field.id === 'vin' && field.value && !validateVIN(field.value)) {
+                isValid = false;
+                errorMessage = 'VIN-код должен содержать 17 символов';
+            }
+            
+            // Устанавливаем статус
+            if (!isValid && field.value) {
+                formGroup.classList.add('error');
+                formGroup.querySelector('.error-message').textContent = errorMessage;
+            } else if (field.value) {
+                formGroup.classList.add('success');
+            }
+            
+            return isValid;
+        }
+        
+        // Добавляем валидацию при потере фокуса
+        const formFields = document.querySelectorAll('input, textarea');
+        formFields.forEach(field => {
+            field.addEventListener('blur', function() {
+                validateField(this);
+            });
+        });
+        
+        // Валидация всей формы
+        function validateForm() {
+            let isValid = true;
+            
+            // Проверяем все обязательные поля
+            const requiredFields = document.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                if (!validateField(field)) {
+                    isValid = false;
+                }
+            });
+            
+            // Проверяем email и телефон, даже если они не обязательные
+            const emailFields = document.querySelectorAll('input[type="email"]');
+            emailFields.forEach(field => {
+                if (field.value && !validateField(field)) {
+                    isValid = false;
+                }
+            });
+            
+            const phoneFields = document.querySelectorAll('input[type="tel"]');
+            phoneFields.forEach(field => {
+                if (field.value && !validateField(field)) {
+                    isValid = false;
+                }
+            });
+            
+            // Проверяем VIN
+            const vinField = document.getElementById('vin');
+            if (vinField.value && !validateField(vinField)) {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
         // Обработка отправки формы
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            // Валидация формы
+            if (!validateForm()) {
+                showAlert('Пожалуйста, исправьте ошибки в форме', 'error');
+                return;
+            }
             
             const formData = new FormData(this);
             const data = {};
@@ -259,6 +480,11 @@
                 if (result.success) {
                     showAlert('Заказ успешно отправлен!', 'success');
                     document.getElementById('orderForm').reset();
+                    
+                    // Сбрасываем статусы полей
+                    document.querySelectorAll('.form-group').forEach(group => {
+                        group.classList.remove('success');
+                    });
                 } else {
                     showAlert('Ошибка: ' + result.error, 'error');
                 }
@@ -276,8 +502,23 @@
             const email = document.getElementById('searchEmail').value;
             const phone = document.getElementById('searchPhone').value;
             
+            // Проверяем, что хотя бы одно поле заполнено
             if (!email && !phone) {
                 showAlert('Введите email или телефон для поиска заказов', 'error', 'historyTab');
+                return;
+            }
+            
+            // Проверяем валидность email, если он указан
+            if (email && !validateEmail(email)) {
+                document.getElementById('searchEmail').parentElement.classList.add('error');
+                showAlert('Пожалуйста, введите корректный email адрес', 'error', 'historyTab');
+                return;
+            }
+            
+            // Проверяем валидность телефона, если он указан
+            if (phone && !validatePhone(phone)) {
+                document.getElementById('searchPhone').parentElement.classList.add('error');
+                showAlert('Пожалуйста, введите корректный номер телефона', 'error', 'historyTab');
                 return;
             }
             
@@ -313,7 +554,7 @@
             const container = document.getElementById('orderHistory');
             
             if (!orders || orders.length === 0) {
-                container.innerHTML = '<p>Заказы не найдены</p>';
+                container.innerHTML = '<div class="alert alert-info">Заказы не найдены</div>';
                 return;
             }
             
@@ -332,6 +573,8 @@
                 <div class="order-item">
                     <p><strong>Дата:</strong> ${orderDate}</p>
                     <p><strong>ФИО:</strong> ${order.ФИО || 'Не указано'}</p>
+                    <p><strong>Телефон:</strong> ${order.Телефон || 'Не указано'}</p>
+                    <p><strong>Email:</strong> ${order.Email || 'Не указано'}</p>
                     <p><strong>Деталь:</strong> ${order['Название детали'] || 'Не указано'}</p>
                     <p><strong>Артикул:</strong> ${order.Артикул || 'Не указано'}</p>
                     <p><strong>Количество:</strong> ${order.Количество || '1'}</p>
