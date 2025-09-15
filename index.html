@@ -301,76 +301,77 @@
                 
                 <div id="alertBox"></div>
                 
-                <form id="orderForm" action="https://docs.google.com/forms/d/e/1wS8ufu519pSB-a-D4_KMHCBaXwX4z-IMpkXDyLfkC4U/formResponse" method="POST" target="hiddenFrame">
+                <!-- Замените YOUR_FORM_ID на реальный ID вашей Google Form -->
+                <form id="orderForm" action="https://docs.google.com/forms/d/e/1dNkfJXZfLQXRUS__JLaaTi4lJN-QwxKT--KgUqVr5FA/formResponse" method="POST" target="hiddenFrame">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="fio" class="required">ФИО клиента</label>
-                            <input type="text" id="fio" name="entry.123456789" required>
                             <!-- Замените entry.123456789 на реальный ID поля из вашей Google Form -->
+                            <input type="text" id="fio" name="entry.123456789" required>
                         </div>
                         <div class="form-group">
                             <label for="phone" class="required">Телефон</label>
-                            <input type="tel" id="phone" name="entry.987654321" required>
                             <!-- Замените entry.987654321 на реальный ID поля из вашей Google Form -->
+                            <input type="tel" id="phone" name="entry.987654321" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="email" class="required">Email</label>
-                            <input type="email" id="email" name="entry.111111111" required>
                             <!-- Замените entry.111111111 на реальный ID поля из вашей Google Form -->
+                            <input type="email" id="email" name="entry.111111111" required>
                         </div>
                         <div class="form-group">
                             <label for="vin" class="required">VIN код автомобиля</label>
-                            <input type="text" id="vin" name="entry.222222222" required>
                             <!-- Замените entry.222222222 на реальный ID поля из вашей Google Form -->
+                            <input type="text" id="vin" name="entry.222222222" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="brandModel" class="required">Марка и модели</label>
-                            <input type="text" id="brandModel" name="entry.333333333" required>
+                            <label for="brandModel" class="required">Марка и модель</label>
                             <!-- Замените entry.333333333 на реальный ID поля из вашей Google Form -->
+                            <input type="text" id="brandModel" name="entry.333333333" required>
                         </div>
                         <div class="form-group">
                             <label for="year" class="required">Год выпуска</label>
-                            <input type="number" id="year" name="entry.444444444" min="1950" max="2030" required>
                             <!-- Замените entry.444444444 на реальный ID поля из вашей Google Form -->
+                            <input type="number" id="year" name="entry.444444444" min="1950" max="2030" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="part" class="required">Название запчасти</label>
-                            <input type="text" id="part" name="entry.555555555" required>
                             <!-- Замените entry.555555555 на реальный ID поля из вашей Google Form -->
+                            <input type="text" id="part" name="entry.555555555" required>
                         </div>
                         <div class="form-group">
                             <label for="article">Артикул</label>
-                            <input type="text" id="article" name="entry.666666666">
                             <!-- Замените entry.666666666 на реальный ID поля из вашей Google Form -->
+                            <input type="text" id="article" name="entry.666666666">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="quantity" class="required">Количество</label>
-                            <input type="number" id="quantity" name="entry.777777777" min="1" required>
                             <!-- Замените entry.777777777 на реальный ID поля из вашей Google Form -->
+                            <input type="number" id="quantity" name="entry.777777777" min="1" required>
                         </div>
                         <div class="form-group">
                             <label for="date" class="required">Дата заказа</label>
-                            <input type="date" id="date" name="entry.888888888" required>
                             <!-- Замените entry.888888888 на реальный ID поля из вашей Google Form -->
+                            <input type="date" id="date" name="entry.888888888" required>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="comment">Комментарий</label>
-                        <textarea id="comment" name="entry.999999999" placeholder="Дополнительная информация о заказе..."></textarea>
                         <!-- Замените entry.999999999 на реальный ID поля из вашей Google Form -->
+                        <textarea id="comment" name="entry.999999999" placeholder="Дополнительная информация о заказе..."></textarea>
                     </div>
                     
                     <div class="actions">
@@ -438,7 +439,24 @@
         // Функция, вызываемая после отправки формы
         function onFormSubmit() {
             addDebugMessage('Форма отправлена в Google Forms');
-            showAlert('Заказ успешно отправлен! Данные сохранены.', 'success');
+            
+            try {
+                // Проверяем, успешно ли отправлена форма
+                const iframe = document.getElementById('hiddenFrame');
+                const iframeContent = iframe.contentDocument || iframe.contentWindow.document;
+                
+                if (iframeContent.body.innerHTML.includes('Ваш ответ был записан')) {
+                    showAlert('Заказ успешно отправлен! Данные сохранены.', 'success');
+                    addDebugMessage('Данные успешно отправлены в Google Forms');
+                } else {
+                    showAlert('Произошла ошибка при отправке формы', 'error');
+                    addDebugMessage('Ошибка при отправке данных в Google Forms', 'error');
+                }
+            } catch (e) {
+                // Если не удалось проверить содержимое iframe, предполагаем успех
+                showAlert('Заказ успешно отправлен! Данные сохранены.', 'success');
+                addDebugMessage('Данные отправлены в Google Forms (проверка не удалась)');
+            }
             
             // Сбрасываем форму
             document.getElementById('orderForm').reset();
@@ -493,6 +511,14 @@
                 submitBtn.disabled = true;
                 
                 addDebugMessage('Данные валидны, отправляем в Google Forms');
+                
+                // Логируем данные формы
+                const formData = new FormData(this);
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+                addDebugMessage(`Данные формы: ${JSON.stringify(data)}`);
             });
         });
         
