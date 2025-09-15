@@ -3,604 +3,616 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заказ авто деталей</title>
+    <title>Заказ автозапчастей</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1, h2 {
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-            position: relative;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        
+        * {
             box-sizing: border-box;
-            transition: border-color 0.3s;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        input:focus, textarea:focus, select:focus {
-            border-color: #4cae4c;
-            outline: none;
-            box-shadow: 0 0 5px rgba(76, 174, 76, 0.3);
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
         }
-        .required::after {
-            content: " *";
-            color: red;
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        button {
-            background: #5cb85c;
+        
+        header {
+            background-color: var(--primary-color);
             color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+            margin-bottom: 20px;
         }
-        button:hover {
-            background: #4cae4c;
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
         }
-        button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
+        
         .tabs {
             display: flex;
             margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
         }
+        
         .tab {
-            padding: 10px 20px;
+            flex: 1;
+            padding: 15px;
+            text-align: center;
             cursor: pointer;
-            background: #eee;
-            border-radius: 4px 4px 0 0;
-            margin-right: 5px;
-            transition: background 0.3s;
+            background-color: var(--light-color);
+            transition: background-color 0.3s;
         }
-        .tab:hover {
-            background: #e0e0e0;
-        }
+        
         .tab.active {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-bottom: 1px solid #fff;
-            margin-bottom: -1px;
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: bold;
         }
+        
         .tab-content {
             display: none;
+            background-color: white;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+        
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.5s;
         }
-        .order-history {
-            margin-top: 20px;
+        
+        .form-group {
+            margin-bottom: 20px;
         }
-        .order-item {
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
             border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
             border-radius: 4px;
-            background-color: #f9f9f9;
-            transition: transform 0.2s;
+            font-size: 16px;
+            transition: border 0.3s;
         }
-        .order-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        
+        input:focus, textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
         }
+        
+        .required::after {
+            content: '*';
+            color: var(--error-color);
+            margin-left: 4px;
+        }
+        
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        
+        .col {
+            flex: 1;
+            padding: 0 10px;
+            min-width: 250px;
+        }
+        
         .alert {
-            padding: 10px;
-            margin-bottom: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
             border-radius: 4px;
-        }
-        .alert-success {
-            background-color: #dff0d8;
-            border-color: #d6e9c6;
-            color: #3c763d;
-        }
-        .alert-error {
-            background-color: #f2dede;
-            border-color: #ebccd1;
-            color: #a94442;
-        }
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 3px solid #3498db;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-        .error-message {
-            color: #a94442;
-            font-size: 0.85em;
-            margin-top: 5px;
             display: none;
         }
-        .form-group.error input,
-        .form-group.error textarea,
-        .form-group.error select {
-            border-color: #a94442;
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
-        .form-group.error .error-message {
-            display: block;
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
-        .form-group.success input,
-        .form-group.success textarea,
-        .form-group.success select {
-            border-color: #3c763d;
+        
+        .order-history {
+            margin-top: 30px;
         }
-        .search-fields {
+        
+        .order-item {
+            background-color: var(--light-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .order-id {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .order-date {
+            color: #7f8c8d;
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .order-details {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
         }
+        
+        .detail-item strong {
+            display: block;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .hidden {
-            display: none;
-        }
-        @media (max-width: 600px) {
-            .search-fields {
-                grid-template-columns: 1fr;
-            }
-            .tabs {
+        
+        @media (max-width: 768px) {
+            .row {
                 flex-direction: column;
             }
-            .tab {
-                margin-bottom: 5px;
-                border-radius: 4px;
+            
+            .col {
+                width: 100%;
+                margin-bottom: 15px;
             }
-            .tab.active {
-                border: 1px solid #ddd;
-                margin-bottom: 5px;
+            
+            .order-details {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Заказ авто деталей</h1>
+        <header>
+            <h1>Заказ автозапчастей</h1>
+            <p>Заполните форму для оформления заказа или проверьте статус существующих заказов</p>
+        </header>
         
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('order')">Новый заказ</div>
-            <div class="tab" onclick="switchTab('history')">История заказов</div>
+            <div class="tab active" data-tab="new-order">Новый заказ</div>
+            <div class="tab" data-tab="order-history">История заказов</div>
         </div>
         
-        <div id="orderTab" class="tab-content active">
-            <form id="orderForm">
-                <div class="form-group">
-                    <label for="name" class="required">ФИО</label>
-                    <input type="text" id="name" name="name" required>
-                    <div class="error-message" id="nameError">Пожалуйста, введите ваше ФИО</div>
+        <div class="alert alert-success" id="success-alert"></div>
+        <div class="alert alert-error" id="error-alert"></div>
+        
+        <div class="tab-content active" id="new-order">
+            <form id="order-form">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="name" class="required">ФИО</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="phone" class="required">Телефон</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+7 (999) 123-45-67" required>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="phone" class="required">Телефон</label>
-                    <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
-                    <div class="error-message" id="phoneError">Пожалуйста, введите корректный номер телефона</div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="email" class="required">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="carModel">Модель автомобиля</label>
+                            <input type="text" id="carModel" name="carModel">
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="email" class="required">Email</label>
-                    <input type="email" id="email" name="email" required>
-                    <div class="error-message" id="emailError">Пожалуйста, введите корректный email адрес</div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="year">Год выпуска</label>
+                            <input type="number" id="year" name="year" min="1950" max="2030">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="vin">VIN-код</label>
+                            <input type="text" id="vin" name="vin" maxlength="17">
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="vin">Vin-code</label>
-                    <input type="text" id="vin" name="vin" placeholder="Пример: ZFA22300005556777">
-                    <div class="error-message" id="vinError">VIN-код должен содержать 17 символов</div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="partName" class="required">Название детали</label>
+                            <input type="text" id="partName" name="partName" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="article">Артикул</label>
+                            <input type="text" id="article" name="article">
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="carModel">Модель автомобиля</label>
-                    <input type="text" id="carModel" name="carModel" placeholder="Пример: Toyota Camry">
-                </div>
-                
-                <div class="form-group">
-                    <label for="year">Год выпуска</label>
-                    <input type="number" id="year" name="year" min="1900" max="2099" placeholder="Год выпуска">
-                </div>
-                
-                <div class="form-group">
-                    <label for="partName" class="required">Название детали</label>
-                    <input type="text" id="partName" name="partName" required>
-                    <div class="error-message" id="partNameError">Пожалуйста, укажите название детали</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="article">Артикул</label>
-                    <input type="text" id="article" name="article" placeholder="Артикул детали (если известен)">
-                </div>
-                
-                <div class="form-group">
-                    <label for="quantity">Количество</label>
-                    <input type="number" id="quantity" name="quantity" min="1" value="1">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="quantity">Количество</label>
+                            <input type="number" id="quantity" name="quantity" min="1" value="1">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <!-- Пустая колонка для выравнивания -->
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="comments">Дополнительные комментарии</label>
-                    <textarea id="comments" name="comments" rows="4" placeholder="Дополнительная информация о детали или автомобиле"></textarea>
+                    <textarea id="comments" name="comments" rows="4"></textarea>
                 </div>
                 
-                <button type="submit" id="submitBtn">Отправить заказ</button>
-                <span id="loadingIndicator" class="loading hidden"></span>
+                <button type="submit">Отправить заказ</button>
             </form>
         </div>
         
-        <div id="historyTab" class="tab-content">
-            <div class="search-fields">
-                <div class="form-group">
-                    <label for="searchEmail">Email для поиска</label>
-                    <input type="email" id="searchEmail" name="searchEmail">
-                    <div class="error-message" id="searchEmailError">Пожалуйста, введите корректный email адрес</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="searchPhone">Телефон для поиска</label>
-                    <input type="tel" id="searchPhone" name="searchPhone" placeholder="+7 (XXX) XXX-XX-XX">
-                    <div class="error-message" id="searchPhoneError">Пожалуйста, введите корректный номер телефона</div>
-                </div>
+        <div class="tab-content" id="order-history">
+            <div class="form-group">
+                <label for="search-email">Email для поиска</label>
+                <input type="email" id="search-email" placeholder="Введите email, указанный при заказе">
             </div>
             
-            <button onclick="loadOrderHistory()" id="historyBtn">Загрузить историю заказов</button>
-            <span id="historyLoading" class="loading hidden"></span>
+            <div class="form-group">
+                <label for="search-phone">Телефон для поиска</label>
+                <input type="tel" id="search-phone" placeholder="Введите телефон, указанный при заказе">
+            </div>
             
-            <div id="orderHistory" class="order-history"></div>
+            <button id="search-orders">Найти заказы</button>
+            
+            <div class="loading" id="history-loading">
+                <div class="spinner"></div>
+                <p>Загрузка истории заказов...</p>
+            </div>
+            
+            <div class="order-history" id="orders-container">
+                <!-- Здесь будет отображаться история заказов -->
+            </div>
         </div>
     </div>
 
     <script>
-        // URL вашего GAS веб-приложения
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw18Wy82zoPKTLBeBPsjTXV5JvRsm8SSCXtYbtMf1ft57SzkRkoOjjfVoFqDGFF6z2HRw/exec";
-        
-        function switchTab(tabName) {
-            // Скрыть все вкладки
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы DOM
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const orderForm = document.getElementById('order-form');
+            const successAlert = document.getElementById('success-alert');
+            const errorAlert = document.getElementById('error-alert');
+            const searchOrdersBtn = document.getElementById('search-orders');
+            const ordersContainer = document.getElementById('orders-container');
+            const historyLoading = document.getElementById('history-loading');
             
-            // Показать выбранную вкладку
-            if (tabName === 'order') {
-                document.getElementById('orderTab').classList.add('active');
-                document.querySelectorAll('.tab')[0].classList.add('active');
-            } else {
-                document.getElementById('historyTab').classList.add('active');
-                document.querySelectorAll('.tab')[1].classList.add('active');
-            }
-        }
-        
-        // Валидация email
-        function validateEmail(email) {
-            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return re.test(String(email).toLowerCase());
-        }
-        
-        // Валидация телефона
-        function validatePhone(phone) {
-            // Удаляем все нецифровые символы, кроме плюса в начале
-            const cleaned = phone.replace(/(?!^\+)\D/g, '');
-            return cleaned.length >= 11;
-        }
-        
-        // Валидация VIN-кода
-        function validateVIN(vin) {
-            if (!vin) return true; // Необязательное поле
-            return vin.length === 17;
-        }
-        
-        // Форматирование телефона
-        function formatPhone(input) {
-            // Удаляем все нецифровые символы
-            let numbers = input.value.replace(/\D/g, '');
+            // URL веб-приложения Google Apps Script
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbw18Wy82zoPKTLBeBPsjTXV5JvRsm8SSCXtYbtMf1ft57SzkRkoOjjfVoFqDGFF6z2HRw/exec';
             
-            // Если номер начинается с 7 или 8, заменяем на +7
-            if (numbers.startsWith('7') || numbers.startsWith('8')) {
-                numbers = '7' + numbers.substring(1);
-            }
-            
-            // Форматируем номер
-            let formatted = '';
-            if (numbers.length > 0) {
-                formatted = '+7 (';
-                if (numbers.length > 1) {
-                    formatted += numbers.substring(1, 4);
-                }
-                if (numbers.length > 4) {
-                    formatted += ') ' + numbers.substring(4, 7);
-                }
-                if (numbers.length > 7) {
-                    formatted += '-' + numbers.substring(7, 9);
-                }
-                if (numbers.length > 9) {
-                    formatted += '-' + numbers.substring(9, 11);
-                }
-            }
-            
-            input.value = formatted;
-        }
-        
-        // Настройка маски для телефона
-        document.getElementById('phone').addEventListener('input', function(e) {
-            formatPhone(e.target);
-            validateField(e.target);
-        });
-        
-        document.getElementById('searchPhone').addEventListener('input', function(e) {
-            formatPhone(e.target);
-            validateField(e.target);
-        });
-        
-        // Валидация поля при вводе
-        function validateField(field) {
-            const formGroup = field.parentElement;
-            let isValid = true;
-            let errorMessage = '';
-            
-            // Сбрасываем статус
-            formGroup.classList.remove('error');
-            formGroup.classList.remove('success');
-            
-            // Проверяем обязательные поля
-            if (field.hasAttribute('required') && !field.value.trim()) {
-                isValid = false;
-                errorMessage = field.parentElement.querySelector('.error-message').textContent;
-            } else if (field.type === 'email' && field.value && !validateEmail(field.value)) {
-                isValid = false;
-                errorMessage = 'Пожалуйста, введите корректный email адрес';
-            } else if (field.type === 'tel' && field.value && !validatePhone(field.value)) {
-                isValid = false;
-                errorMessage = 'Пожалуйста, введите корректный номер телефона';
-            } else if (field.id === 'vin' && field.value && !validateVIN(field.value)) {
-                isValid = false;
-                errorMessage = 'VIN-код должен содержать 17 символов';
-            }
-            
-            // Устанавливаем статус
-            if (!isValid && field.value) {
-                formGroup.classList.add('error');
-                formGroup.querySelector('.error-message').textContent = errorMessage;
-            } else if (field.value) {
-                formGroup.classList.add('success');
-            }
-            
-            return isValid;
-        }
-        
-        // Добавляем валидацию при потере фокуса
-        const formFields = document.querySelectorAll('input, textarea');
-        formFields.forEach(field => {
-            field.addEventListener('blur', function() {
-                validateField(this);
-            });
-        });
-        
-        // Валидация всей формы
-        function validateForm() {
-            let isValid = true;
-            
-            // Проверяем все обязательные поля
-            const requiredFields = document.querySelectorAll('[required]');
-            requiredFields.forEach(field => {
-                if (!validateField(field)) {
-                    isValid = false;
-                }
-            });
-            
-            // Проверяем email и телефон, даже если они не обязательные
-            const emailFields = document.querySelectorAll('input[type="email"]');
-            emailFields.forEach(field => {
-                if (field.value && !validateField(field)) {
-                    isValid = false;
-                }
-            });
-            
-            const phoneFields = document.querySelectorAll('input[type="tel"]');
-            phoneFields.forEach(field => {
-                if (field.value && !validateField(field)) {
-                    isValid = false;
-                }
-            });
-            
-            // Проверяем VIN
-            const vinField = document.getElementById('vin');
-            if (vinField.value && !validateField(vinField)) {
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-        
-        // Обработка отправки формы
-        document.getElementById('orderForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Валидация формы
-            if (!validateForm()) {
-                showAlert('Пожалуйста, исправьте ошибки в форме', 'error');
-                return;
-            }
-            
-            const formData = new FormData(this);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-            
-            // Показываем индикатор загрузки
-            document.getElementById('loadingIndicator').classList.remove('hidden');
-            document.getElementById('submitBtn').disabled = true;
-            
-            try {
-                // Используем прямой запрос к GAS
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8',
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showAlert('Заказ успешно отправлен!', 'success');
-                    document.getElementById('orderForm').reset();
+            // Переключение вкладок
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
                     
-                    // Сбрасываем статусы полей
-                    document.querySelectorAll('.form-group').forEach(group => {
-                        group.classList.remove('success');
-                    });
-                } else {
-                    showAlert('Ошибка: ' + result.error, 'error');
+                    // Активируем выбранную вкладку
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Маска для телефона
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                
+                if (value.startsWith('7') || value.startsWith('8')) {
+                    value = value.substring(1);
                 }
-            } catch (error) {
-                showAlert('Ошибка соединения: ' + error.message, 'error');
-            } finally {
-                // Скрываем индикатор загрузки
-                document.getElementById('loadingIndicator').classList.add('hidden');
-                document.getElementById('submitBtn').disabled = false;
+                
+                let formattedValue = '+7';
+                
+                if (value.length > 0) {
+                    formattedValue += ' (' + value.substring(0, 3);
+                }
+                if (value.length > 3) {
+                    formattedValue += ') ' + value.substring(3, 6);
+                }
+                if (value.length > 6) {
+                    formattedValue += '-' + value.substring(6, 8);
+                }
+                if (value.length > 8) {
+                    formattedValue += '-' + value.substring(8, 10);
+                }
+                
+                e.target.value = formattedValue;
+            });
+            
+            // Отправка формы заказа
+            orderForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Сбор данных формы
+                const formData = {
+                    name: document.getElementById('name').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    carModel: document.getElementById('carModel').value,
+                    year: document.getElementById('year').value,
+                    vin: document.getElementById('vin').value,
+                    partName: document.getElementById('partName').value,
+                    article: document.getElementById('article').value,
+                    quantity: document.getElementById('quantity').value || 1,
+                    comments: document.getElementById('comments').value
+                };
+                
+                // Валидация
+                if (!formData.name || !formData.phone || !formData.email || !formData.partName) {
+                    showError('Пожалуйста, заполните все обязательные поля');
+                    return;
+                }
+                
+                if (formData.vin && formData.vin.length !== 17) {
+                    showError('VIN-код должен содержать 17 символов');
+                    return;
+                }
+                
+                // Отправка данных
+                try {
+                    const response = await fetch(scriptUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showSuccess(`Заказ успешно добавлен! Номер вашего заказа: #${result.orderId}`);
+                        orderForm.reset();
+                    } else {
+                        showError(result.error || 'Произошла ошибка при отправке заказа');
+                        if (result.details) {
+                            console.error('Детали ошибки:', result.details);
+                        }
+                    }
+                } catch (error) {
+                    showError('Ошибка сети или сервера: ' + error.message);
+                    console.error('Ошибка:', error);
+                }
+            });
+            
+            // Поиск заказов
+            searchOrdersBtn.addEventListener('click', async function() {
+                const email = document.getElementById('search-email').value;
+                const phone = document.getElementById('search-phone').value;
+                
+                if (!email && !phone) {
+                    showError('Введите email или телефон для поиска заказов');
+                    return;
+                }
+                
+                // Формируем параметры запроса
+                const params = new URLSearchParams();
+                if (email) params.append('email', email);
+                if (phone) params.append('phone', phone.replace(/\D/g, ''));
+                
+                historyLoading.style.display = 'block';
+                ordersContainer.innerHTML = '';
+                
+                try {
+                    const response = await fetch(`${scriptUrl}?${params}`);
+                    const result = await response.json();
+                    
+                    historyLoading.style.display = 'none';
+                    
+                    if (result.success) {
+                        if (result.orders.length === 0) {
+                            ordersContainer.innerHTML = '<p>Заказы не найдены</p>';
+                        } else {
+                            displayOrders(result.orders);
+                        }
+                    } else {
+                        showError(result.error || 'Произошла ошибка при поиске заказов');
+                    }
+                } catch (error) {
+                    historyLoading.style.display = 'none';
+                    showError('Ошибка сети или сервера: ' + error.message);
+                    console.error('Ошибка:', error);
+                }
+            });
+            
+            // Функция отображения заказов
+            function displayOrders(orders) {
+                ordersContainer.innerHTML = '';
+                
+                orders.forEach(order => {
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'order-item';
+                    
+                    const orderDate = new Date(order['Дата']).toLocaleDateString('ru-RU', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    orderElement.innerHTML = `
+                        <div class="order-header">
+                            <span class="order-id">Заказ #${order['Дата'] ? order['Дата'].getTime() : ''}</span>
+                            <span class="order-date">${orderDate}</span>
+                            <span class="order-status">${order['Статус'] || 'Новый'}</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="detail-item">
+                                <strong>ФИО</strong>
+                                ${order['ФИО'] || 'Не указано'}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Телефон</strong>
+                                ${order['Телефон'] || 'Не указан'}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Email</strong>
+                                ${order['Email'] || 'Не указан'}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Деталь</strong>
+                                ${order['Название детали'] || 'Не указана'}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Артикул</strong>
+                                ${order['Артикул'] || 'Не указан'}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Количество</strong>
+                                ${order['Количество'] || 1}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Автомобиль</strong>
+                                ${order['Модель автомобиля'] || 'Не указана'}
+                            </div>
+                            <div class="detail-item">
+                                <strong>Год выпуска</strong>
+                                ${order['Год выпуска'] || 'Не указан'}
+                            </div>
+                            <div class="detail-item">
+                                <strong>VIN-код</strong>
+                                ${order['Vin-code'] || 'Не указан'}
+                            </div>
+                            <div class="detail-item full-width">
+                                <strong>Комментарии</strong>
+                                ${order['Дополнительные комментарии'] || 'Отсутствуют'}
+                            </div>
+                        </div>
+                    `;
+                    
+                    ordersContainer.appendChild(orderElement);
+                });
+            }
+            
+            // Вспомогательные функции для показа уведомлений
+            function showSuccess(message) {
+                successAlert.textContent = message;
+                successAlert.style.display = 'block';
+                errorAlert.style.display = 'none';
+                
+                // Автоматическое скрытие через 5 секунд
+                setTimeout(() => {
+                    successAlert.style.display = 'none';
+                }, 5000);
+            }
+            
+            function showError(message) {
+                errorAlert.textContent = message;
+                errorAlert.style.display = 'block';
+                successAlert.style.display = 'none';
+                
+                // Автоматическое скрытие через 5 секунд
+                setTimeout(() => {
+                    errorAlert.style.display = 'none';
+                }, 5000);
             }
         });
-        
-        // Загрузка истории заказов
-        async function loadOrderHistory() {
-            const email = document.getElementById('searchEmail').value;
-            const phone = document.getElementById('searchPhone').value;
-            
-            // Проверяем, что хотя бы одно поле заполнено
-            if (!email && !phone) {
-                showAlert('Введите email или телефон для поиска заказов', 'error', 'historyTab');
-                return;
-            }
-            
-            // Проверяем валидность email, если он указан
-            if (email && !validateEmail(email)) {
-                document.getElementById('searchEmail').parentElement.classList.add('error');
-                showAlert('Пожалуйста, введите корректный email адрес', 'error', 'historyTab');
-                return;
-            }
-            
-            // Проверяем валидность телефона, если он указан
-            if (phone && !validatePhone(phone)) {
-                document.getElementById('searchPhone').parentElement.classList.add('error');
-                showAlert('Пожалуйста, введите корректный номер телефона', 'error', 'historyTab');
-                return;
-            }
-            
-            // Показываем индикатор загрузки
-            document.getElementById('historyLoading').classList.remove('hidden');
-            document.getElementById('historyBtn').disabled = true;
-            
-            try {
-                let url = SCRIPT_URL + '?';
-                if (email) url += `email=${encodeURIComponent(email)}`;
-                if (phone) url += `&phone=${encodeURIComponent(phone)}`;
-                
-                // Используем прямой запрос к GAS
-                const response = await fetch(url);
-                const result = await response.json();
-                
-                if (result.success) {
-                    displayOrders(result.orders);
-                } else {
-                    showAlert('Ошибка: ' + result.error, 'error', 'historyTab');
-                }
-            } catch (error) {
-                showAlert('Ошибка соединения: ' + error.message, 'error', 'historyTab');
-            } finally {
-                // Скрываем индикатор загрузки
-                document.getElementById('historyLoading').classList.add('hidden');
-                document.getElementById('historyBtn').disabled = false;
-            }
-        }
-        
-        // Отображение заказов
-        function displayOrders(orders) {
-            const container = document.getElementById('orderHistory');
-            
-            if (!orders || orders.length === 0) {
-                container.innerHTML = '<div class="alert alert-info">Заказы не найдены</div>';
-                return;
-            }
-            
-            container.innerHTML = orders.map(order => {
-                // Форматируем дату
-                let orderDate = 'Не указана';
-                if (order.Дата) {
-                    try {
-                        orderDate = new Date(order.Дата).toLocaleString('ru-RU');
-                    } catch (e) {
-                        orderDate = order.Дата;
-                    }
-                }
-                
-                return `
-                <div class="order-item">
-                    <p><strong>Дата:</strong> ${orderDate}</p>
-                    <p><strong>ФИО:</strong> ${order.ФИО || 'Не указано'}</p>
-                    <p><strong>Телефон:</strong> ${order.Телефон || 'Не указано'}</p>
-                    <p><strong>Email:</strong> ${order.Email || 'Не указано'}</p>
-                    <p><strong>Деталь:</strong> ${order['Название детали'] || 'Не указано'}</p>
-                    <p><strong>Артикул:</strong> ${order.Артикул || 'Не указано'}</p>
-                    <p><strong>Количество:</strong> ${order.Количество || '1'}</p>
-                    <p><strong>Комментарии:</strong> ${order['Дополнительные комментарии'] || 'Нет'}</p>
-                </div>
-                `;
-            }).join('');
-        }
-        
-        // Показать уведомление
-        function showAlert(message, type, parentElement = 'orderTab') {
-            // Удаляем существующие уведомления
-            document.querySelectorAll('.alert').forEach(alert => alert.remove());
-            
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            
-            const container = document.getElementById(parentElement);
-            container.insertBefore(alert, container.firstChild);
-            
-            // Автоматически скрыть уведомление через 5 секунд
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
     </script>
 </body>
 </html>
