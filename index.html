@@ -235,6 +235,40 @@
             display: none;
         }
         
+        .debug-panel {
+            margin-top: 30px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .debug-toggle {
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        .debug-content {
+            display: none;
+            font-family: monospace;
+            white-space: pre-wrap;
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .debug-content.show {
+            display: block;
+        }
+        
         @media (max-width: 768px) {
             .form-group {
                 flex: 1 1 100%;
@@ -337,13 +371,15 @@
                     </div>
                 </form>
                 
-                <!-- Скрытая форма для отправки данных через iframe -->
-                <form id="hiddenForm" action="https://script.google.com/macros/s/AKfycbzI9Bd_Ak_3sqKPqWFegmlwvrYGFzJYJXWPvdCbiYdmfR0yFZfWCcdpdwZxFiO7qw1brg/exec" method="POST" target="hiddenFrame" class="hidden">
-                    <input type="hidden" name="data" id="hiddenData">
-                </form>
-                
-                <!-- Скрытый iframe для обработки ответа -->
-                <iframe name="hiddenFrame" id="hiddenFrame" class="hidden"></iframe>
+                <!-- Панель отладки -->
+                <div class="debug-panel">
+                    <button class="debug-toggle" onclick="toggleDebug()">
+                        <i class="fas fa-bug"></i> Показать отладку
+                    </button>
+                    <div class="debug-content" id="debugContent">
+                        Журнал отладки будет отображаться здесь...
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -353,54 +389,51 @@
     </div>
 
     <script>
+        // Глобальная переменная для отладки
+        let debugLog = [];
+        
+        // Функция для добавления сообщений в журнал отладки
+        function addDebugMessage(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            debugLog.push(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
+            
+            const debugContent = document.getElementById('debugContent');
+            if (debugContent.classList.contains('show')) {
+                debugContent.textContent = debugLog.join('\n');
+                debugContent.scrollTop = debugContent.scrollHeight;
+            }
+        }
+        
+        // Функция для переключения видимости панели отладки
+        function toggleDebug() {
+            const debugContent = document.getElementById('debugContent');
+            const debugToggle = document.querySelector('.debug-toggle');
+            
+            debugContent.classList.toggle('show');
+            
+            if (debugContent.classList.contains('show')) {
+                debugContent.textContent = debugLog.join('\n');
+                debugContent.scrollTop = debugContent.scrollHeight;
+                debugToggle.innerHTML = '<i class="fas fa-bug"></i> Скрыть отладку';
+            } else {
+                debugToggle.innerHTML = '<i class="fas fa-bug"></i> Показать отладку';
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
+            addDebugMessage('Страница загружена');
+            
             // Установка текущей даты по умолчанию
             const today = new Date();
             const formattedDate = today.toISOString().split('T')[0];
             document.getElementById('date').value = formattedDate;
+            addDebugMessage(`Установлена дата по умолчанию: ${formattedDate}`);
             
             // Обработка отправки формы
             document.getElementById('orderForm').addEventListener('submit', function(e) {
                 e.preventDefault();
+                addDebugMessage('Форма отправлена, начинается обработка');
                 submitOrder();
-            });
-            
-            // Обработка ответа от Google Apps Script
-            document.getElementById('hiddenFrame').addEventListener('load', function() {
-                try {
-                    const iframeContent = this.contentDocument || this.contentWindow.document;
-                    const responseText = iframeContent.body.innerText;
-                    
-                    if (responseText) {
-                        const response = JSON.parse(responseText);
-                        
-                        if (response.success) {
-                            showAlert('Заказ успешно добавлен! Данные сохранены в таблице.', 'success');
-                            document.getElementById('orderForm').reset();
-                            
-                            // Устанавливаем текущую дату снова после сброса формы
-                            const today = new Date();
-                            const formattedDate = today.toISOString().split('T')[0];
-                            document.getElementById('date').value = formattedDate;
-                        } else {
-                            showAlert('Ошибка: ' + response.message, 'error');
-                        }
-                    }
-                } catch (e) {
-                    // Если не удалось распарсить ответ, считаем что запрос выполнен успешно
-                    showAlert('Заказ успешно добавлен! Данные сохранены в таблице.', 'success');
-                    document.getElementById('orderForm').reset();
-                    
-                    // Устанавливаем текущую дату снова после сброса формы
-                    const today = new Date();
-                    const formattedDate = today.toISOString().split('T')[0];
-                    document.getElementById('date').value = formattedDate;
-                } finally {
-                    // Восстанавливаем кнопку отправки
-                    const submitBtn = document.querySelector('#orderForm button[type="submit"]');
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
-                    submitBtn.disabled = false;
-                }
             });
         });
         
@@ -443,6 +476,7 @@
                 if (!field.value.trim()) {
                     isValid = false;
                     field.style.borderColor = '#e74c3c';
+                    addDebugMessage(`Обязательное поле не заполнено: ${field.name}`, 'error');
                 } else {
                     field.style.borderColor = '#ddd';
                 }
@@ -459,6 +493,8 @@
                 data[key] = value;
             });
             
+            addDebugMessage(`Данные формы: ${JSON.stringify(data)}`);
+            
             // Показываем индикатор загрузки
             submitBtn.innerHTML = '<div class="loader"></div> Отправка...';
             submitBtn.disabled = true;
@@ -469,9 +505,53 @@
                 data: data
             });
             
-            // Устанавливаем данные в скрытую форму и отправляем
-            document.getElementById('hiddenData').value = requestData;
-            document.getElementById('hiddenForm').submit();
+            addDebugMessage(`Отправляемые данные: ${requestData}`);
+            
+            // Отправляем данные через fetch API
+            fetch('https://script.google.com/macros/s/AKfycbzI9Bd_Ak_3sqKPqWFegmlwvrYGFzJYJXWPvdCbiYdmfR0yFZfWCcdpdwZxFiO7qw1brg/exec', {
+                method: 'POST',
+                body: requestData,
+                headers: {
+                    'Content-Type': 'text/plain; charset=utf-8'
+                }
+            })
+            .then(response => {
+                addDebugMessage(`Получен ответ от сервера: ${response.status} ${response.statusText}`);
+                return response.text();
+            })
+            .then(text => {
+                addDebugMessage(`Тело ответа: ${text}`);
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    addDebugMessage(`Ошибка парсинга JSON: ${e.message}`, 'error');
+                    throw new Error('Некорректный JSON в ответе сервера');
+                }
+            })
+            .then(result => {
+                if (result.success) {
+                    showAlert('Заказ успешно добавлен! Данные сохранены в таблице.', 'success');
+                    addDebugMessage('Заказ успешно обработан сервером');
+                    form.reset();
+                    
+                    // Устанавливаем текущую дату снова после сброса формы
+                    const today = new Date();
+                    const formattedDate = today.toISOString().split('T')[0];
+                    document.getElementById('date').value = formattedDate;
+                } else {
+                    showAlert('Ошибка: ' + result.message, 'error');
+                    addDebugMessage(`Ошибка сервера: ${result.message}`, 'error');
+                }
+            })
+            .catch(error => {
+                showAlert('Ошибка при отправке данных: ' + error.message, 'error');
+                addDebugMessage(`Ошибка сети: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                // Восстанавливаем кнопку отправки
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
+                submitBtn.disabled = false;
+            });
         }
     </script>
 </body>
