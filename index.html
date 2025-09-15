@@ -414,7 +414,7 @@
             debugLog.push(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
             
             const debugContent = document.getElementById('debugContent');
-            if (debugContent.classList.contains('show')) {
+            if (debugContent && debugContent.classList.contains('show')) {
                 debugContent.textContent = debugLog.join('\n');
                 debugContent.scrollTop = debugContent.scrollHeight;
             }
@@ -425,14 +425,16 @@
             const debugContent = document.getElementById('debugContent');
             const debugToggle = document.querySelector('.debug-toggle');
             
-            debugContent.classList.toggle('show');
-            
-            if (debugContent.classList.contains('show')) {
-                debugContent.textContent = debugLog.join('\n');
-                debugContent.scrollTop = debugContent.scrollHeight;
-                debugToggle.innerHTML = '<i class="fas fa-bug"></i> Скрыть отладку';
-            } else {
-                debugToggle.innerHTML = '<i class="fas fa-bug"></i> Показать отладку';
+            if (debugContent && debugToggle) {
+                debugContent.classList.toggle('show');
+                
+                if (debugContent.classList.contains('show')) {
+                    debugContent.textContent = debugLog.join('\n');
+                    debugContent.scrollTop = debugContent.scrollHeight;
+                    debugToggle.innerHTML = '<i class="fas fa-bug"></i> Скрыть отладку';
+                } else {
+                    debugToggle.innerHTML = '<i class="fas fa-bug"></i> Показать отладку';
+                }
             }
         }
         
@@ -470,6 +472,35 @@
             const submitBtn = document.querySelector('#orderForm button[type="submit"]');
             submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
             submitBtn.disabled = false;
+        }
+        
+        function showAlert(message, type = 'success') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `
+                <div class="alert alert-${type}">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+            
+            // Показываем уведомление с анимацией
+            setTimeout(() => {
+                const alertElement = alertBox.querySelector('.alert');
+                if (alertElement) {
+                    alertElement.classList.add('show');
+                }
+            }, 10);
+            
+            // Скрываем уведомление через 5 секунд
+            setTimeout(() => {
+                const alert = alertBox.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => {
+                        alertBox.innerHTML = '';
+                    }, 500);
+                }
+            }, 5000);
         }
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -521,32 +552,6 @@
                 addDebugMessage(`Данные формы: ${JSON.stringify(data)}`);
             });
         });
-        
-        function showAlert(message, type = 'success') {
-            const alertBox = document.getElementById('alertBox');
-            alertBox.innerHTML = `
-                <div class="alert alert-${type}">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                    ${message}
-                </div>
-            `;
-            
-            // Показываем уведомление с анимацией
-            setTimeout(() => {
-                alertBox.querySelector('.alert').classList.add('show');
-            }, 10);
-            
-            // Скрываем уведомление через 5 секунд
-            setTimeout(() => {
-                const alert = alertBox.querySelector('.alert');
-                if (alert) {
-                    alert.classList.remove('show');
-                    setTimeout(() => {
-                        alertBox.innerHTML = '';
-                    }, 500);
-                }
-            }, 5000);
-        }
     </script>
 </body>
 </html>
