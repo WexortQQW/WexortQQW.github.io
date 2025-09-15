@@ -3,487 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отправка данных в Google Таблицы</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Заказ авто деталей</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
             padding: 20px;
+            background-color: #f4f4f4;
         }
-        
         .container {
-            width: 100%;
-            max-width: 900px;
+            max-width: 800px;
+            margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin-top: 20px;
-        }
-        
-        header {
-            background: #4285f4;
-            color: white;
             padding: 20px;
-            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
+        h1, h2 {
+            color: #333;
         }
-        
-        .description {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .form-container {
-            padding: 20px;
-        }
-        
         .form-group {
             margin-bottom: 15px;
         }
-        
         label {
             display: block;
             margin-bottom: 5px;
-            font-weight: 500;
-            color: #555;
+            font-weight: bold;
         }
-        
-        input, select, textarea {
+        input, textarea {
             width: 100%;
-            padding: 12px;
+            padding: 8px;
             border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
-        
-        input:focus, select:focus, textarea:focus {
-            border-color: #4285f4;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
-        }
-        
         .required::after {
-            content: '*';
-            color: #e74c3c;
-            margin-left: 4px;
+            content: " *";
+            color: red;
         }
-        
         button {
-            background: #4285f4;
+            background: #5cb85c;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
+            padding: 10px 15px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            transition: background 0.3s;
         }
-        
         button:hover {
-            background: #3367d6;
+            background: #4cae4c;
         }
-        
-        button:disabled {
-            background: #a8c7fa;
-            cursor: not-allowed;
-        }
-        
-        .loader {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .alert {
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 15px;
+        .tabs {
             display: flex;
-            align-items: center;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: opacity 0.3s, transform 0.3s;
+            margin-bottom: 20px;
         }
-        
-        .alert.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert i {
-            margin-right: 10px;
-        }
-        
-        .debug-panel {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 900px;
-        }
-        
-        .debug-toggle {
-            background: #5f6368;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+        .tab {
+            padding: 10px 20px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
+            background: #eee;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
         }
-        
-        .debug-toggle i {
-            margin-right: 8px;
+        .tab.active {
+            background: #fff;
+            border-bottom: 1px solid #fff;
         }
-        
-        .debug-content {
-            background: #2c2c2c;
-            color: #00ff00;
-            padding: 15px;
-            border-radius: 6px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            max-height: 200px;
-            overflow-y: auto;
+        .tab-content {
             display: none;
         }
-        
-        .debug-content.show {
+        .tab-content.active {
             display: block;
         }
-        
-        .row {
-            display: flex;
-            gap: 15px;
+        .order-history {
+            margin-top: 20px;
         }
-        
-        .row .form-group {
-            flex: 1;
+        .order-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
         }
-        
-        @media (max-width: 600px) {
-            .row {
-                flex-direction: column;
-                gap: 0;
-            }
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+            color: #3c763d;
+        }
+        .alert-error {
+            background-color: #f2dede;
+            border-color: #ebccd1;
+            color: #a94442;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1><i class="fas fa-table"></i> Отправка данных в Google Таблицы</h1>
-            <p class="description">Заполните форму для отправки данных напрямую в Google Таблицы</p>
-        </header>
+        <h1>Заказ авто деталей</h1>
         
-        <div class="form-container">
-            <div id="alertBox"></div>
-            
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('order')">Новый заказ</div>
+            <div class="tab" onclick="switchTab('history')">История заказов</div>
+        </div>
+        
+        <div id="orderTab" class="tab-content active">
             <form id="orderForm">
-                <div class="row">
-                    <div class="form-group">
-                        <label for="date" class="required">Дата заказа</label>
-                        <input type="date" id="date" name="date" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="fio" class="required">ФИО</label>
-                        <input type="text" id="fio" name="fio" placeholder="Иванов Иван Иванович" required>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="form-group">
-                        <label for="phone" class="required">Телефон</label>
-                        <input type="tel" id="phone" name="phone" placeholder="+7 (123) 456-78-90" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="example@mail.com">
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="form-group">
-                        <label for="vin">VIN код автомобиля</label>
-                        <input type="text" id="vin" name="vin" placeholder="ZFA22300005556777">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="brandModel" class="required">Марка и модель</label>
-                        <input type="text" id="brandModel" name="brandModel" placeholder="Toyota Camry" required>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="form-group">
-                        <label for="year">Год выпуска</label>
-                        <input type="number" id="year" name="year" min="1990" max="2023" placeholder="2018">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="part" class="required">Название запчасти</label>
-                        <input type="text" id="part" name="part" placeholder="Тормозной диск" required>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="form-group">
-                        <label for="article">Артикул</label>
-                        <input type="text" id="article" name="article" placeholder="43512-06050">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="quantity" class="required">Количество</label>
-                        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
-                    </div>
+                <div class="form-group">
+                    <label for="name" class="required">ФИО</label>
+                    <input type="text" id="name" name="name" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="comment">Комментарий к заказу</label>
-                    <textarea id="comment" name="comment" rows="3" placeholder="Дополнительная информация..."></textarea>
+                    <label for="phone" class="required">Телефон</label>
+                    <input type="tel" id="phone" name="phone" required>
                 </div>
                 
                 <div class="form-group">
-                    <button type="submit"><i class="fas fa-paper-plane"></i> Отправить заказ</button>
+                    <label for="email" class="required">Email</label>
+                    <input type="email" id="email" name="email" required>
                 </div>
+                
+                <div class="form-group">
+                    <label for="vin">Vin-code</label>
+                    <input type="text" id="vin" name="vin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="carModel">Модель автомобиля</label>
+                    <input type="text" id="carModel" name="carModel">
+                </div>
+                
+                <div class="form-group">
+                    <label for="year">Год выпуска</label>
+                    <input type="number" id="year" name="year" min="1900" max="2099">
+                </div>
+                
+                <div class="form-group">
+                    <label for="partName">Название детали</label>
+                    <input type="text" id="partName" name="partName">
+                </div>
+                
+                <div class="form-group">
+                    <label for="article">Артикул</label>
+                    <input type="text" id="article" name="article">
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity">Количество</label>
+                    <input type="number" id="quantity" name="quantity" min="1" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="comments">Дополнительные комментарии</label>
+                    <textarea id="comments" name="comments" rows="4"></textarea>
+                </div>
+                
+                <button type="submit">Отправить заказ</button>
             </form>
         </div>
-    </div>
-    
-    <div class="debug-panel">
-        <button class="debug-toggle" onclick="toggleDebug()">
-            <i class="fas fa-bug"></i> Показать отладку
-        </button>
-        <div id="debugContent" class="debug-content"></div>
+        
+        <div id="historyTab" class="tab-content">
+            <div class="form-group">
+                <label for="searchEmail">Email для поиска</label>
+                <input type="email" id="searchEmail" name="searchEmail">
+            </div>
+            
+            <div class="form-group">
+                <label for="searchPhone">Телефон для поиска</label>
+                <input type="tel" id="searchPhone" name="searchPhone">
+            </div>
+            
+            <button onclick="loadOrderHistory()">Загрузить историю заказов</button>
+            
+            <div id="orderHistory" class="order-history"></div>
+        </div>
     </div>
 
     <script>
-        // Глобальная переменная для отладки
-        let debugLog = [];
+        // Замените на URL вашего GAS веб-приложения
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxc8AejoFRM6uiuXCUJVew5EUu_yiDzNs1vzP4DvWN6lRXnnqqWlInMaPXE3_nI7YocJw/exec";
         
-        // Глобальная функция для обработки ответов JSONP
-        window.handleJsonpResponse = function(response) {
-            addDebugMessage(`Получен ответ от сервера: ${JSON.stringify(response)}`);
+        function switchTab(tabName) {
+            // Скрыть все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
             
-            const submitBtn = document.querySelector('#orderForm button[type="submit"]');
-            
-            if (response.success) {
-                showAlert('Заказ успешно отправлен! Данные сохранены в таблице.', 'success');
-                addDebugMessage('Данные успешно отправлены в Google Sheets');
-                
-                // Сбрасываем форму
-                document.getElementById('orderForm').reset();
-                
-                // Устанавливаем текущую дату снова после сброса формы
-                const today = new Date();
-                const formattedDate = today.toISOString().split('T')[0];
-                document.getElementById('date').value = formattedDate;
+            // Показать выбранную вкладку
+            if (tabName === 'order') {
+                document.getElementById('orderTab').classList.add('active');
+                document.querySelectorAll('.tab')[0].classList.add('active');
             } else {
-                showAlert('Произошла ошибка при отправке данных: ' + response.message, 'error');
-                addDebugMessage('Ошибка при отправке данных в Google Sheets: ' + response.message, 'error');
-            }
-            
-            // Восстанавливаем кнопку отправки
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
-            submitBtn.disabled = false;
-        };
-        
-        // Функция для добавления сообщений в журнал отладки
-        function addDebugMessage(message, type = 'info') {
-            const timestamp = new Date().toLocaleTimeString();
-            debugLog.push(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
-            
-            const debugContent = document.getElementById('debugContent');
-            if (debugContent && debugContent.classList.contains('show')) {
-                debugContent.textContent = debugLog.join('\n');
-                debugContent.scrollTop = debugContent.scrollHeight;
+                document.getElementById('historyTab').classList.add('active');
+                document.querySelectorAll('.tab')[1].classList.add('active');
             }
         }
         
-        // Функция для переключения видимости панели отладки
-        function toggleDebug() {
-            const debugContent = document.getElementById('debugContent');
-            const debugToggle = document.querySelector('.debug-toggle');
+        // Обработка отправки формы
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            if (debugContent && debugToggle) {
-                debugContent.classList.toggle('show');
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
                 
-                if (debugContent.classList.contains('show')) {
-                    debugContent.textContent = debugLog.join('\n');
-                    debugContent.scrollTop = debugContent.scrollHeight;
-                    debugToggle.innerHTML = '<i class="fas fa-bug"></i> Скрыть отладку';
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Заказ успешно отправлен!', 'success');
+                    document.getElementById('orderForm').reset();
                 } else {
-                    debugToggle.innerHTML = '<i class="fas fa-bug"></i> Показать отладку';
+                    showAlert('Ошибка: ' + result.error, 'error');
                 }
+            } catch (error) {
+                showAlert('Ошибка соединения: ' + error.message, 'error');
+            }
+        });
+        
+        // Загрузка истории заказов
+        async function loadOrderHistory() {
+            const email = document.getElementById('searchEmail').value;
+            const phone = document.getElementById('searchPhone').value;
+            
+            if (!email && !phone) {
+                showAlert('Введите email или телефон для поиска заказов', 'error', 'historyTab');
+                return;
+            }
+            
+            let url = SCRIPT_URL + '?';
+            if (email) url += `email=${encodeURIComponent(email)}`;
+            if (phone) url += `&phone=${encodeURIComponent(phone)}`;
+            
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayOrders(result.orders);
+                } else {
+                    showAlert('Ошибка: ' + result.error, 'error', 'historyTab');
+                }
+            } catch (error) {
+                showAlert('Ошибка соединения: ' + error.message, 'error', 'historyTab');
             }
         }
         
-        // Функция для показа уведомлений
-        function showAlert(message, type = 'success') {
-            const alertBox = document.getElementById('alertBox');
-            alertBox.innerHTML = `
-                <div class="alert alert-${type}">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                    ${message}
+        // Отображение заказов
+        function displayOrders(orders) {
+            const container = document.getElementById('orderHistory');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<p>Заказы не найдены</p>';
+                return;
+            }
+            
+            container.innerHTML = orders.map(order => `
+                <div class="order-item">
+                    <p><strong>Дата:</strong> ${new Date(order.Дата).toLocaleString()}</p>
+                    <p><strong>Деталь:</strong> ${order['Название детали'] || 'Не указано'}</p>
+                    <p><strong>Артикул:</strong> ${order.Артикул || 'Не указано'}</p>
+                    <p><strong>Количество:</strong> ${order.Количество || '1'}</p>
+                    <p><strong>Статус:</strong> Обрабатывается</p>
                 </div>
-            `;
+            `).join('');
+        }
+        
+        // Показать уведомление
+        function showAlert(message, type, parentElement = 'orderTab') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
             
-            // Показываем уведомление с анимацией
-            setTimeout(() => {
-                const alertElement = alertBox.querySelector('.alert');
-                if (alertElement) {
-                    alertElement.classList.add('show');
-                }
-            }, 10);
+            const container = document.getElementById(parentElement);
+            container.insertBefore(alert, container.firstChild);
             
-            // Скрываем уведомление через 5 секунд
+            // Автоматически скрыть уведомление через 5 секунд
             setTimeout(() => {
-                const alert = alertBox.querySelector('.alert');
-                if (alert) {
-                    alert.classList.remove('show');
-                    setTimeout(() => {
-                        alertBox.innerHTML = '';
-                    }, 500);
-                }
+                alert.remove();
             }, 5000);
         }
-        
-        // Функция для отправки данных в Google Sheets через Google Apps Script с использованием JSONP
-        function sendToGoogleSheets(data) {
-            // Замените этот URL на URL вашего веб-приложения Google Apps Script
-            const scriptURL = 'https://script.google.com/macros/s/1YOaatXh3Gn3xaEe7ID1F6Iz2IzDN0dJv87SvOF-_iZlNauvEHKAdVK7H/exec';
-            
-            // Формируем параметры для GET-запроса
-            const params = new URLSearchParams();
-            params.append('data', JSON.stringify({
-                action: 'addOrder',
-                data: data
-            }));
-            params.append('callback', 'handleJsonpResponse');
-            
-            // Создаем тег script для JSONP
-            const script = document.createElement('script');
-            script.src = `${scriptURL}?${params.toString()}`;
-            
-            // Добавляем скрипт на страницу для выполнения запроса
-            document.body.appendChild(script);
-            
-            // Удаляем скрипт после выполнения
-            script.onload = function() {
-                document.body.removeChild(script);
-                addDebugMessage('JSONP запрос выполнен');
-            };
-            
-            script.onerror = function() {
-                document.body.removeChild(script);
-                addDebugMessage('Ошибка при выполнении JSONP запроса', 'error');
-                
-                const submitBtn = document.querySelector('#orderForm button[type="submit"]');
-                showAlert('Произошла ошибка при отправке данных', 'error');
-                
-                // Восстанавливаем кнопку отправки
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить заказ';
-                submitBtn.disabled = false;
-            };
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            addDebugMessage('Страница загружена');
-            
-            // Установка текущей даты по умолчанию
-            const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0];
-            document.getElementById('date').value = formattedDate;
-            addDebugMessage(`Установлена дата по умолчанию: ${formattedDate}`);
-            
-            // Обработка отправки формы
-            document.getElementById('orderForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                addDebugMessage('Форма отправлена, начинается обработка');
-                
-                // Валидация обязательных полей
-                const requiredFields = this.querySelectorAll('[required]');
-                let isValid = true;
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        isValid = false;
-                        field.style.borderColor = '#e74c3c';
-                        addDebugMessage(`Обязательное поле не заполнено: ${field.name}`, 'error');
-                    } else {
-                        field.style.borderColor = '#ddd';
-                    }
-                });
-                
-                if (!isValid) {
-                    showAlert('Пожалуйста, заполните все обязательные поля', 'error');
-                    return;
-                }
-                
-                // Показываем индикатор загрузки
-                const submitBtn = this.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<div class="loader"></div> Отправка...';
-                submitBtn.disabled = true;
-                
-                addDebugMessage('Данные валидны, отправляем в Google Sheets');
-                
-                // Формируем данные для отправки
-                const formData = new FormData(this);
-                const data = {};
-                formData.forEach((value, key) => {
-                    data[key] = value;
-                });
-                
-                addDebugMessage(`Данные формы: ${JSON.stringify(data)}`);
-                
-                // Отправляем данные в Google Sheets с использованием JSONP
-                sendToGoogleSheets(data);
-            });
-        });
     </script>
 </body>
 </html>
