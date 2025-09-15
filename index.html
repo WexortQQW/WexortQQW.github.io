@@ -385,7 +385,7 @@
                 </form>
                 
                 <!-- Скрытый iframe для обработки ответа -->
-                <iframe name="hiddenFrame" id="hiddenFrame" class="hidden" onload="onFormSubmit()"></iframe>
+                <iframe id="hiddenFrame" name="hiddenFrame" style="display:none;"></iframe>
                 
                 <!-- Панель отладки -->
                 <div class="debug-panel">
@@ -505,6 +505,9 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             addDebugMessage('Страница загружена');
+            
+            // Добавляем обработчик события загрузки для iframe
+            document.getElementById('hiddenFrame').addEventListener('load', onFormSubmit);
             
             // Установка текущей даты по умолчанию
             const today = new Date();
