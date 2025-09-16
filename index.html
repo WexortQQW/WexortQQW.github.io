@@ -184,6 +184,7 @@ button:disabled {
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  align-items: center;
 }
 
 .history-controls input {
@@ -242,7 +243,7 @@ button:disabled {
   padding: 2rem;
 }
 
-#historyLoader {
+.loader-container {
   text-align: center;
   padding: 2rem;
 }
@@ -273,6 +274,15 @@ button:disabled {
   
   input, textarea, select {
     padding: 0.75rem;
+  }
+  
+  .history-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .history-controls input {
+    max-width: 100%;
   }
 }
 
@@ -393,10 +403,38 @@ textarea:invalid + .error-message {
             </form>
             
             <p class="form-footer">Нажимая кнопку "Отправить заказ", вы соглашаетесь с обработкой ваших персональных данных</p>
+            
+            <!-- Секция истории заказов -->
+            <div class="order-history-section">
+                <h2 class="form-section-title">История ваших заказов</h2>
+                
+                <div class="history-controls">
+                    <input type="text" id="historyPhone" placeholder="Введите ваш телефон для поиска заказов">
+                    <button type="button" id="loadHistoryBtn">Загрузить историю</button>
+                </div>
+                
+                <div id="historyContent">
+                    <div id="historyLoader" class="loader-container hidden">
+                        <div class="loader" style="border-color: var(--primary); border-bottom-color: transparent;"></div>
+                        <p>Загрузка истории заказов...</p>
+                    </div>
+                    
+                    <div class="order-cards">
+                        <div class="empty-history">
+                            <p>Введите телефон и нажмите "Загрузить историю" для просмотра ваших заказов</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        // Конфигурация
+        const CONFIG = {
+            SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyL6ANEhMtoww7MBcBl9Fd56mofDVGKLSjANcXpXvHX7P_N8-fuSfXydAm0hY4FamTw6Q/exec'
+        };
+
         // Иконки для уведомлений
         const successIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -463,24 +501,27 @@ textarea:invalid + .error-message {
             e.target.value = formattedValue;
         });
 
-        // Ваш обновленный код с обработкой CORS
+        // Функция отправки формы
         async function submitForm(data) {
-            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyL6ANEhMtoww7MBcBl9Fd56mofDVGKLSjANcXpXvHX7P_N8-fuSfXydAm0hY4FamTw6Q/exec';
-            
             try {
-                // Основной запрос
-                const response = await fetch(SCRIPT_URL, {
+                // Переименовываем email в почту для совместимости с GAS
+                data.почта = data.email;
+                delete data.email;
+                
+                const response = await fetch(CONFIG.SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 });
 
-                // При no-cors мы не можем прочитать ответ, поэтому считаем успешным
-                // В реальном приложении нужно использовать cors и проверять ответ
-                return { success: true, orderId: Math.floor(Math.random() * 10000) };
+                if (!response.ok) {
+                    throw new Error('Ошибка сети');
+                }
+                
+                const result = await response.json();
+                return result;
                 
             } catch (error) {
                 console.error('Ошибка:', error);
@@ -511,8 +552,16 @@ textarea:invalid + .error-message {
                 const data = Object.fromEntries(formData.entries());
                 
                 const result = await submitForm(data);
-                showSuccessNotification(result.orderId);
-                e.target.reset();
+                
+                if (result.success) {
+                    showSuccessNotification(result.orderId);
+                    e.target.reset();
+                    
+                    // Автоматически заполняем поле телефона в истории
+                    document.getElementById('historyPhone').value = data.телефон;
+                } else {
+                    throw new Error(result.error || 'Ошибка при отправке формы');
+                }
                 
             } catch (error) {
                 showError(error.message || 'Ошибка при отправке формы');
@@ -521,6 +570,77 @@ textarea:invalid + .error-message {
                 submitButton.textContent = 'Отправить заказ';
             }
         });
+
+        // Функция загрузки истории заказов
+        async function loadHistory() {
+            const phoneInput = document.getElementById('historyPhone');
+            const loader = document.getElementById('historyLoader');
+            const content = document.getElementById('historyContent');
+            const orderCards = content.querySelector('.order-cards');
+            const emptyMsg = content.querySelector('.empty-history');
+
+            if (!phoneInput.value) {
+                showError('Введите телефон для просмотра истории');
+                return;
+            }
+
+            try {
+                content.classList.add('hidden');
+                loader.classList.remove('hidden');
+                
+                const response = await fetch(`${CONFIG.SCRIPT_URL}?phone=${encodeURIComponent(phoneInput.value)}`);
+                const data = await response.json();
+                
+                if (!data.success) throw new Error(data.error);
+                
+                orderCards.innerHTML = '';
+                emptyMsg.classList.add('hidden');
+                
+                if (data.orders.length === 0) {
+                    emptyMsg.classList.remove('hidden');
+                } else {
+                    data.orders.forEach((order, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'order-card';
+                        card.innerHTML = `
+                            <div class="order-header">
+                                <div class="order-id">Заказ #${index + 1}</div>
+                                <div class="order-date">${new Date(order['Дата']).toLocaleDateString('ru-RU')}</div>
+                            </div>
+                            <div class="order-details">
+                                <div class="order-detail-item">
+                                    <strong>Деталь:</strong>
+                                    <span>${order['Деталь']}</span>
+                                </div>
+                                <div class="order-detail-item">
+                                    <strong>Количество:</strong>
+                                    <span>${order['Количество']}</span>
+                                </div>
+                                <div class="order-detail-item">
+                                    <strong>Статус:</strong>
+                                    <span>${order['Статус'] || 'В обработке'}</span>
+                                </div>
+                                <div class="order-detail-item">
+                                    <strong>Комментарии:</strong>
+                                    <span>${order['Комментарии'] || '—'}</span>
+                                </div>
+                            </div>
+                        `;
+                        orderCards.appendChild(card);
+                    });
+                }
+                
+                content.classList.remove('hidden');
+                
+            } catch (error) {
+                showError('Ошибка загрузки истории: ' + error.message);
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        // Обработчик кнопки загрузки истории
+        document.getElementById('loadHistoryBtn').addEventListener('click', loadHistory);
 
         // Валидация в реальном времени
         document.querySelectorAll('input, textarea').forEach(input => {
@@ -537,72 +657,6 @@ textarea:invalid + .error-message {
                     input.style.borderColor = 'var(--error)';
                 }
             });
-                async function loadHistory() {
-                  const phoneInput = document.getElementById('historyPhone');
-                  const loader = document.getElementById('historyLoader');
-                  const content = document.getElementById('historyContent');
-                  const orderCards = content.querySelector('.order-cards');
-                  const emptyMsg = content.querySelector('.empty-history');
-
-  if (!phoneInput.value) {
-    showError('Введите телефон для просмотра истории');
-    return;
-  }
-
-  try {
-    content.classList.add('hidden');
-    loader.classList.remove('hidden');
-    
-    const response = await fetch(`${CONFIG.SCRIPT_URL}?phone=${encodeURIComponent(phoneInput.value)}`);
-    const data = await response.json();
-    
-    if (!data.success) throw new Error(data.error);
-    
-    orderCards.innerHTML = '';
-    emptyMsg.classList.add('hidden');
-    
-    if (data.orders.length === 0) {
-      emptyMsg.classList.remove('hidden');
-    } else {
-      data.orders.forEach(order => {
-        const card = document.createElement('div');
-        card.className = 'order-card';
-        card.innerHTML = `
-          <div class="order-header">
-            <div class="order-id">Заказ #${data.orders.indexOf(order) + 1}</div>
-            <div class="order-date">${new Date(order['Дата']).toLocaleDateString('ru-RU')}</div>
-          </div>
-          <div class="order-details">
-            <div class="order-detail-item">
-              <strong>Деталь:</strong>
-              <span>${order['Деталь']}</span>
-            </div>
-            <div class="order-detail-item">
-              <strong>Количество:</strong>
-              <span>${order['Количество']}</span>
-            </div>
-            <div class="order-detail-item">
-              <strong>Статус:</strong>
-              <span>${order['Статус'] || 'В обработке'}</span>
-            </div>
-            <div class="order-detail-item">
-              <strong>Комментарии:</strong>
-              <span>${order['Комментарии'] || '—'}</span>
-            </div>
-          </div>
-        `;
-        orderCards.appendChild(card);
-      });
-    }
-    
-    content.classList.remove('hidden');
-    
-  } catch (error) {
-    showError('Ошибка загрузки истории: ' + error.message);
-  } finally {
-    loader.classList.add('hidden');
-  }
-}
         });
     </script>
 </body>
