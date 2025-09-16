@@ -172,6 +172,81 @@ button:disabled {
   display: none;
 }
 
+/* История заказов */
+.order-history-section {
+  grid-column: span 2;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #E2E8F0;
+}
+
+.history-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.history-controls input {
+  flex: 1;
+  max-width: 300px;
+}
+
+.order-cards {
+  display: grid;
+  gap: 1rem;
+}
+
+.order-card {
+  background: var(--surface);
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.order-id {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.order-date {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+}
+
+.order-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.order-detail-item strong {
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.order-detail-item span {
+  color: var(--text-secondary);
+}
+
+.empty-history {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 2rem;
+}
+
+#historyLoader {
+  text-align: center;
+  padding: 2rem;
+}
+        
 /* Адаптация для мобильных */
 @media (max-width: 640px) {
   .container {
@@ -462,6 +537,72 @@ textarea:invalid + .error-message {
                     input.style.borderColor = 'var(--error)';
                 }
             });
+                async function loadHistory() {
+                  const phoneInput = document.getElementById('historyPhone');
+                  const loader = document.getElementById('historyLoader');
+                  const content = document.getElementById('historyContent');
+                  const orderCards = content.querySelector('.order-cards');
+                  const emptyMsg = content.querySelector('.empty-history');
+
+  if (!phoneInput.value) {
+    showError('Введите телефон для просмотра истории');
+    return;
+  }
+
+  try {
+    content.classList.add('hidden');
+    loader.classList.remove('hidden');
+    
+    const response = await fetch(`${CONFIG.SCRIPT_URL}?phone=${encodeURIComponent(phoneInput.value)}`);
+    const data = await response.json();
+    
+    if (!data.success) throw new Error(data.error);
+    
+    orderCards.innerHTML = '';
+    emptyMsg.classList.add('hidden');
+    
+    if (data.orders.length === 0) {
+      emptyMsg.classList.remove('hidden');
+    } else {
+      data.orders.forEach(order => {
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.innerHTML = `
+          <div class="order-header">
+            <div class="order-id">Заказ #${data.orders.indexOf(order) + 1}</div>
+            <div class="order-date">${new Date(order['Дата']).toLocaleDateString('ru-RU')}</div>
+          </div>
+          <div class="order-details">
+            <div class="order-detail-item">
+              <strong>Деталь:</strong>
+              <span>${order['Деталь']}</span>
+            </div>
+            <div class="order-detail-item">
+              <strong>Количество:</strong>
+              <span>${order['Количество']}</span>
+            </div>
+            <div class="order-detail-item">
+              <strong>Статус:</strong>
+              <span>${order['Статус'] || 'В обработке'}</span>
+            </div>
+            <div class="order-detail-item">
+              <strong>Комментарии:</strong>
+              <span>${order['Комментарии'] || '—'}</span>
+            </div>
+          </div>
+        `;
+        orderCards.appendChild(card);
+      });
+    }
+    
+    content.classList.remove('hidden');
+    
+  } catch (error) {
+    showError('Ошибка загрузки истории: ' + error.message);
+  } finally {
+    loader.classList.add('hidden');
+  }
+}
         });
     </script>
 </body>
