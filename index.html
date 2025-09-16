@@ -389,66 +389,106 @@ textarea:invalid + .error-message {
 
         // Ваш обновленный код с обработкой CORS
         // В функции submitForm данные собираются корректно
-async function submitForm(data) {
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzce9wSsZ9o7gZIi0Und74UY_5TlcJ5m0Q5W4IGFkPZSKIS61A_B9z-w1PUDg4Dndtiaw/exec';
-    
-    try {
-        // Проверяем наличие обязательных полей
-        if (!data.фио || !data.телефон || !data.деталь || !data.количество) {
-            throw new Error('Не заполнены обязательные поля');
+ // Функция отправки формы
+    async function submitForm(data) {
+        try {
+            // Переименовываем email в почту для совместимости с GAS
+            data.почта = data.email;
+            delete data.email;
+            
+            const response = await fetch(CONFIG.SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка сети');
+            }
+            
+            const result = await response.json();
+            return result;
+            
+        } catch (error) {
+            console.error('Ошибка:', error);
+            throw new Error('Ошибка при отправке формы: ' + error.message);
         }
-
-        const response = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            throw new Error('Ошибка сервера');
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Ошибка:', error);
-        throw new Error('Ошибка при отправке формы');
     }
-}
 
-        // Обработчик отправки формы
-        document.getElementById('orderForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitButton = document.getElementById('submitButton');
+    // Функция загрузки истории заказов
+    async function loadHistory() {
+        const phoneInput = document.getElementById('historyPhone');
+        const loader = document.getElementById('historyLoader');
+        const content = document.getElementById('historyContent');
+        const orderCards = content.querySelector('.order-cards');
+        const emptyMsg = content.querySelector('.empty-history');
+
+        if (!phoneInput.value) {
+            showError('Введите телефон для просмотра истории');
+            return;
+        }
+
+        try {
+            content.classList.add('hidden');
+            loader.classList.remove('hidden');
             
-            // Проверка валидности формы
-            if (!e.target.checkValidity()) {
-                // Показываем сообщения об ошибках
-                document.querySelectorAll('input:invalid, textarea:invalid').forEach(input => {
-                    input.style.borderColor = 'var(--error)';
+            const response = await fetch(`${CONFIG.SCRIPT_URL}?phone=${encodeURIComponent(phoneInput.value)}`);
+            
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки истории');
+            }
+            
+            const data = await response.json();
+            
+            if (!data.success) throw new Error(data.error);
+            
+            orderCards.innerHTML = '';
+            emptyMsg.classList.add('hidden');
+            
+            if (data.orders.length === 0) {
+                emptyMsg.classList.remove('hidden');
+            } else {
+                data.orders.forEach((order, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'order-card';
+                    card.innerHTML = `
+                        <div class="order-header">
+                            <div class="order-id">Заказ #${index + 1}</div>
+                            <div class="order-date">${new Date(order['Дата']).toLocaleDateString('ru-RU')}</div>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-detail-item">
+                                <strong>Деталь:</strong>
+                                <span>${order['Деталь']}</span>
+                            </div>
+                            <div class="order-detail-item">
+                                <strong>Количество:</strong>
+                                <span>${order['Количество']}</span>
+                            </div>
+                            <div class="order-detail-item">
+                                <strong>Статус:</strong>
+                                <span>${order['Статус'] || 'В обработке'}</span>
+                            </div>
+                            <div class="order-detail-item">
+                                <strong>Комментарии:</strong>
+                                <span>${order['Комментарии'] || '—'}</span>
+                            </div>
+                        </div>
+                    `;
+                    orderCards.appendChild(card);
                 });
-                showError('Пожалуйста, заполните все обязательные поля корректно.');
-                return;
             }
             
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<div class="loader"></div> Обработка...';
-
-            try {
-                const formData = new FormData(e.target);
-                const data = Object.fromEntries(formData.entries());
-                
-                const result = await submitForm(data);
-                showSuccessNotification(result.orderId);
-                e.target.reset();
-                
-            } catch (error) {
-                showError(error.message || 'Ошибка при отправке формы');
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Отправить заказ';
-            }
+            content.classList.remove('hidden');
+            
+        } catch (error) {
+            showError('Ошибка загрузки истории: ' + error.message);
+        } finally {
+            loader.classList.add('hidden');
+        }
+    }
         });
 
         // Валидация в реальном времени
