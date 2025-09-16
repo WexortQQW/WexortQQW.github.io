@@ -5,327 +5,292 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма заказа запчастей</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --accent: #f59e0b;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --success: #10b981;
-            --error: #ef4444;
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --transition: all 0.2s ease-in-out;
-            --radius: 8px;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: var(--dark);
-            background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-        
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 28px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            opacity: 0.5;
-            transform: rotate(30deg);
-        }
-        
-        h1 {
-            font-size: 30px;
-            margin-bottom: 12px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            position: relative;
-        }
-        
-        .header-description {
-            font-size: 16px;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-            font-weight: 400;
-            position: relative;
-        }
-        
-        .form-container {
-            padding: 35px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 28px;
-        }
-        
-        .form-section {
-            margin-bottom: 18px;
-        }
-        
-        .form-section-title {
-            font-size: 20px;
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--accent);
-            grid-column: span 2;
-            font-weight: 600;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        
-        .form-section-title::before {
-            content: '';
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            margin-right: 12px;
-        }
-        
-        .form-group {
-            margin-bottom: 24px;
-            position: relative;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 500;
-            color: var(--dark);
-            font-size: 15px;
-            transition: var(--transition);
-        }
-        
-        input, textarea, select {
-            width: 100%;
-            padding: 15px;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 16px;
-            transition: var(--transition);
-            background-color: var(--light);
-            font-family: inherit;
-        }
-        
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-            background-color: #fff;
-        }
-        
-        input:hover, textarea:hover, select:hover {
-            border-color: #cbd5e1;
-        }
-        
-        .required::after {
-            content: " *";
-            color: var(--error);
-        }
-        
-        button {
-            grid-column: span 2;
-            background: linear-gradient(to right, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 18px;
-            font-size: 17px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
-            margin-top: 15px;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.5px;
-        }
-        
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-        
-        button:hover::before {
-            left: 100%;
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        button:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        button:disabled::before {
-            display: none;
-        }
-        
-        .alert {
-            padding: 18px;
-            margin: 20px 0;
-            border-radius: var(--radius);
-            font-weight: 500;
-            grid-column: span 2;
-            display: flex;
-            align-items: center;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .alert-success {
-            color: var(--success);
-            background-color: rgba(16, 185, 129, 0.1);
-            border: 1.5px solid var(--success);
-        }
-        
-        .alert-error {
-            color: var(--error);
-            background-color: rgba(239, 68, 68, 0.1);
-            border: 1.5px solid var(--error);
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .form-footer {
-            grid-column: span 2;
-            text-align: center;
-            margin-top: 25px;
-            font-size: 14px;
-            color: var(--secondary);
-            line-height: 1.5;
-        }
-        
-        /* Анимации */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-        
-        /* Иконки для полей */
-        .form-group i {
-            position: absolute;
-            right: 15px;
-            top: 42px;
-            color: var(--secondary);
-            opacity: 0.6;
-        }
-        
-        /* Валидация полей */
-        input:invalid:not(:placeholder-shown) {
-            border-color: var(--error);
-        }
-        
-        input:valid:not(:placeholder-shown) {
-            border-color: var(--success);
-        }
-        
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .form-container {
-                grid-template-columns: 1fr;
-                padding: 25px 20px;
-                gap: 20px;
-            }
-            
-            .form-section-title, button {
-                grid-column: 1;
-            }
-            
-            header {
-                padding: 22px 15px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-            
-            .header-description {
-                font-size: 14px;
-            }
-            
-            .container {
-                border-radius: 10px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .form-container {
-                padding: 20px 15px;
-            }
-            
-            input, textarea, select {
-                padding: 12px;
-            }
-            
-            button {
-                padding: 16px;
-            }
-        }
-    </style>
+:root {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --secondary: #f472b6;
+  --accent: #10b981;
+  --dark: #1e293b;
+  --light: #f8fafc;
+  --background: #0f172a;
+  --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --neon-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--light);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 2rem;
+  display: grid;
+  place-items: center;
+}
+
+.container {
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--neon-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, 
+    rgba(99, 102, 241, 0.1) 0%, 
+    transparent 60%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+h1 {
+  font-size: 2.5rem;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.header-description {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  position: relative;
+}
+
+.form-section-title {
+  grid-column: 1 / -1;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--light);
+  padding-bottom: 1rem;
+  margin: 1.5rem 0;
+  border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+  position: relative;
+}
+
+.form-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100px;
+  height: 2px;
+  background: var(--gradient);
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 1.2rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.8rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  background: rgba(30, 41, 59, 0.6);
+  border: 2px solid rgba(71, 85, 105, 0.3);
+  border-radius: 0.75rem;
+  color: var(--light);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--neon-shadow);
+  background: rgba(30, 41, 59, 0.8);
+}
+
+input:hover, textarea:hover {
+  border-color: var(--primary);
+}
+
+button {
+  grid-column: 1 / -1;
+  background: var(--gradient);
+  color: white;
+  border: none;
+  padding: 1.2rem;
+  font-size: 1.1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+  margin-top: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+.alert {
+  padding: 1.2rem;
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideIn 0.4s ease-out forwards;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  color: #ef4444;
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .form-container {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+.loader {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #fff;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: rotation 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.input-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+}
+
+/* Кастомные элементы */
+.form-group:hover label {
+  color: var(--primary);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--light);
+  -webkit-box-shadow: 0 0 0px 1000px rgba(30, 41, 59, 0.6) inset;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 480px) {
+  body {
+    padding: 1rem;
+  }
+
+  input, textarea, select {
+    padding: 0.8rem;
+  }
+
+  button {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+</style>
 </head>
 <body>
     <div class="container">
