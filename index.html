@@ -266,19 +266,18 @@ textarea:invalid + .error-message {
                     <div class="error-message">Введите корректный номер телефона</div>
                 </div>
 
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="почта" name="почта" placeholder="example@mail.ru">
-                    <div class="error-message">Введите корректный email адрес</div>
-                </div>
+               <div class="form-group">
+    <label for="почта">Email</label>
+    <input type="email" id="почта" name="почта" placeholder="example@mail.ru">
+    <div class="error-message">Введите корректный email адрес</div>
+</div>
 
-                <h2 class="form-section-title">Информация об автомобиле</h2>
-
-                <div class="form-group">
-                    <label for="vin">VIN-код автомобиля</label>
-                    <input type="text" id="вин" name="вин" placeholder="Введите VIN код" pattern="[A-HJ-NPR-Z0-9]{17}" title="17-символьный VIN код">
-                    <div class="error-message">VIN код должен содержать 17 символов (буквы и цифры)</div>
-                </div>
+<!-- Поле VIN -->
+<div class="form-group">
+    <label for="вин">VIN-код автомобиля</label>
+    <input type="text" id="вин" name="вин" placeholder="Введите VIN код" pattern="[A-HJ-NPR-Z0-9]{17}" title="17-символьный VIN код">
+    <div class="error-message">VIN код должен содержать 17 символов (буквы и цифры)</div>
+</div>
 
                 <div class="form-group">
                     <label for="модель">Модель автомобиля</label>
@@ -389,29 +388,34 @@ textarea:invalid + .error-message {
         });
 
         // Ваш обновленный код с обработкой CORS
-        async function submitForm(data) {
-            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzce9wSsZ9o7gZIi0Und74UY_5TlcJ5m0Q5W4IGFkPZSKIS61A_B9z-w1PUDg4Dndtiaw/exec';
-            
-            try {
-                // Основной запрос
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                // При no-cors мы не можем прочитать ответ, поэтому считаем успешным
-                // В реальном приложении нужно использовать cors и проверять ответ
-                return { success: true, orderId: Math.floor(Math.random() * 10000) };
-                
-            } catch (error) {
-                console.error('Ошибка:', error);
-                throw new Error('Ошибка при отправке формы');
-            }
+        // В функции submitForm данные собираются корректно
+async function submitForm(data) {
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzce9wSsZ9o7gZIi0Und74UY_5TlcJ5m0Q5W4IGFkPZSKIS61A_B9z-w1PUDg4Dndtiaw/exec';
+    
+    try {
+        // Проверяем наличие обязательных полей
+        if (!data.фио || !data.телефон || !data.деталь || !data.количество) {
+            throw new Error('Не заполнены обязательные поля');
         }
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error('Ошибка сервера');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Ошибка:', error);
+        throw new Error('Ошибка при отправке формы');
+    }
+}
 
         // Обработчик отправки формы
         document.getElementById('orderForm').addEventListener('submit', async (e) => {
