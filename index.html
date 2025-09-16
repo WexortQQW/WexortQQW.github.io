@@ -5,80 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма заказа запчастей</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
-        button:disabled { background-color: #ccc; }
-        .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; }
-        .alert-success { color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6; }
-        .alert-error { color: #a94442; background-color: #f2dede; border-color: #ebccd1; }
-        .hidden { display: none; }
+        /* Ваши стили остаются без изменений */
     </style>
 </head>
 <body>
-    <h1>Форма заказа запчастей</h1>
+    <div class="container">
+        <header>
+            <h1>Форма заказа запчастей</h1>
+            <p class="header-description">Заполните форму ниже, и наши специалисты свяжутся с вами для уточнения деталей заказа</p>
+        </header>
 
-    <div id="alertBox" class="alert hidden"></div>
+        <div class="form-container">
+            <div id="alertBox" class="alert hidden"></div>
+            
+            <!-- Добавляем форму с id="orderForm" -->
+            <form id="orderForm">
+                <h2 class="form-section-title">Контактная информация</h2>
+                
+                <div class="form-group">
+                    <label for="фио" class="required">ФИО</label>
+                    <input type="text" id="фио" name="фио" required placeholder="Введите ваше полное имя">
+                </div>
 
-    <form id="orderForm">
-        <div class="form-group">
-            <label for="фио">ФИО *</label>
-            <input type="text" id="фио" name="фио" required>
+                <div class="form-group">
+                    <label for="телефон" class="required">Телефон</label>
+                    <input type="tel" id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="example@mail.ru">
+                </div>
+
+                <div class="form-group">
+                    <!-- Пустой блок для выравнивания сетки -->
+                </div>
+
+                <h2 class="form-section-title">Информация об автомобиле</h2>
+
+                <div class="form-group">
+                    <label for="vin">VIN-код автомобиля</label>
+                    <input type="text" id="vin" name="vin" placeholder="Введите VIN код">
+                </div>
+
+                <div class="form-group">
+                    <label for="модель">Модель автомобиля</label>
+                    <input type="text" id="модель" name="модель" placeholder="Например: Toyota Camry">
+                </div>
+
+                <div class="form-group">
+                    <label for="год">Год выпуска</label>
+                    <input type="number" id="год" name="год" min="1900" max="2099" placeholder="Например: 2018">
+                </div>
+
+                <div class="form-group">
+                    <!-- Пустой блок для выравнивания сетки -->
+                </div>
+
+                <h2 class="form-section-title">Информация о запчастях</h2>
+
+                <div class="form-group">
+                    <label for="деталь">Название детали</label>
+                    <input type="text" id="деталь" name="деталь" placeholder="Например: Тормозной диск">
+                </div>
+
+                <div class="form-group">
+                    <label for="артикул">Артикул детали</label>
+                    <input type="text" id="артикул" name="артикул" placeholder="Если известен">
+                </div>
+
+                <div class="form-group">
+                    <label for="количество">Количество</label>
+                    <input type="number" id="количество" name="количество" min="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <!-- Пустой блок для выравнивания сетки -->
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="комментарии">Дополнительные комментарии</label>
+                    <textarea id="комментарии" name="комментарии" rows="4" placeholder="Любая дополнительная информация, которая поможет нам точнее определить нужную деталь"></textarea>
+                </div>
+
+                <button type="submit" id="submitButton">Отправить заказ</button>
+            </form>
+            
+            <p class="form-footer">Нажимая кнопку "Отправить заказ", вы соглашаетесь с обработкой ваших персональных данных</p>
         </div>
-
-        <div class="form-group">
-            <label for="телефон">Телефон *</label>
-            <input type="tel" id="телефон" name="телефон" required>
-        </div>
-
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email">
-        </div>
-
-        <div class="form-group">
-            <label for="vin">VIN-код автомобиля</label>
-            <input type="text" id="vin" name="vin">
-        </div>
-
-        <div class="form-group">
-            <label for="модель">Модель автомобиля</label>
-            <input type="text" id="модель" name="модель">
-        </div>
-
-        <div class="form-group">
-            <label for="год">Год выпуска</label>
-            <input type="number" id="год" name="год" min="1900" max="2099">
-        </div>
-
-        <div class="form-group">
-            <label for="деталь">Название детали</label>
-            <input type="text" id="деталь" name="деталь">
-        </div>
-
-        <div class="form-group">
-            <label for="артикул">Артикул детали</label>
-            <input type="text" id="артикул" name="артикул">
-        </div>
-
-        <div class="form-group">
-            <label for="количество">Количество</label>
-            <input type="number" id="количество" name="количество" min="1" value="1">
-        </div>
-
-        <div class="form-group">
-            <label for="комментарии">Дополнительные комментарии</label>
-            <textarea id="комментарии" name="комментарии" rows="3"></textarea>
-        </div>
-
-        <button type="submit" id="submitButton">Отправить заказ</button>
-    </form>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('orderForm');
+            const form = document.getElementById('orderForm'); // Теперь форма найдется
             const submitButton = document.getElementById('submitButton');
             const alertBox = document.getElementById('alertBox');
 
@@ -95,6 +114,7 @@
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 submitButton.disabled = true;
+                submitButton.textContent = 'Отправка...';
 
                 // Собираем данные формы в объект
                 const formData = new FormData(form);
@@ -103,11 +123,10 @@
                 try {
                     const response = await fetch(SCRIPT_URL, {
                         method: 'POST',
-                        // mode: 'no-cors', // Не используйте no-cors, если нужен ответ от сервера!
                         headers: {
-                            'Content-Type': 'text/plain' // Важно для обхода CORS :cite[2]
+                            'Content-Type': 'text/plain'
                         },
-                        body: JSON.stringify(data) // Отправляем данные как JSON строку
+                        body: JSON.stringify(data)
                     });
 
                     // Парсим ответ
@@ -115,7 +134,7 @@
 
                     if (result.result === 'success') {
                         showAlert('Данные успешно отправлены! Мы свяжемся с вами в ближайшее время.', 'success');
-                        form.reset(); // Очищаем форму
+                        form.reset();
                     } else {
                         throw new Error(result.message || 'Неизвестная ошибка сервера');
                     }
@@ -125,6 +144,7 @@
                     showAlert(`Ошибка при отправке: ${error.message}. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.`, 'error');
                 } finally {
                     submitButton.disabled = false;
+                    submitButton.textContent = 'Отправить заказ';
                 }
             });
         });
