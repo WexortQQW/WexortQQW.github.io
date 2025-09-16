@@ -379,69 +379,98 @@ input:-webkit-autofill:focus {
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('orderForm');
-  const submitButton = document.getElementById('submitButton');
-  const alertBox = document.getElementById('alertBox');
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNeOhA_3xnhPK0L-AkRDWe9Cpamxqxq1TymubZg9zBhTcs08cDexlpNwQbf_k83pp8NA/exec';
+        // Функции для показа уведомлений
+        function showSuccessNotification(orderId) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `
+                <svg>...</svg>
+                <div>
+                    <strong>Заказ #${orderId} принят!</strong><br>
+                    Мы свяжемся с вами в течение 15 минут
+                </div>
+            `;
+            alertBox.className = 'alert alert-success';
+            alertBox.classList.remove('hidden');
+        }
 
-  // Функция отображения уведомлений
-  const showAlert = (message, type, orderId = null) => {
-    alertBox.innerHTML = orderId 
-      ? `<strong>Заказ #${orderId}</strong><br>${message}`
-      : message;
-    
-    alertBox.className = `alert alert-${type}`;
-    alertBox.classList.remove('hidden');
-    
-    setTimeout(() => alertBox.classList.add('hidden'), 5000);
-  };
+        function showError(message) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `
+                <svg>...</svg>
+                <div>${message}</div>
+            `;
+            alertBox.className = 'alert alert-error';
+            alertBox.classList.remove('hidden');
+        }
 
-  // Обработка отправки формы
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    submitButton.disabled = true;
-    submitButton.textContent = 'Отправка...';
+        // Ваш обновленный код с обработкой CORS
+        async function submitForm(data) {
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNeOhA_3xnhPK0L-AkRDWe9Cpamxqxq1TymubZg9zBhTcs08cDexlpNwQbf_k83pp8NA/exec';
+            
+            try {
+                // Preflight запрос
+                await fetch(SCRIPT_URL, {
+                    method: 'OPTIONS',
+                    mode: 'cors'
+                });
 
-    try {
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
+                // Основной запрос
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
 
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+                if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
+                
+                const result = await response.json();
+                if (!result.success) throw new Error(result.error);
+                
+                return result;
 
-      if (!response.ok) throw new Error('HTTP Error: ' + response.status);
+            } catch (error) {
+                console.error('Ошибка:', error);
+                throw error;
+            }
+        }
 
-      const result = await response.json();
+        // Обработчик отправки формы
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = document.getElementById('submitButton');
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<div class="loader"></div>';
 
-      if (result.success) {
-        showAlert('Заказ успешно создан! Мы свяжемся с вами в течение 15 минут.', 'success', result.orderId);
-        form.reset();
-      } else {
-        throw new Error(result.error || 'Неизвестная ошибка сервера');
-      }
+            try {
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                
+                const result = await submitForm(data);
+                showSuccessNotification(result.orderId);
+                e.target.reset();
+                
+            } catch (error) {
+                showError(error.message || 'Ошибка при отправке формы');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Отправить заказ';
+            }
+        });
 
-    } catch (error) {
-      console.error('Ошибка:', error);
-      showAlert(`Ошибка отправки: ${error.message}`, 'error');
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = 'Отправить заказ';
-    }
-  });
-
-  // Валидация полей в реальном времени
-  form.querySelectorAll('input, textarea').forEach(input => {
-    input.addEventListener('input', () => {
-      if (input.validity.valid) {
-        input.style.borderColor = '';
-      }
-    });
-  });
-});
+        // Валидация в реальном времени
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.checkValidity()) {
+                    input.style.borderColor = 'var(--primary)';
+                } else {
+                    input.style.borderColor = 'var(--error)';
+                }
+            });
+        });
     </script>
 </body>
 </html>
