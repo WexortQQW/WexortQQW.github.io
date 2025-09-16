@@ -414,108 +414,69 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('orderForm');
-    const submitButton = document.getElementById('submitButton');
-    const alertBox = document.getElementById('alertBox');
+        document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('orderForm');
+  const submitButton = document.getElementById('submitButton');
+  const alertBox = document.getElementById('alertBox');
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNeOhA_3xnhPK0L-AkRDWe9Cpamxqxq1TymubZg9zBhTcs08cDexlpNwQbf_k83pp8NA/exec';
 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNeOhA_3xnhPK0L-AkRDWe9Cpamxqxq1TymubZg9zBhTcs08cDexlpNwQbf_k83pp8NA/exec';
-
-    // Функция отображения уведомлений
-    function showAlert(message, type, orderId = null) {
-        alertBox.textContent = message;
-        alertBox.className = `alert alert-${type}`;
-        alertBox.classList.remove('hidden');
-        
-        // Добавляем номер заказа, если есть
-        if (orderId) {
-            alertBox.innerHTML = `<strong>Заказ №${orderId}</strong><br>${message}`;
-        }
-        
-        // Анимация появления
-        alertBox.style.animation = 'none';
-        setTimeout(() => {
-            alertBox.style.animation = 'fadeIn 0.3s ease-out';
-        }, 10);
-        
-        setTimeout(() => { 
-            alertBox.classList.add('hidden'); 
-        }, 5000);
-    }
-
-    // Обработка отправки формы
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // Валидация обязательных полей
-        const requiredFields = form.querySelectorAll('[required]');
-        let valid = true;
-        
-        requiredFields.forEach(field => {
-            if (!field.value.trim()) {
-                field.style.borderColor = 'var(--error)';
-                valid = false;
-            }
-        });
-        
-        if (!valid) {
-            showAlert('Пожалуйста, заполните все обязательные поля', 'error');
-            return;
-        }
-        
-        // Блокировка кнопки
-        submitButton.disabled = true;
-        submitButton.textContent = 'Отправка...';
-
-        try {
-            // Собираем данные формы
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-
-            // Отправляем запрос
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-
-            // Проверяем статус ответа
-            if (!response.ok) {
-                throw new Error('Ошибка сервера');
-            }
-
-            const result = await response.json();
-
-            if (result.success) {
-                // Успешная отправка
-                showAlert('Заказ успешно создан! Мы свяжемся с вами в ближайшее время.', 'success', result.orderId);
-                form.reset();
-            } else {
-                throw new Error(result.error || 'Неизвестная ошибка');
-            }
-
-        } catch (error) {
-            console.error('Ошибка:', error);
-            showAlert(`Ошибка при отправке: ${error.message}. Попробуйте позже или свяжитесь с нами по телефону.`, 'error');
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Отправить заказ';
-        }
-    });
+  // Функция отображения уведомлений
+  const showAlert = (message, type, orderId = null) => {
+    alertBox.innerHTML = orderId 
+      ? `<strong>Заказ #${orderId}</strong><br>${message}`
+      : message;
     
-    // Сброс стиля ошибки при вводе
-    const inputs = form.querySelectorAll('input, textarea');
-    inputs.forEach(input => {
-        input.addEventListener('input', () => {
-            if (input.hasAttribute('required') && input.value.trim()) {
-                input.style.borderColor = '';
-            }
-        });
-    });
-});
+    alertBox.className = `alert alert-${type}`;
+    alertBox.classList.remove('hidden');
+    
+    setTimeout(() => alertBox.classList.add('hidden'), 5000);
+  };
 
+  // Обработка отправки формы
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitButton.disabled = true;
+    submitButton.textContent = 'Отправка...';
+
+    try {
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) throw new Error('HTTP Error: ' + response.status);
+
+      const result = await response.json();
+
+      if (result.success) {
+        showAlert('Заказ успешно создан! Мы свяжемся с вами в течение 15 минут.', 'success', result.orderId);
+        form.reset();
+      } else {
+        throw new Error(result.error || 'Неизвестная ошибка сервера');
+      }
+
+    } catch (error) {
+      console.error('Ошибка:', error);
+      showAlert(`Ошибка отправки: ${error.message}`, 'error');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Отправить заказ';
+    }
+  });
+
+  // Валидация полей в реальном времени
+  form.querySelectorAll('input, textarea').forEach(input => {
+    input.addEventListener('input', () => {
+      if (input.validity.valid) {
+        input.style.borderColor = '';
+      }
+    });
+  });
+});
     </script>
 </body>
 </html>
