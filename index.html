@@ -5,264 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма заказа запчастей</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #e74c3c;
-            --accent: #3498db;
-            --light: #ecf0f1;
-            --dark: #34495e;
-            --success: #2ecc71;
-            --error: #e74c3c;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--dark);
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-        
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        
-        .header-description {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-        
-        .form-container {
-            padding: 30px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-        
-        .form-section {
-            margin-bottom: 15px;
-        }
-        
-        .form-section-title {
-            font-size: 18px;
-            color: var(--primary);
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--accent);
-            grid-column: span 2;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-        
-        input, textarea, select {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: var(--transition);
-        }
-        
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-        
-        .required::after {
-            content: " *";
-            color: var(--secondary);
-        }
-        
-        button {
-            grid-column: span 2;
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 16px;
-            font-size: 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
-            margin-top: 10px;
-            width: 100%;
-        }
-        
-        button:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        button:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .alert {
-            padding: 16px;
-            margin: 20px 0;
-            border-radius: 6px;
-            font-weight: 500;
-        }
-        
-        .alert-success {
-            color: var(--success);
-            background-color: rgba(46, 204, 113, 0.1);
-            border: 1px solid var(--success);
-        }
-        
-        .alert-error {
-            color: var(--error);
-            background-color: rgba(231, 76, 60, 0.1);
-            border: 1px solid var(--error);
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .form-footer {
-            grid-column: span 2;
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #7f8c8d;
-        }
-        
-        @media (max-width: 768px) {
-            .form-container {
-                grid-template-columns: 1fr;
-                padding: 20px;
-            }
-            
-            .form-section-title, button {
-                grid-column: 1;
-            }
-        }
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:disabled { background-color: #ccc; }
+        .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; }
+        .alert-success { color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6; }
+        .alert-error { color: #a94442; background-color: #f2dede; border-color: #ebccd1; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Форма заказа запчастей</h1>
-            <p class="header-description">Заполните форму ниже, и наши специалисты свяжутся с вами для уточнения деталей заказа</p>
-        </header>
+    <h1>Форма заказа запчастей</h1>
 
-        <div class="form-container">
-            <div id="alertBox" class="alert hidden"></div>
-            
-            <h2 class="form-section-title">Контактная информация</h2>
-            
-            <div class="form-group">
-                <label for="фио" class="required">ФИО</label>
-                <input type="text" id="фио" name="фио" required placeholder="Введите ваше полное имя">
-            </div>
+    <div id="alertBox" class="alert hidden"></div>
 
-            <div class="form-group">
-                <label for="телефон" class="required">Телефон</label>
-                <input type="tel" id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX">
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="example@mail.ru">
-            </div>
-
-            <div class="form-group">
-                <!-- Пустой блок для выравнивания сетки -->
-            </div>
-
-            <h2 class="form-section-title">Информация об автомобиле</h2>
-
-            <div class="form-group">
-                <label for="vin">VIN-код автомобиля</label>
-                <input type="text" id="vin" name="vin" placeholder="Введите VIN код">
-            </div>
-
-            <div class="form-group">
-                <label for="модель">Модель автомобиля</label>
-                <input type="text" id="модель" name="модель" placeholder="Например: Toyota Camry">
-            </div>
-
-            <div class="form-group">
-                <label for="год">Год выпуска</label>
-                <input type="number" id="год" name="год" min="1900" max="2099" placeholder="Например: 2018">
-            </div>
-
-            <div class="form-group">
-                <!-- Пустой блок для выравнивания сетки -->
-            </div>
-
-            <h2 class="form-section-title">Информация о запчастях</h2>
-
-            <div class="form-group">
-                <label for="деталь">Название детали</label>
-                <input type="text" id="деталь" name="деталь" placeholder="Например: Тормозной диск">
-            </div>
-
-            <div class="form-group">
-                <label for="артикул">Артикул детали</label>
-                <input type="text" id="артикул" name="артикул" placeholder="Если известен">
-            </div>
-
-            <div class="form-group">
-                <label for="количество">Количество</label>
-                <input type="number" id="количество" name="количество" min="1" value="1">
-            </div>
-
-            <div class="form-group">
-                <!-- Пустой блок для выравнивания сетки -->
-            </div>
-
-            <div class="form-group" style="grid-column: span 2;">
-                <label for="комментарии">Дополнительные комментарии</label>
-                <textarea id="комментарии" name="комментарии" rows="4" placeholder="Любая дополнительная информация, которая поможет нам точнее определить нужную деталь"></textarea>
-            </div>
-
-            <button type="submit" id="submitButton">Отправить заказ</button>
-            
-            <p class="form-footer">Нажимая кнопку "Отправить заказ", вы соглашаетесь с обработкой ваших персональных данных</p>
+    <form id="orderForm">
+        <div class="form-group">
+            <label for="фио">ФИО *</label>
+            <input type="text" id="фио" name="фио" required>
         </div>
-    </div>
+
+        <div class="form-group">
+            <label for="телефон">Телефон *</label>
+            <input type="tel" id="телефон" name="телефон" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email">
+        </div>
+
+        <div class="form-group">
+            <label for="vin">VIN-код автомобиля</label>
+            <input type="text" id="vin" name="vin">
+        </div>
+
+        <div class="form-group">
+            <label for="модель">Модель автомобиля</label>
+            <input type="text" id="модель" name="модель">
+        </div>
+
+        <div class="form-group">
+            <label for="год">Год выпуска</label>
+            <input type="number" id="год" name="год" min="1900" max="2099">
+        </div>
+
+        <div class="form-group">
+            <label for="деталь">Название детали</label>
+            <input type="text" id="деталь" name="деталь">
+        </div>
+
+        <div class="form-group">
+            <label for="артикул">Артикул детали</label>
+            <input type="text" id="артикул" name="артикул">
+        </div>
+
+        <div class="form-group">
+            <label for="количество">Количество</label>
+            <input type="number" id="количество" name="количество" min="1" value="1">
+        </div>
+
+        <div class="form-group">
+            <label for="комментарии">Дополнительные комментарии</label>
+            <textarea id="комментарии" name="комментарии" rows="3"></textarea>
+        </div>
+
+        <button type="submit" id="submitButton">Отправить заказ</button>
+    </form>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -283,7 +95,6 @@
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 submitButton.disabled = true;
-                submitButton.textContent = 'Отправка...';
 
                 // Собираем данные формы в объект
                 const formData = new FormData(form);
@@ -292,10 +103,11 @@
                 try {
                     const response = await fetch(SCRIPT_URL, {
                         method: 'POST',
+                        // mode: 'no-cors', // Не используйте no-cors, если нужен ответ от сервера!
                         headers: {
-                            'Content-Type': 'text/plain'
+                            'Content-Type': 'text/plain' // Важно для обхода CORS :cite[2]
                         },
-                        body: JSON.stringify(data)
+                        body: JSON.stringify(data) // Отправляем данные как JSON строку
                     });
 
                     // Парсим ответ
@@ -303,7 +115,7 @@
 
                     if (result.result === 'success') {
                         showAlert('Данные успешно отправлены! Мы свяжемся с вами в ближайшее время.', 'success');
-                        form.reset();
+                        form.reset(); // Очищаем форму
                     } else {
                         throw new Error(result.message || 'Неизвестная ошибка сервера');
                     }
@@ -313,7 +125,6 @@
                     showAlert(`Ошибка при отправке: ${error.message}. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.`, 'error');
                 } finally {
                     submitButton.disabled = false;
-                    submitButton.textContent = 'Отправить заказ';
                 }
             });
         });
