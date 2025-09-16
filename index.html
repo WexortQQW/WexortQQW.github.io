@@ -6,15 +6,20 @@
     <title>Форма заказа запчастей</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #e74c3c;
-            --accent: #3498db;
-            --light: #ecf0f1;
-            --dark: #34495e;
-            --success: #2ecc71;
-            --error: #e74c3c;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --accent: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --success: #10b981;
+            --error: #ef4444;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s ease-in-out;
+            --radius: 8px;
         }
         
         * {
@@ -24,10 +29,10 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
             color: var(--dark);
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -37,123 +42,198 @@
             margin: 0 auto;
             background: white;
             border-radius: 12px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
+            transition: var(--transition);
         }
         
         header {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 25px;
+            padding: 28px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0.5;
+            transform: rotate(30deg);
         }
         
         h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 30px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            position: relative;
         }
         
         .header-description {
             font-size: 16px;
             opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 400;
+            position: relative;
         }
         
         .form-container {
-            padding: 30px;
+            padding: 35px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 25px;
+            gap: 28px;
         }
         
         .form-section {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         
         .form-section-title {
-            font-size: 18px;
+            font-size: 20px;
             color: var(--primary);
-            margin-bottom: 15px;
-            padding-bottom: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
             border-bottom: 2px solid var(--accent);
             grid-column: span 2;
+            font-weight: 600;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-section-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin-right: 12px;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            position: relative;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 500;
             color: var(--dark);
+            font-size: 15px;
+            transition: var(--transition);
         }
         
         input, textarea, select {
             width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 15px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
             font-size: 16px;
             transition: var(--transition);
+            background-color: var(--light);
+            font-family: inherit;
         }
         
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            background-color: #fff;
+        }
+        
+        input:hover, textarea:hover, select:hover {
+            border-color: #cbd5e1;
         }
         
         .required::after {
             content: " *";
-            color: var(--secondary);
+            color: var(--error);
         }
         
         button {
             grid-column: span 2;
-            background: var(--secondary);
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            padding: 16px;
-            font-size: 18px;
-            border-radius: 6px;
+            padding: 18px;
+            font-size: 17px;
+            border-radius: var(--radius);
             cursor: pointer;
             transition: var(--transition);
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 15px;
             width: 100%;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
         }
         
         button:hover {
-            background: #c0392b;
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:active {
+            transform: translateY(0);
         }
         
         button:disabled {
-            background: #95a5a6;
+            background: #94a3b8;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
         
+        button:disabled::before {
+            display: none;
+        }
+        
         .alert {
-            padding: 16px;
+            padding: 18px;
             margin: 20px 0;
-            border-radius: 6px;
+            border-radius: var(--radius);
             font-weight: 500;
+            grid-column: span 2;
+            display: flex;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
         }
         
         .alert-success {
             color: var(--success);
-            background-color: rgba(46, 204, 113, 0.1);
-            border: 1px solid var(--success);
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1.5px solid var(--success);
         }
         
         .alert-error {
             color: var(--error);
-            background-color: rgba(231, 76, 60, 0.1);
-            border: 1px solid var(--error);
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1.5px solid var(--error);
         }
         
         .hidden {
@@ -163,19 +243,86 @@
         .form-footer {
             grid-column: span 2;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
             font-size: 14px;
-            color: #7f8c8d;
+            color: var(--secondary);
+            line-height: 1.5;
         }
         
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Иконки для полей */
+        .form-group i {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: var(--secondary);
+            opacity: 0.6;
+        }
+        
+        /* Валидация полей */
+        input:invalid:not(:placeholder-shown) {
+            border-color: var(--error);
+        }
+        
+        input:valid:not(:placeholder-shown) {
+            border-color: var(--success);
+        }
+        
+        /* Адаптивность */
         @media (max-width: 768px) {
             .form-container {
                 grid-template-columns: 1fr;
-                padding: 20px;
+                padding: 25px 20px;
+                gap: 20px;
             }
             
             .form-section-title, button {
                 grid-column: 1;
+            }
+            
+            header {
+                padding: 22px 15px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .header-description {
+                font-size: 14px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .form-container {
+                padding: 20px 15px;
+            }
+            
+            input, textarea, select {
+                padding: 12px;
+            }
+            
+            button {
+                padding: 16px;
             }
         }
     </style>
@@ -190,7 +337,6 @@
         <div class="form-container">
             <div id="alertBox" class="alert hidden"></div>
             
-            <!-- Добавляем форму с id="orderForm" -->
             <form id="orderForm">
                 <h2 class="form-section-title">Контактная информация</h2>
                 
@@ -269,26 +415,50 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('orderForm'); // Теперь форма найдется
+            const form = document.getElementById('orderForm');
             const submitButton = document.getElementById('submitButton');
             const alertBox = document.getElementById('alertBox');
 
-            // URL вашего GAS веб-приложения
             const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9NiN2xsFjPzEd4Kt-QCmS5O7dt97vAZSFvBdHmzbSheIJ28tPWNnL8bkmVt36OPZFvw/exec';
 
             function showAlert(message, type) {
                 alertBox.textContent = message;
                 alertBox.className = `alert alert-${type}`;
                 alertBox.classList.remove('hidden');
-                setTimeout(() => { alertBox.classList.add('hidden'); }, 5000);
+                
+                // Анимация появления
+                alertBox.style.animation = 'none';
+                setTimeout(() => {
+                    alertBox.style.animation = 'fadeIn 0.3s ease-out';
+                }, 10);
+                
+                setTimeout(() => { 
+                    alertBox.classList.add('hidden'); 
+                }, 5000);
             }
 
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
+                
+                // Валидация обязательных полей
+                const requiredFields = form.querySelectorAll('[required]');
+                let valid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.style.borderColor = 'var(--error)';
+                        valid = false;
+                    }
+                });
+                
+                if (!valid) {
+                    showAlert('Пожалуйста, заполните все обязательные поля', 'error');
+                    return;
+                }
+                
                 submitButton.disabled = true;
                 submitButton.textContent = 'Отправка...';
 
-                // Собираем данные формы в объект
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
 
@@ -301,7 +471,6 @@
                         body: JSON.stringify(data)
                     });
 
-                    // Парсим ответ
                     const result = await response.json();
 
                     if (result.result === 'success') {
@@ -318,6 +487,16 @@
                     submitButton.disabled = false;
                     submitButton.textContent = 'Отправить заказ';
                 }
+            });
+            
+            // Сброс стиля ошибки при вводе
+            const inputs = form.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.hasAttribute('required') && input.value.trim()) {
+                        input.style.borderColor = '';
+                    }
+                });
             });
         });
     </script>
