@@ -5,215 +5,205 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма заказа запчастей</title>
     <style>
-:root {
-  --primary: #333;                    /* Тёмно-серый */
-  --secondary: #666;                  /* Серый */
-  --accent: #0077CC;                  /* Синий акцент */
-  --error: #D9534F;                   /* Красный для ошибок */
-  --background: #F5F5F5;              /* Светло-серый фон */
-  --surface: #FFFFFF;                 /* Белый */
-  --text-primary: #333;               /* Основной текст */
-  --text-secondary: #666;             /* Вторичный текст */
-  
-  --shadow: 0 2px 4px rgba(0,0,0,0.1);
-  --radius: 4px;
-  --transition: all 0.2s ease-in-out;
-}
+        :root {
+            --primary: #333;
+            --secondary: #666;
+            --accent: #0077CC;
+            --error: #D9534F;
+            --background: #F5F5F5;
+            --surface: #FFFFFF;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --radius: 4px;
+            --transition: all 0.2s ease-in-out;
+        }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', system-ui, sans-serif;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
 
-body {
-  background: var(--background);
-  color: var(--text-primary);
-  line-height: 1.6;
-  min-height: 100vh;
-  padding: 2rem;
-  font-size: 14px;
-}
+        body {
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+            font-size: 14px;
+        }
 
-/* Контейнер */
-.container {
-  background: var(--surface);
-  max-width: 600px;
-  margin: 2rem auto;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 1.5rem;
-}
+        .container {
+            background: var(--surface);
+            max-width: 600px;
+            margin: 2rem auto;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
 
-/* Шапка */
-.header {
-  margin-bottom: 2rem;
-  text-align: center;
-}
+        .header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
 
-.header h1 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--primary);
-}
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
 
-.header p {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
 
-/* Форма */
-.form-container {
-  display: grid;
-  gap: 1.5rem;
-}
+        .form-container {
+            display: grid;
+            gap: 1.5rem;
+        }
 
-.form-section-title {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: var(--primary);
-}
+        .form-section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
-.required::after {
-  content: " *";
-  color: var(--error);
-}
+        .required::after {
+            content: " *";
+            color: var(--error);
+        }
 
-/* Поля ввода */
-input, textarea, select {
-  padding: 0.8rem;
-  border: 1px solid var(--secondary);
-  border-radius: var(--radius);
-  background: var(--surface);
-  font-size: 1rem;
-  transition: var(--transition);
-}
+        input, textarea, select {
+            padding: 0.8rem;
+            border: 1px solid var(--secondary);
+            border-radius: var(--radius);
+            background: var(--surface);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
 
-input:focus, textarea:focus, select:focus {
-  border-color: var(--accent);
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0,121,204,0.25);
-}
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0,121,204,0.25);
+        }
 
-/* Кнопка */
-button {
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: var(--radius);
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-}
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
 
-button:hover {
-  background: darken(var(--accent), 10%);
-}
+        button:hover {
+            background: #0066b3;
+        }
 
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
-/* Уведомления */
-.alert {
-  padding: 1rem;
-  border-radius: var(--radius);
-  margin-bottom: 1.5rem;
-}
+        .alert {
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+        }
 
-.alert-success {
-  background: #e8f5e9;
-  color: #388e3c;
-  border: 1px solid #
-}
+        .alert-success {
+            background: #e8f5e9;
+            color: #388e3c;
+            border: 1px solid #c8e6c9;
+        }
 
-.alert-error {
-  background: #FEF2F2;
-  color: #DC2626;
-  border: 1px solid #FECACA;
-}
+        .alert-error {
+            background: #FEF2F2;
+            color: #DC2626;
+            border: 1px solid #FECACA;
+        }
 
-.hidden {
-  display: none;
-}
+        .hidden {
+            display: none;
+        }
 
-/* Адаптация для мобильных */
-@media (max-width: 640px) {
-  .container {
-    margin: 0;
-    border-radius: 0;
-  }
-  
-  .header {
-    padding: 1.5rem;
-  }
-  
-  .form-container {
-    padding: 1.5rem;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-  }
-  
-  .form-section-title,
-  .form-group-full,
-  button,
-  .alert {
-    grid-column: span 1;
-  }
-  
-  input, textarea, select {
-    padding: 0.75rem;
-  }
-}
+        @media (max-width: 640px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .form-container {
+                padding: 1.5rem;
+                gap: 1rem;
+                grid-template-columns: 1fr;
+            }
+            
+            .form-section-title,
+            .form-group-full,
+            button,
+            .alert {
+                grid-column: span 1;
+            }
+            
+            input, textarea, select {
+                padding: 0.75rem;
+            }
+        }
 
-/* Загрузчик */
-.loader {
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 2px solid #fff;
-  border-bottom-color: transparent;
-  border-radius: 50%;
-  animation: rotation 1s linear infinite;
-}
+        .loader {
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid #fff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
 
-@keyframes rotation {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-/* Валидация */
-input:invalid, textarea:invalid {
-  border-color: var(--error);
-}
+        input:invalid, textarea:invalid {
+            border-color: var(--error);
+        }
 
-.error-message {
-  color: var(--error);
-  font-size: 0.875rem;
-  display: none;
-}
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
+            display: none;
+        }
 
-input:invalid + .error-message,
-textarea:invalid + .error-message {
-  display: block;
-}
+        input:invalid + .error-message,
+        textarea:invalid + .error-message {
+            display: block;
+        }
 
-.form-footer {
-  grid-column: span 2;
-  text-align: center;
-  margin-top: 1rem;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-</style>
+        .form-footer {
+            grid-column: span 2;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
