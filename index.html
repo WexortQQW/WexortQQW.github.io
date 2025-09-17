@@ -6,20 +6,18 @@
     <title>Форма заказа запчастей</title>
     <style>
 :root {
-  --primary: #4F46E5;       /* Индиго */
-  --secondary: #06B6D4;    /* Бирюзовый */
-  --accent: #10B981;       /* Изумрудный */
-  --error: #EF4444;        /* Мягкий красный */
-  --background: #F8FAFC;   /* Светло-серый */
-  --surface: #FFFFFF;      /* Белый */
-  --text-primary: #0F172A; /* Темно-синий */
-  --text-secondary: #64748B; /* Серо-синий */
+  --primary: #333;                    /* Тёмно-серый */
+  --secondary: #666;                  /* Серый */
+  --accent: #0077CC;                  /* Синий акцент */
+  --error: #D9534F;                   /* Красный для ошибок */
+  --background: #F5F5F5;              /* Светло-серый фон */
+  --surface: #FFFFFF;                 /* Белый */
+  --text-primary: #333;               /* Основной текст */
+  --text-secondary: #666;             /* Вторичный текст */
   
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-  --radius-lg: 1rem;
-  --radius-md: 0.5rem;
-  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow: 0 2px 4px rgba(0,0,0,0.1);
+  --radius: 4px;
+  --transition: all 0.2s ease-in-out;
 }
 
 * {
@@ -32,62 +30,55 @@
 body {
   background: var(--background);
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: 1.6;
   min-height: 100vh;
-  padding: 1rem;
+  padding: 2rem;
+  font-size: 14px;
 }
 
 /* Контейнер */
 .container {
   background: var(--surface);
-  max-width: 800px;
+  max-width: 600px;
   margin: 2rem auto;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
 }
 
 /* Шапка */
 .header {
-  padding: 2rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
+  margin-bottom: 2rem;
   text-align: center;
 }
 
 .header h1 {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   margin-bottom: 0.5rem;
+  color: var(--primary);
 }
 
 .header p {
-  color: rgba(255,255,255,0.9);
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 /* Форма */
 .form-container {
-  padding: 2rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
 }
 
 .form-section-title {
-  grid-column: span 2;
-  margin: 1rem 0 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #E2E8F0;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
   color: var(--primary);
 }
 
 .form-group {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
-}
-
-.form-group-full {
-  grid-column: span 2;
 }
 
 .required::after {
@@ -97,69 +88,52 @@ body {
 
 /* Поля ввода */
 input, textarea, select {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  border: 1px solid #E2E8F0;
-  border-radius: var(--radius-md);
+  padding: 0.8rem;
+  border: 1px solid var(--secondary);
+  border-radius: var(--radius);
   background: var(--surface);
   font-size: 1rem;
   transition: var(--transition);
 }
 
 input:focus, textarea:focus, select:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-  border-color: transparent;
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,121,204,0.25);
 }
 
 /* Кнопка */
 button {
-  background: var(--primary);
+  background: var(--accent);
   color: white;
   border: none;
-  padding: 1rem 2rem;
-  border-radius: var(--radius-md);
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius);
   font-weight: 600;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
   transition: var(--transition);
-  grid-column: span 2;
-  margin-top: 1rem;
 }
 
 button:hover {
-  background: #4338CA;
-  transform: translateY(-1px);
+  background: darken(var(--accent), 10%);
 }
 
 button:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* Уведомления */
 .alert {
   padding: 1rem;
-  border-radius: var(--radius-md);
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  grid-column: span 2;
-}
-
-.alert svg {
-  width: 1.5rem;
-  height: 1.5rem;
-  flex-shrink: 0;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
 }
 
 .alert-success {
-  background: #F0FDF4;
-  color: #059669;
-  border: 1px solid #A7F3D0;
+  background: #e8f5e9;
+  color: #388e3c;
+  border: 1px solid #
 }
 
 .alert-error {
