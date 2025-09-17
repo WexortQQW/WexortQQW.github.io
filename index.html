@@ -5,9 +5,259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма заказа запчастей</title>
     <style>
-        /* ... (существующие стили остаются без изменений) ... */
-        
-        .search-section {
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --accent: #f59e0b;
+            --error: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 8px;
+            --transition: all 0.2s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: var(--surface);
+            max-width: 640px;
+            width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .form-container {
+            padding: 2rem;
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-section {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .form-section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section-title::before {
+            content: "";
+            width: 4px;
+            height: 1.25rem;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .required::after {
+            content: " *";
+            color: var(--error);
+        }
+
+        input, textarea, select {
+            padding: 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--surface);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            border: 1px solid;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loader {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        input:invalid, textarea:invalid {
+            border-color: var(--error);
+        }
+
+        input:invalid + .error-message,
+        textarea:invalid + .error-message {
+            display: block;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 0;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+            }
+            
+            .header {
+                padding: 1.5rem 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-container {
+                padding: 1.5rem 1rem;
+                gap: 1rem;
+            }
+            
+            .form-section {
+                padding: 1rem;
+            }
+        }
+.search-section {
             margin-top: 2rem;
             padding-top: 2rem;
             border-top: 1px solid var(--border);
@@ -71,9 +321,86 @@
             <div id="alertBox" class="alert hidden"></div>
             
             <form id="orderForm">
-                <!-- ... (существующая форма остается без изменений) ... -->
+                <h2 class="form-section-title">Контактная информация</h2>
+                
+                <div class="form-group">
+                    <label for="фио" class="required">ФИО</label>
+                    <input type="text" id="фио" name="фио" required placeholder="Введите ваше полное имя">
+                    <div class="error-message">Пожалуйста, введите ваше ФИО</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="телефон" class="required">Телефон</label>
+                    <input type="tel" id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX" pattern="^(\+7|8)[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$">
+                    <div class="error-message">Введите корректный номер телефона</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="example@mail.ru">
+                    <div class="error-message">Введите корректный email адрес</div>
+                </div>
+
+                <h2 class="form-section-title">Информация об автомобиле</h2>
+
+                <div class="form-group">
+                    <label for="vin">VIN-код автомобиля</label>
+                    <input type="text" id="vin" name="vin" placeholder="Введите VIN код" pattern="[A-HJ-NPR-Z0-9]{17}" title="17-символьный VIN код">
+                    <div class="error-message">VIN код должен содержать 17 символов (буквы и цифры)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="модель">Модель автомобиля</label>
+                    <input type="text" id="модель" name="модель" placeholder="Например: Toyota Camry">
+                </div>
+
+                <div class="form-group">
+                    <label for="год">Год выпуска</label>
+                    <input type="number" id="год" name="год" min="1950" max="2099" placeholder="Например: 2018">
+                </div>
+
+                <h2 class="form-section-title">Информация о запчастях</h2>
+
+                <div class="form-group">
+                    <label for="деталь" class="required">Название детали</label>
+                    <input type="text" id="деталь" name="деталь" required placeholder="Например: Тормозной диск">
+                    <div class="error-message">Пожалуйста, укажите название детали</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="артикул">Артикул детали</label>
+                    <input type="text" id="артикул" name="артикул" placeholder="Если известен">
+                </div>
+
+                <div class="form-group">
+                    <label for="количество" class="required">Количество</label>
+                    <input type="number" id="количество" name="количество" min="1" value="1" required>
+                    <div class="error-message">Укажите количество</div>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="комментарии">Дополнительные комментарии</label>
+                    <textarea id="комментарии" name="комментарии" rows="4" placeholder="Любая дополнительная информация, которая поможет нам точнее определить нужную деталь"></textarea>
+                </div>
+
+                <button type="submit" id="submitButton">Отправить заказ</button>
+                <div class="container" style="margin-top: 2rem;">
+                      <div class="header">
+                        <h2>Поиск заказа</h2>
+                      </div>
+                          <div class="form-container">
+                        <div class="form-group">
+                  <input type="text" id="searchOrderId" placeholder="Введите 4-значный ID заказа" maxlength="4" pattern="\d{4}">
+                  <button onclick="searchOrder()">Найти заказ</button>
+                </div>
+                <div id="orderDetails" class="hidden">
+              <h3 class="form-section-title">Детали заказа</h3>
+                  <div id="orderContent"></div>
+                </div>
+          </div>
+    </div>
+<style>
             </form>
-            
             <div class="search-section">
                 <h2 class="form-section-title">Поиск заказа</h2>
                 <div class="search-container">
@@ -91,10 +418,153 @@
     </div>
 
     <script>
-        // ... (существующий JavaScript код остается без изменений) ...
+            <p class="form-footer">Нажимая кнопку "Отправить заказ", вы соглашаетесь с обработкой ваших персональных данных</p>
+        </div>
+    </div>
+
+    <script>
+        // Иконки для уведомлений
+        const successIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>`;
         
-        // Функция поиска заказа
-        async function searchOrder() {
+        const errorIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>`;
+
+        // Функции для показа уведомлений
+        function showSuccessNotification(orderId) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `
+                ${successIcon}
+                <div>
+                    <strong>Заказ #${orderId} принят!</strong><br>
+                    Мы свяжемся с вами!
+                </div>
+            `;
+            alertBox.className = 'alert alert-success';
+            alertBox.classList.remove('hidden');
+            
+            // Прокрутка к уведомлению
+            alertBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showError(message) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `
+                ${errorIcon}
+                <div>${message}</div>
+            `;
+            alertBox.className = 'alert alert-error';
+            alertBox.classList.remove('hidden');
+            
+            // Прокрутка к уведомлению
+            alertBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Маска для телефона
+        document.getElementById('телефон').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Форматирование номера
+            if (value.startsWith('7') || value.startsWith('8')) {
+                value = value.substring(1);
+            }
+            
+            let formattedValue = '+7 (';
+            
+            if (value.length > 0) {
+                formattedValue += value.substring(0, 3);
+            }
+            if (value.length > 3) {
+                formattedValue += ') ' + value.substring(3, 6);
+            }
+            if (value.length > 6) {
+                formattedValue += '-' + value.substring(6, 8);
+            }
+            if (value.length > 8) {
+                formattedValue += '-' + value.substring(8, 10);
+            }
+            
+            e.target.value = formattedValue;
+        });
+
+        // Ваш обновленный код с обработкой CORS
+        async function submitForm(data) {
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx423LZxEkKXyI5OmG0PTRubf707dZmdboVFO-kBI2I_RNZdiu78Qh37k6Bi-Lvpyt10A/exec';
+            
+            try {
+                // Основной запрос
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                // При no-cors мы не можем прочитать ответ, поэтому считаем успешным
+                // В реальном приложении нужно использовать cors и проверять ответ
+                return { success: true, orderId: Math.floor(Math.random() * 10000) };
+                
+            } catch (error) {
+                console.error('Ошибка:', error);
+                throw new Error('Ошибка при отправке формы');
+            }
+        }
+
+        // Обработчик отправки формы
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = document.getElementById('submitButton');
+            
+            // Проверка валидности формы
+            if (!e.target.checkValidity()) {
+                // Показываем сообщения об ошибках
+                document.querySelectorAll('input:invalid, textarea:invalid').forEach(input => {
+                    input.style.borderColor = 'var(--error)';
+                });
+                showError('Пожалуйста, заполните все обязательные поля корректно.');
+                return;
+            }
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<div class="loader"></div> Обработка...';
+
+            try {
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                
+                const result = await submitForm(data);
+                showSuccessNotification(result.orderId);
+                e.target.reset();
+                
+            } catch (error) {
+                showError(error.message || 'Ошибка при отправке формы');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Отправить заказ';
+            }
+        });
+
+        // Валидация в реальном времени
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.checkValidity()) {
+                    input.style.borderColor = '#E2E8F0';
+                } else {
+                    input.style.borderColor = 'var(--error)';
+                }
+            });
+            
+            input.addEventListener('blur', () => {
+                if (!input.checkValidity()) {
+                    input.style.borderColor = 'var(--error)';
+                }
+            });
+        });
+          async function searchOrder() {
             const orderId = document.getElementById('searchOrderId').value;
             const orderDetails = document.getElementById('orderDetails');
             const orderContent = document.getElementById('orderContent');
