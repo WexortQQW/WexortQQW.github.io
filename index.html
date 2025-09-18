@@ -452,7 +452,6 @@
             try {
                 const formData = new FormData(e.target);
                 const data = Object.fromEntries(formData.entries());
-                
                 const result = await submitForm(data);
                 showSuccessNotification(result.orderId);
                 e.target.reset();
