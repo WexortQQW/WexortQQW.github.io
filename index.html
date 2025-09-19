@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма заказа запчастей</title>
     <style>
+        /* Стили остаются без изменений */
         :root {
             --primary: #2563eb;
             --primary-dark: #1e40af;
@@ -294,7 +295,7 @@
 
                 <div class="form-group">
                     <label for="vin">VIN-код автомобиля</label>
-                    <input type="text" id="вин" name="вин" required placeholder="Введите VIN код" pattern="[A-HJ-NPR-Z0-9]{17}" title="17-символьный VIN код">
+                    <input type="text" id="вин" name="вин" placeholder="Введите VIN код" pattern="[A-HJ-NPR-Z0-9]{17}" title="17-символьный VIN код">
                     <div class="error-message">VIN код должен содержать 17 символов (буквы и цифры)</div>
                 </div>
 
@@ -355,8 +356,8 @@
             alertBox.innerHTML = `
                 ${successIcon}
                 <div>
-                    <strong>#${orderId} принят!</strong><br>
-                    Мы свяжемся с вами!
+                    <strong>Заказ #${orderId} принят!</strong><br>
+                    Мы свяжемся с вами в ближайшее время для подтверждения заказа.
                 </div>
             `;
             alertBox.className = 'alert alert-success';
@@ -406,28 +407,34 @@
             e.target.value = formattedValue;
         });
 
-        // Ваш обновленный код с обработкой CORS
+        // Функция для отправки данных на сервер
         async function submitForm(data) {
             const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMVaIjAoepWEytQxFVf2lwF2a1PTeE_TH34jtijfbEsP25efkbpOItKpHitWrc2GwO/exec';
             
             try {
-                // Основной запрос
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 });
 
-                // При no-cors мы не можем прочитать ответ, поэтому считаем успешным
-                // В реальном приложении нужно использовать cors и проверять ответ
-                return { success: true, orderId: Math.floor(Math.random() * 10000) };
+                if (!response.ok) {
+                    throw new Error(`Ошибка сервера: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Неизвестная ошибка сервера');
+                }
+                
+                return result;
                 
             } catch (error) {
-                console.error('Ошибка:', error);
-                throw new Error('Ошибка при отправке формы');
+                console.error('Ошибка при отправке формы:', error);
+                throw new Error('Ошибка при отправке формы. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.');
             }
         }
 
@@ -452,9 +459,19 @@
             try {
                 const formData = new FormData(e.target);
                 const data = Object.fromEntries(formData.entries());
+                
+                // Преобразуем числовые поля
+                if (data.год) data.год = parseInt(data.год);
+                if (data.количество) data.количество = parseInt(data.количество);
+                
                 const result = await submitForm(data);
-                showSuccessNotification(result.orderId);
-                e.target.reset();
+                
+                if (result.success && result.orderId) {
+                    showSuccessNotification(result.orderId);
+                    e.target.reset();
+                } else {
+                    throw new Error('Не удалось получить номер заказа');
+                }
                 
             } catch (error) {
                 showError(error.message || 'Ошибка при отправке формы');
@@ -468,7 +485,7 @@
         document.querySelectorAll('input, textarea').forEach(input => {
             input.addEventListener('input', () => {
                 if (input.checkValidity()) {
-                    input.style.borderColor = '#E2E8F0';
+                    input.style.borderColor = '';
                 } else {
                     input.style.borderColor = 'var(--error)';
                 }
@@ -480,6 +497,9 @@
                 }
             });
         });
+
+        // Убираем required атрибут с VIN, так как он не обязательный
+        document.getElementById('вин').removeAttribute('required');
     </script>
 </body>
 </html>
