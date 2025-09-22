@@ -408,32 +408,28 @@
 
         // Отправка формы
         async function submitForm(data) {
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzM2aBx7qTrEg2CW_Lz_oeKpxwD5iy295vRHsT18CIit1hQhEDeAXgS_0n48fTwu8UqEA/exec';
-        
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
+          const SCRIPT_URL = "https://script.google.com/macros/s/AKfycb.../exec";
 
-            if (!response.ok) {
-                throw new Error(`Ошибка сервера: ${response.status}`);
-            }
+          const formData = new FormData();
+          for (const key in data) {
+            formData.append(key, data[key]);
+          }
 
-            const result = await response.json();
-            if (result.success) {
-                return result; // содержит orderId
-            } else {
-                throw new Error(result.error || 'Не удалось обработать заказ');
-            }
-        } catch (error) {
-            console.error('Ошибка', error);
-            throw new Error('Ошибка при отправке формы');
+          const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: formData
+          });
+
+          const text = await response.text(); // для отладки
+          console.log("RAW response:", text);
+
+          try {
+            const result = JSON.parse(text);
+            return result;
+          } catch (e) {
+            throw new Error("Сервер вернул не JSON: " + text);
+          }
         }
-    }
 
     document.getElementById('orderForm').addEventListener('submit', async (e) => {
         e.preventDefault();
