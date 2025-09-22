@@ -408,67 +408,59 @@
 
         // Отправка формы
         async function submitForm(data) {
-            // Замените на ваш URL Google Apps Script
-            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxAJ-uLd_T0lOZuF6VVjtZlHrYsjQsThw5-TAdJQ_bpOdw37pltnZ-P9seeh67IiLcBug/exec';
-            
-            try {
-                // Создаем форму для отправки данных (обход CORS)
-                const formData = new FormData();
-                for (const key in data) {
-                    formData.append(key, data[key]);
-                }
-                
-                // Основной запрос
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
-                });
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzM2aBx7qTrEg2CW_Lz_oeKpxwD5iy295vRHsT18CIit1hQhEDeAXgS_0n48fTwu8UqEA/exec';
+        
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
 
-                // Проверяем статус ответа
-                if (response.ok) {
-                    return { success: true, orderId: Math.floor(Math.random() * 10000) };
-                } else {
-                    throw new Error('Ошибка сервера');
-                }
-                
-            } catch (error) {
-                console.error('Ошибка', error);
-                throw new Error('Ошибка при отправке формы');
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
             }
+
+            const result = await response.json();
+            if (result.success) {
+                return result; // содержит orderId
+            } else {
+                throw new Error(result.error || 'Не удалось обработать заказ');
+            }
+        } catch (error) {
+            console.error('Ошибка', error);
+            throw new Error('Ошибка при отправке формы');
+        }
+    }
+
+    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitButton = document.getElementById('submitButton');
+
+        if (!e.target.checkValidity()) {
+            showError('Пожалуйста, заполните все обязательные поля корректно.');
+            return;
         }
 
-        // Обработчик отправки формы
-        document.getElementById('orderForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitButton = document.getElementById('submitButton');
-            
-            // Проверка валидности формы
-            if (!e.target.checkValidity()) {
-                // Показываем сообщения об ошибках
-                document.querySelectorAll('input:invalid, textarea:invalid').forEach(input => {
-                    input.style.borderColor = 'var(--error)';
-                });
-                showError('Пожалуйста, заполните все обязательные поля корректно.');
-                return;
-            }
-            
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<div class="loader"></div> Обработка...';
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<div class="loader"></div> Обработка...';
 
-            try {
-                const formData = new FormData(e.target);
-                const data = Object.fromEntries(formData.entries());
-                const result = await submitForm(data);
-                showSuccessNotification(result.orderId);
-                e.target.reset();
-                
-            } catch (error) {
-                showError(error.message || 'Ошибка при отправке формы');
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Отправить заказ';
-            }
-        });
+        try {
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            const result = await submitForm(data);
+
+            showSuccessNotification(result.orderId);
+            e.target.reset();
+        } catch (error) {
+            showError(error.message);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Отправить заказ';
+        }
+    });
 
         // Валидация в реальном времени
         document.querySelectorAll('input, textarea').forEach(input => {
