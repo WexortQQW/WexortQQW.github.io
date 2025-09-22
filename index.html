@@ -90,7 +90,7 @@
       font-weight: 600;
       font-size: 0.9rem;
     }
-    input, textarea, select {
+    input, textarea {
       width: 100%;
       padding: 0.75rem;
       border: 1px solid #d1d5db;
@@ -98,7 +98,7 @@
       font-size: 1rem;
       transition: border-color 0.2s;
     }
-    input:focus, textarea:focus, select:focus {
+    input:focus, textarea:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
@@ -127,18 +127,18 @@
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
+      display: none;
       font-size: 0.95rem;
       font-weight: 500;
     }
     .alert-success {
+      display: block;
       background: #ecfdf5;
       color: #065f46;
       border: 1px solid #a7f3d0;
     }
     .alert-error {
+      display: block;
       background: #fef2f2;
       color: #991b1b;
       border: 1px solid #fecaca;
@@ -164,76 +164,67 @@
       <p>Заполните все обязательные поля</p>
     </div>
     <div class="form-container">
-      <div id="alertBox" class="alert hidden"></div>
+      <div id="alertBox" class="alert"></div>
+
       <form id="orderForm">
-        <form id="orderForm">
-                <h2 class="form-section-title">Контактная информация</h2>
-                
-                <div class="form-group">
-                    <label for="фио" class="required">ФИО</label>
-                    <input type="text" id="фио" name="фио" required placeholder="Введите ваше полное имя">
-                    <div class="error-message">Пожалуйста, введите ваше ФИО</div>
-                </div>
+        <div class="form-section">
+          <h2>Контактная информация</h2>
+          <div class="form-group">
+            <label for="фио">ФИО *</label>
+            <input type="text" id="фио" name="фио" required>
+          </div>
+          <div class="form-group">
+            <label for="телефон">Телефон *</label>
+            <input type="tel" id="телефон" name="телефон" required>
+          </div>
+          <div class="form-group">
+            <label for="почта">Email</label>
+            <input type="email" id="почта" name="почта">
+          </div>
+        </div>
 
-                <div class="form-group">
-                    <label for="телефон" class="required">Телефон</label>
-                    <input type="tel" id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX" pattern="^(\+7|8)[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$">
-                    <div class="error-message">Введите корректный номер телефона</div>
-                </div>
+        <div class="form-section">
+          <h2>Информация об автомобиле</h2>
+          <div class="form-group">
+            <label for="вин">VIN *</label>
+            <input type="text" id="вин" name="вин" required pattern="[A-HJ-NPR-Z0-9]{17}">
+          </div>
+          <div class="form-group">
+            <label for="модель">Модель</label>
+            <input type="text" id="модель" name="модель">
+          </div>
+          <div class="form-group">
+            <label for="год">Год выпуска</label>
+            <input type="number" id="год" name="год" min="1950" max="2099">
+          </div>
+        </div>
 
-                <div class="form-group">
-                    <label for="почта">Email</label>
-                    <input type="email" id="почта" name="почта" placeholder="example@mail.ru">
-                    <div class="error-message">Введите корректный email адрес</div>
-                </div>
+        <div class="form-section">
+          <h2>Информация о запчастях</h2>
+          <div class="form-group">
+            <label for="деталь">Название детали *</label>
+            <input type="text" id="деталь" name="деталь" required>
+          </div>
+          <div class="form-group">
+            <label for="артикул">Артикул</label>
+            <input type="text" id="артикул" name="артикул">
+          </div>
+          <div class="form-group">
+            <label for="количество">Количество *</label>
+            <input type="number" id="количество" name="количество" min="1" value="1" required>
+          </div>
+          <div class="form-group">
+            <label for="комментарии">Комментарии</label>
+            <textarea id="комментарии" name="комментарии" rows="4"></textarea>
+          </div>
+        </div>
 
-                <h2 class="form-section-title">Информация об автомобиле</h2>
-
-                <div class="form-group">
-                    <label for="вин" class="required">VIN-код автомобиля</label>
-                    <input type="text" id="вин" name="вин" required placeholder="Введите VIN код" pattern="[A-HJ-NPR-Z0-9]{17}" title="17-символьный VIN код">
-                    <div class="error-message">VIN код должен содержать 17 символов (буквы и цифры)</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="модель">Модель автомобиля</label>
-                    <input type="text" id="модель" name="модель" placeholder="Например Toyota Camry">
-                </div>
-
-                <div class="form-group">
-                    <label for="год">Год выпуска</label>
-                    <input type="number" id="год" name="год" min="1950" max="2099" placeholder="Например 2018">
-                </div>
-
-                <h2 class="form-section-title">Информация о запчастях</h2>
-
-                <div class="form-group">
-                    <label for="деталь" class="required">Название детали</label>
-                    <input type="text" id="деталь" name="деталь" required placeholder="Например Тормозной диск">
-                    <div class="error-message">Пожалуйста, укажите название детали</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="артикул">Артикул детали</label>
-                    <input type="text" id="артикул" name="артикул" placeholder="Если известен">
-                </div>
-
-                <div class="form-group">
-                    <label for="количество" class="required">Количество</label>
-                    <input type="number" id="количество" name="количество" min="1" value="1" required>
-                    <div class="error-message">Укажите количество</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="комментарии">Дополнительные комментарии</label>
-                    <textarea id="комментарии" name="комментарии" rows="4" placeholder="Любая дополнительная информация, которая поможет нам точнее определить нужную деталь"></textarea>
-                </div>
-
-                <button type="submit" id="submitButton">Отправить заказ</button>
-            </form>
         <button type="submit" id="submitButton">Отправить заказ</button>
       </form>
-      <p class="form-footer">Нажимая кнопку, вы соглашаетесь с обработкой персональных данных</p>
+
+      <p class="form-footer">
+        Нажимая кнопку, вы соглашаетесь с обработкой персональных данных
+      </p>
     </div>
   </div>
 </body>
