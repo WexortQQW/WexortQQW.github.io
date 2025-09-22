@@ -408,55 +408,60 @@
 
         // Отправка формы
         async function submitForm(data) {
-          const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM2aBx7qTrEg2CW_Lz_oeKpxwD5iy295vRHsT18CIit1hQhEDeAXgS_0n48fTwu8UqEA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5L27RftoUSEm6MhvAyzTXNkno3srm05tw8KuAMF-N7w5VAjJMfcRMq4ikIJsYbb6l6A/exec"; // замените на свой URL
 
-          const formData = new FormData();
-          for (const key in data) {
+    try {
+        const formData = new FormData();
+        for (const key in data) {
             formData.append(key, data[key]);
-          }
+        }
 
-          const response = await fetch(SCRIPT_URL, {
+        const response = await fetch(SCRIPT_URL, {
             method: "POST",
             body: formData
-          });
+        });
 
-          const text = await response.text(); // для отладки
-          console.log("RAW response:", text);
+        const text = await response.text(); // полезно для отладки
+        console.log("RAW:", text);
 
-          try {
-            const result = JSON.parse(text);
+        const result = JSON.parse(text);
+        if (result.success) {
             return result;
-          } catch (e) {
-            throw new Error("Сервер вернул не JSON: " + text);
-          }
+        } else {
+            throw new Error(result.error || "Ошибка сервера");
         }
+    } catch (error) {
+        console.error("Ошибка:", error);
+        throw new Error("Ошибка при отправке формы");
+    }
+}
 
-    document.getElementById('orderForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitButton = document.getElementById('submitButton');
+document.getElementById("orderForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitButton = document.getElementById("submitButton");
 
-        if (!e.target.checkValidity()) {
-            showError('Пожалуйста, заполните все обязательные поля корректно.');
-            return;
-        }
+    if (!e.target.checkValidity()) {
+        showError("Пожалуйста, заполните все обязательные поля корректно.");
+        return;
+    }
 
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<div class="loader"></div> Обработка...';
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<div class="loader"></div> Обработка...';
 
-        try {
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            const result = await submitForm(data);
+    try {
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        const result = await submitForm(data);
 
-            showSuccessNotification(result.orderId);
-            e.target.reset();
-        } catch (error) {
-            showError(error.message);
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Отправить заказ';
-        }
-    });
+        showSuccessNotification(result.orderId);
+        e.target.reset();
+    } catch (error) {
+        showError(error.message);
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Отправить заказ";
+    }
+});
 
         // Валидация в реальном времени
         document.querySelectorAll('input, textarea').forEach(input => {
