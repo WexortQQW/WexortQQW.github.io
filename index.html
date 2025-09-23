@@ -179,6 +179,53 @@
       modal.style.display = 'none';
       modal.setAttribute('aria-hidden','true');
     }
+    
+     const TRUSTED_ORIGIN = "https://wexortqqw.github.io"; // замените при необходимости
+
+  let fallbackTimer = null;
+  function handleSubmit(e) {
+    const btn = document.getElementById('submitButton');
+    btn.disabled = true;
+    btn.textContent = 'Отправка...';
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    fallbackTimer = setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Отправить заказ';
+      showModal('Спасибо! Заявка отправлена (timeout).');
+    }, 12000);
+    return true;
+  }
+
+  window.addEventListener('message', function(event) {
+    if (!event.origin || event.origin !== TRUSTED_ORIGIN) {
+      console.warn('Ignored message from:', event.origin);
+      return;
+    }
+    const data = event.data || {};
+    console.log('Received from GAS:', data);
+    if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+
+    const btn = document.getElementById('submitButton');
+    btn.disabled = false;
+    btn.textContent = 'Отправить заказ';
+
+    if (data && data.success) {
+      const text = 'Спасибо! Номер заказа: #' + data.orderId + (data.personalId ? (' — ваш ID: ' + data.personalId) : '');
+      showModal(text);
+      document.getElementById('orderForm').reset();
+    } else {
+      const err = (data && (data.error || data.message)) || 'Ошибка сервера';
+      showModal('Ошибка при отправке: ' + err);
+    }
+  }, false);
+
+  function showModal(text) {
+    const modal = document.getElementById('successModal');
+    document.getElementById('modalMessage').textContent = text;
+    modal.style.display = 'flex';
+    setTimeout(closeModal, 8000);
+  }
+  function closeModal() { document.getElementById('successModal').style.display = 'none'; }
 
     // Примечание: если захотим показывать реальный orderId — уберу этот код
     // и переключимся на postMessage (Apps Script должен постить сообщение родителю).
