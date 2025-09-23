@@ -225,7 +225,7 @@
         <button type="submit" id="submitButton">Отправить заказ</button>
       </form>
 
-      <iframe name="hidden_iframe" style="display:none;"></iframe>
+      <iframe id="hidden_iframe" name="hidden_iframe" style="width:100%;height:160px;border:1px solid #ddd;"></iframe>
 
       <p class="form-footer">
         Нажимая кнопку, вы соглашаетесь с обработкой персональных данных
@@ -243,19 +243,44 @@
   </div>
 
   <script>
-    function handleSubmit() {
-      document.getElementById("orderForm").reset();
-      openModal();
-      return true; // продолжить отправку в Google Apps Script
+  // После отправки форма откроет iframe, а onload прочитает ответ
+  const iframe = document.getElementById('hidden_iframe');
+  iframe.onload = function() {
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      const text = doc.body.innerText || doc.body.textContent;
+      console.log('iframe response:', text);
+      // Попытаемся распарсить JSON (наш GAS возвращает <pre>JSON</pre>)
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed.success) {
+          openModalWithId(parsed.orderId);
+        } else {
+          openModalWithError(parsed.error || 'Ошибка сервера');
+        }
+      } catch (e) {
+        // Если не JSON — покажем как текст
+        openModalWithError(text || 'Пустой ответ от сервера');
+      }
+    } catch (err) {
+      console.error('Не удалось прочитать ответ iframe:', err);
     }
+  };
 
-    function openModal() {
-      document.getElementById("successModal").style.display = "flex";
-    }
+  function openModalWithId(id) {
+    // Показываем модалку с номером заказа
+    const modal = document.getElementById('successModal');
+    modal.querySelector('.modal-content p').textContent = 'Номер заказа: #' + id;
+    modal.style.display = 'flex';
+    setTimeout(() => modal.style.display = 'none', 6000);
+  }
 
-    function closeModal() {
-      document.getElementById("successModal").style.display = "none";
-    }
-  </script>
+  function openModalWithError(msg) {
+    const modal = document.getElementById('successModal');
+    modal.querySelector('.modal-content p').textContent = 'Ошибка: ' + msg;
+    modal.style.display = 'flex';
+    setTimeout(() => modal.style.display = 'none', 8000);
+  }
+</script>
 </body>
 </html>
