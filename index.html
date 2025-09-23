@@ -118,78 +118,64 @@
     </div>
   </div>
 
-  <script>
-    // Блокируем кнопку при отправке; ждем ответа в iframe
-    function handleSubmit(e) {
-      const btn = document.getElementById('submitButton');
-      btn.disabled = true;
-      btn.textContent = 'Отправка...';
-      // не сбрасываем форму здесь — дождемся ответа из iframe
-      return true; // продолжить стандартную отправку формы
+ <script>
+  // Блокируем кнопку при отправке; ждем message от iframe (GAS)
+  function handleSubmit(e) {
+    const btn = document.getElementById('submitButton');
+    btn.disabled = true;
+    btn.textContent = 'Отправка...';
+    return true; // продолжаем обычный submit в iframe
+  }
+
+  // Слушаем postMessage от iframe (GAS)
+  window.addEventListener('message', function(event) {
+    // Проверка источника сообщения — ОБЯЗАТЕЛЬНО
+    // Разрешаем origin, который использует GAS (script.google.com)
+    // Параметр event.origin может быть "https://script.google.com"
+    if (!event.origin || !event.origin.startsWith('https://script.google.com')) {
+      console.warn('Message from unexpected origin:', event.origin);
+      // можно игнорировать, если нужно
+      return;
     }
 
-    // iframe onload: читать ответ и показать модалку
-    const iframe = document.getElementById('hidden_iframe');
-    iframe.onload = function() {
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        const raw = (doc.body && (doc.body.innerText || doc.body.textContent) || '').trim();
-        if (!raw) {
-          console.log('iframe: empty response (initial or blank).');
-          return;
-        }
-        console.log('iframe raw:', raw);
-        let parsed;
-        try {
-          parsed = JSON.parse(raw);
-        } catch (e) {
-          // Если сервер вернул HTML, попробуем вытащить JSON из <pre>
-          const pre = doc.querySelector('pre');
-          const text = pre ? (pre.innerText || pre.textContent || '').trim() : raw;
-          try { parsed = JSON.parse(text); } catch (err) { parsed = null; }
-        }
+    // event.data — это объект, который мы посылаем из GAS
+    const data = event.data;
+    console.log('Received postMessage from iframe:', data);
 
-        if (parsed && parsed.success) {
-          // показываем номер заказа
-          openModalWithId(parsed.orderId);
-          // сброс формы и восстановление кнопки
-          document.getElementById('orderForm').reset();
-          document.getElementById('submitButton').disabled = false;
-          document.getElementById('submitButton').textContent = 'Отправить заказ';
-        } else {
-          const errMsg = parsed && parsed.error ? parsed.error : raw;
-          openModalWithError(errMsg);
-          // восстановим кнопку, но не сбрасываем форму
-          document.getElementById('submitButton').disabled = false;
-          document.getElementById('submitButton').textContent = 'Отправить заказ';
-        }
-      } catch (err) {
-        console.error('iframe onload error:', err);
-        // восстановим кнопку
-        document.getElementById('submitButton').disabled = false;
-        document.getElementById('submitButton').textContent = 'Отправить заказ';
-      }
-    };
-
-    function openModalWithId(id) {
-      const modal = document.getElementById('successModal');
-      const msg = document.getElementById('modalMessage');
-      msg.textContent = 'Номер заказа: #' + id + '. Спасибо! Мы свяжемся с вами.';
-      modal.style.display = 'flex';
-      setTimeout(closeModal, 6000);
+    // восстановим кнопку
+    const btn = document.getElementById('submitButton');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Отправить заказ';
     }
 
-    function openModalWithError(msg) {
-      const modal = document.getElementById('successModal');
-      const modalMessage = document.getElementById('modalMessage');
-      modalMessage.textContent = 'Ошибка: ' + msg;
-      modal.style.display = 'flex';
-      setTimeout(closeModal, 8000);
+    if (data && data.success) {
+      // show modal with orderId
+      openModalWithId(data.orderId);
+      // reset the form (optionally)
+      document.getElementById('orderForm').reset();
+    } else {
+      const err = (data && (data.error || data.message)) || 'Неизвестная ошибка';
+      openModalWithError(err);
     }
+  }, false);
 
-    function closeModal() {
-      document.getElementById('successModal').style.display = 'none';
-    }
-  </script>
+  function openModalWithId(id) {
+    const modal = document.getElementById('successModal');
+    const msg = document.getElementById('modalMessage');
+    msg.textContent = 'Номер заказа: #' + id + '. Спасибо! Мы свяжемся с вами.';
+    modal.style.display = 'flex';
+    setTimeout(closeModal, 6000);
+  }
+  function openModalWithError(msg) {
+    const modal = document.getElementById('successModal');
+    const modalMessage = document.getElementById('modalMessage');
+    modalMessage.textContent = 'Ошибка: ' + msg;
+    modal.style.display = 'flex';
+    setTimeout(closeModal, 8000);
+  }
+  function closeModal() { document.getElementById('successModal').style.display = 'none'; }
+</script>
+
 </body>
 </html>
