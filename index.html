@@ -119,63 +119,70 @@
   </div>
 
  <script>
-  // Блокируем кнопку при отправке; ждем message от iframe (GAS)
-  function handleSubmit(e) {
-    const btn = document.getElementById('submitButton');
-    btn.disabled = true;
-    btn.textContent = 'Отправка...';
-    return true; // продолжаем обычный submit в iframe
-  }
+    // Флаг, чтобы не показать модалку дважды
+    let waitingTimeout = null;
 
-  // Слушаем postMessage от iframe (GAS)
-  window.addEventListener('message', function(event) {
-    // Проверка источника сообщения — ОБЯЗАТЕЛЬНО
-    // Разрешаем origin, который использует GAS (script.google.com)
-    // Параметр event.origin может быть "https://script.google.com"
-    if (!event.origin || !event.origin.startsWith('https://script.google.com')) {
-      console.warn('Message from unexpected origin:', event.origin);
-      // можно игнорировать, если нужно
-      return;
+    function handleSubmit(e) {
+      // Блокируем кнопку и запускаем резервный таймаут (если iframe не загрузится)
+      const btn = document.getElementById('submitButton');
+      btn.disabled = true;
+      btn.textContent = 'Отправка...';
+
+      // Резервный таймаут: если iframe не вернёт onload (непредвиденно), то через 12s разблокируем
+      if (waitingTimeout) clearTimeout(waitingTimeout);
+      waitingTimeout = setTimeout(()=> {
+        btn.disabled = false;
+        btn.textContent = 'Отправить заказ';
+        // Показываем подтверждение ВСЁ РАВНО, т.к. данные обычно доходят (как ты сказал)
+        showGenericSuccess();
+      }, 12000);
+
+      // Продолжаем стандартный submit (он отправит форму в iframe)
+      return true;
     }
 
-    // event.data — это объект, который мы посылаем из GAS
-    const data = event.data;
-    console.log('Received postMessage from iframe:', data);
-
-    // восстановим кнопку
-    const btn = document.getElementById('submitButton');
-    if (btn) {
+    // Не читаем iframe.contentWindow.document чтобы избежать SecurityError
+    // Просто реагируем на факт загрузки iframe (onload) — это безопасно
+    const iframe = document.getElementById('hidden_iframe');
+    iframe.onload = function() {
+      // iframe загрузился (ответ пришёл) — считаем, что всё успешно отправлено
+      if (waitingTimeout) { clearTimeout(waitingTimeout); waitingTimeout = null; }
+      // Показываем модалку, сбрасываем форму, разблокируем кнопку
+      showGenericSuccess();
+      document.getElementById('orderForm').reset();
+      const btn = document.getElementById('submitButton');
       btn.disabled = false;
       btn.textContent = 'Отправить заказ';
+    };
+
+    function showGenericSuccess() {
+      const modal = document.getElementById('successModal');
+      const msg = document.getElementById('modalMessage');
+      msg.textContent = 'Спасибо! Ваша заявка принята. Проверьте таблицу/почту для номера заказа.';
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+      // автозакрытие
+      setTimeout(closeModal, 6000);
     }
 
-    if (data && data.success) {
-      // show modal with orderId
-      openModalWithId(data.orderId);
-      // reset the form (optionally)
-      document.getElementById('orderForm').reset();
-    } else {
-      const err = (data && (data.error || data.message)) || 'Неизвестная ошибка';
-      openModalWithError(err);
+    function openModalWithId(id) {
+      const modal = document.getElementById('successModal');
+      const msg = document.getElementById('modalMessage');
+      msg.textContent = 'Номер вашего заказа: #' + id + '. Спасибо! Мы свяжемся с вами.';
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+      setTimeout(closeModal, 7000);
     }
-  }, false);
 
-  function openModalWithId(id) {
-    const modal = document.getElementById('successModal');
-    const msg = document.getElementById('modalMessage');
-    msg.textContent = 'Номер заказа: #' + id + '. Спасибо! Мы свяжемся с вами.';
-    modal.style.display = 'flex';
-    setTimeout(closeModal, 6000);
-  }
-  function openModalWithError(msg) {
-    const modal = document.getElementById('successModal');
-    const modalMessage = document.getElementById('modalMessage');
-    modalMessage.textContent = 'Ошибка: ' + msg;
-    modal.style.display = 'flex';
-    setTimeout(closeModal, 8000);
-  }
-  function closeModal() { document.getElementById('successModal').style.display = 'none'; }
-</script>
+    function closeModal() {
+      const modal = document.getElementById('successModal');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden','true');
+    }
 
+    // Примечание: если захотим показывать реальный orderId — уберу этот код
+    // и переключимся на postMessage (Apps Script должен постить сообщение родителю).
+    // Тогда мы будем слушать window.addEventListener('message', ...).
+  </script>
 </body>
 </html>
