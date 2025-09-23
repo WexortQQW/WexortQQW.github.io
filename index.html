@@ -11,28 +11,16 @@
     body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#f5f7fa;color:#1f2937;display:flex;justify-content:center;align-items:flex-start;padding:32px}
     .card{background:#fff;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,.08);width:100%;max-width:760px;overflow:hidden}
     .card-header{background:var(--dark);color:#fff;padding:28px;text-align:center}
-    .card-header h1{margin:0;font-size:20px;font-weight:700}
-    .card-header p{margin:6px 0 0;opacity:.9;font-size:14px}
     .form-container{padding:24px}
     .form-section{margin-bottom:20px}
-    .form-section h2{font-size:16px;color:var(--dark);margin:0 0 12px;border-left:4px solid var(--primary);padding-left:10px}
-    .form-group{margin-bottom:12px}
     label{display:block;margin-bottom:6px;font-weight:600;font-size:13px}
     input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e5e7eb;font-size:14px}
-    input:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.08)}
     button{background:var(--primary);color:#fff;padding:10px 16px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
     button[disabled]{opacity:.6;cursor:not-allowed}
-    .form-footer{font-size:13px;color:var(--muted);text-align:center;margin-top:16px}
-    /* modal */
     .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);z-index:10000}
-    .modal .content{background:#fff;padding:20px;border-radius:12px;max-width:480px;width:92%;text-align:center;box-shadow:0 10px 30px rgba(2,6,23,.12)}
-    .modal h2{margin:0 0 8px;color:#065f46}
-    .ids {display:flex;gap:10px;justify-content:center;margin:8px 0 12px;flex-wrap:wrap}
+    .modal .content{background:#fff;padding:20px;border-radius:12px;max-width:480px;width:92%;text-align:center}
+    .ids{display:flex;gap:10px;justify-content:center;margin:8px 0 12px;flex-wrap:wrap}
     .id-box{background:#f3f4f6;padding:10px 12px;border-radius:8px;border:1px solid #e6eefc;min-width:140px}
-    .id-title{font-size:12px;color:#374151;margin-bottom:4px}
-    .id-value{font-weight:700;color:#111827;word-break:break-all}
-    .copy-btn{background:var(--primary);color:#fff;border:0;padding:6px 10px;border-radius:8px;cursor:pointer}
-    @media (max-width:600px){body{padding:14px}.card{max-width:100%}}
   </style>
 </head>
 <body>
@@ -44,29 +32,26 @@
 
     <div class="form-container">
       <form id="orderForm" method="POST" target="hidden_iframe"
-            action="https://script.google.com/macros/s/AKfycbyGrlxlTeOs2mTtgCL5gQ9dsAe6T2rHr1WZPWdytdy3xG6__EItqJjXX8iqVURV5PukUQ/exec"
+            action="https://script.google.com/macros/s/YOUR_GAS_WEBAPP_URL/exec"
             onsubmit="return handleSubmit(event)">
 
         <div class="form-section">
-          <h2>Контактная информация</h2>
-          <div class="form-group"><label for="fio">ФИО *</label><input id="fio" name="фио" required></div>
-          <div class="form-group"><label for="phone">Телефон *</label><input id="phone" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX"></div>
-          <div class="form-group"><label for="email">Email</label><input id="email" name="почта" type="email" placeholder="example@mail.ru"></div>
+          <label>ФИО * <input name="фио" required></label>
+          <label>Телефон * <input name="телефон" required autocomplete="tel"></label>
+          <label>Email <input name="почта" type="email" autocomplete="email"></label>
         </div>
 
         <div class="form-section">
-          <h2>Информация об автомобиле</h2>
-          <div class="form-group"><label for="vin">VIN *</label><input id="vin" name="вин" required pattern="[A-HJ-NPR-Z0-9]{17}" placeholder="17 символов"></div>
-          <div class="form-group"><label for="model">Модель</label><input id="model" name="модель"></div>
-          <div class="form-group"><label for="year">Год выпуска</label><input id="year" name="год" type="number" min="1950" max="2099"></div>
+          <label>VIN * <input name="вин" required pattern="[A-HJ-NPR-Z0-9]{17}"></label>
+          <label>Модель <input name="модель"></label>
+          <label>Год <input name="год" type="number" min="1950" max="2099"></label>
         </div>
 
         <div class="form-section">
-          <h2>Информация о запчастях</h2>
-          <div class="form-group"><label for="part">Название детали *</label><input id="part" name="деталь" required></div>
-          <div class="form-group"><label for="art">Артикул</label><input id="art" name="артикул"></div>
-          <div class="form-group"><label for="qty">Количество *</label><input id="qty" name="количество" type="number" min="1" value="1" required></div>
-          <div class="form-group"><label for="note">Комментарии</label><textarea id="note" name="комментарии" rows="4"></textarea></div>
+          <label>Название детали * <input name="деталь" required></label>
+          <label>Артикул <input name="артикул"></label>
+          <label>Количество <input name="количество" type="number" min="1" value="1" required></label>
+          <label>Комментарии <textarea name="комментарии"></textarea></label>
         </div>
 
         <div style="display:flex;gap:12px;align-items:center">
@@ -76,126 +61,79 @@
       </form>
 
       <iframe id="hidden_iframe" name="hidden_iframe" style="display:none"></iframe>
-
-      <p class="form-footer">Нажимая кнопку, вы соглашаетесь с обработкой персональных данных</p>
     </div>
   </div>
 
-  <!-- Modal showing both IDs -->
+  <!-- modal -->
   <div class="modal" id="successModal" aria-hidden="true">
     <div class="content">
       <h2>✅ Заявка принята</h2>
-      <p id="modalText">Спасибо! Ваши идентификаторы:</p>
+      <p id="modalText">Ваши идентификаторы:</p>
       <div class="ids">
-        <div class="id-box">
-          <div class="id-title">Номер заказа</div>
-          <div class="id-value" id="orderIdValue">—</div>
-        </div>
-        <div class="id-box">
-          <div class="id-title">Personal ID (последние 4)</div>
-          <div class="id-value" id="personalIdValue">—</div>
-        </div>
+        <div class="id-box"><div class="id-title">Order ID</div><div id="orderIdVal">—</div></div>
+        <div class="id-box"><div class="id-title">Personal ID</div><div id="personalIdVal">—</div></div>
       </div>
       <div style="display:flex;gap:8px;justify-content:center">
-        <button class="copy-btn" id="copyBtn">Копировать оба</button>
-        <button class="copy-btn" id="closeBtn">Закрыть</button>
+        <button onclick="copyIds()">Копировать</button>
+        <button onclick="closeModal()">Закрыть</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Один раз задаём TRUSTED_ORIGIN
-    const TRUSTED_ORIGIN = "https://wexortqqw.github.io"; // <- ЗАМЕНИ на свой origin
+    // Поменяй на origin твоего сайта (без слэша)
+    const TRUSTED_ORIGIN = "https://wexortqqw.github.io"; 
 
-    // Переменные состояния
-    let fallbackTimer = null;
-
-    // handleSubmit вызывается через onsubmit; должен быть глобальным
+    let fallback = null;
     function handleSubmit(e) {
       const btn = document.getElementById('submitButton');
-      const status = document.getElementById('status');
       btn.disabled = true;
       btn.textContent = 'Отправка...';
-      status.textContent = '';
-
-      // Резервный таймаут — чтобы кнопка не висела навсегда
-      if (fallbackTimer) clearTimeout(fallbackTimer);
-      fallbackTimer = setTimeout(() => {
+      if (fallback) clearTimeout(fallback);
+      fallback = setTimeout(()=> {
         btn.disabled = false;
         btn.textContent = 'Отправить заказ';
-        showModalFallback();
+        showModal('Резерв: заявка отправлена. Проверьте таблицу/почту.');
       }, 12000);
-
-      // Продолжить стандартную отправку формы (в iframe)
       return true;
     }
 
-    // Обработчик postMessage — получаем orderId и personalId от GAS (iframe)
-    window.addEventListener('message', function(event) {
-      // Безопасность: сверяем origin
-      if (!event.origin || event.origin !== TRUSTED_ORIGIN) {
-        console.warn('Ignored message from', event.origin);
+    // Debug: лог любых сообщений (временно)
+    window.addEventListener('message', function(ev) {
+      console.log('postMessage raw:', ev.origin, ev.data);
+      // БЕЗОПАСНОСТЬ: проверяем origin
+      if (!ev.origin || ev.origin !== TRUSTED_ORIGIN) {
+        console.warn('Ignored message from', ev.origin);
         return;
       }
-      const data = event.data || {};
-
-      // Сброс таймаута
-      if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
-
-      // Восстановим кнопку
+      if (fallback) { clearTimeout(fallback); fallback = null; }
       const btn = document.getElementById('submitButton');
-      btn.disabled = false;
-      btn.textContent = 'Отправить заказ';
+      btn.disabled = false; btn.textContent = 'Отправить заказ';
 
+      const data = ev.data || {};
       if (data && data.success) {
-        document.getElementById('orderIdValue').textContent = data.orderId || '—';
-        document.getElementById('personalIdValue').textContent = data.personalId || '—';
+        document.getElementById('orderIdVal').textContent = data.orderId || '—';
+        document.getElementById('personalIdVal').textContent = data.personalId || '—';
         openModal();
         document.getElementById('orderForm').reset();
-        document.getElementById('status').textContent = 'Заказ принят. Смотрите ID выше.';
+        document.getElementById('status').textContent = 'Заказ принят';
       } else {
-        const err = (data && (data.error || data.message)) || 'Ошибка сервера';
-        showError(err);
+        const err = (data && (data.error || data.message)) || 'Ошибка';
+        document.getElementById('status').textContent = 'Ошибка: ' + err;
+        openModal();
       }
     }, false);
 
-    // UI: модалки и копирование
-    function openModal() {
-      const m = document.getElementById('successModal');
-      m.style.display = 'flex';
-      m.setAttribute('aria-hidden', 'false');
-    }
-    function closeModal() {
-      const m = document.getElementById('successModal');
-      m.style.display = 'none';
-      m.setAttribute('aria-hidden', 'true');
-    }
-    function showModalFallback() {
-      document.getElementById('orderIdValue').textContent = '—';
-      document.getElementById('personalIdValue').textContent = '—';
-      document.getElementById('status').textContent = 'Заявка отправлена (резервная подсказка). Проверьте таблицу/почту.';
-      openModal();
-    }
-    function showError(text) {
-      document.getElementById('status').textContent = 'Ошибка: ' + text;
-      openModal();
-      document.getElementById('orderIdValue').textContent = '—';
-      document.getElementById('personalIdValue').textContent = '—';
-    }
+    function openModal(){ const m=document.getElementById('successModal'); m.style.display='flex'; m.setAttribute('aria-hidden','false'); }
+    function closeModal(){ const m=document.getElementById('successModal'); m.style.display='none'; m.setAttribute('aria-hidden','true'); }
+    function showModal(text){ document.getElementById('modalText').textContent = text; openModal(); }
 
-    // copy both IDs
-    document.getElementById('copyBtn').addEventListener('click', () => {
-      const order = document.getElementById('orderIdValue').textContent;
-      const pid = document.getElementById('personalIdValue').textContent;
+    function copyIds(){
+      const order = document.getElementById('orderIdVal').textContent;
+      const pid = document.getElementById('personalIdVal').textContent;
       const txt = `Order ID: ${order}\nPersonal ID: ${pid}`;
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(txt).then(()=> alert('Скопировано в буфер обмена'));
-      } else {
-        alert('Ваш браузер не поддерживает автоматическое копирование. Выделите и нажмите Ctrl+C.');
-      }
-    });
-
-    document.getElementById('closeBtn').addEventListener('click', closeModal);
+      navigator.clipboard ? navigator.clipboard.writeText(txt).then(()=>alert('Скопировано')) : alert('Копируйте вручную');
+    }
   </script>
 </body>
 </html>
