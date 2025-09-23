@@ -110,11 +110,24 @@
   </div>
 
   <!-- Модалка -->
-  <div class="modal" id="successModal">
-    <div class="modal-content">
-      <h2>✅ Заявка отправлена</h2>
-      <p id="modalMessage">Спасибо! Мы свяжемся с вами в ближайшее время.</p>
-      <button onclick="closeModal()">Закрыть</button>
+   <div class="modal" id="successModal" aria-hidden="true">
+    <div class="content">
+      <h2>✅ Заявка принята</h2>
+      <p id="modalText">Спасибо! Ваши идентификаторы:</p>
+      <div class="ids">
+        <div class="id-box">
+          <div class="id-title">Номер заказа</div>
+          <div class="id-value" id="orderIdValue">—</div>
+        </div>
+        <div class="id-box">
+          <div class="id-title">Personal ID (последние 4)</div>
+          <div class="id-value" id="personalIdValue">—</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="copy-btn" onclick="copyIds()">Копировать оба</button>
+        <button class="copy-btn" onclick="closeModal()">Закрыть</button>
+      </div>
     </div>
   </div>
 
@@ -226,6 +239,86 @@
     setTimeout(closeModal, 8000);
   }
   function closeModal() { document.getElementById('successModal').style.display = 'none'; }
+
+    const TRUSTED_ORIGIN = "https://wexortqqw.github.io"; // <- замените если нужно
+
+    let fallbackTimer = null;
+    function handleSubmit(e) {
+      const btn = document.getElementById('submitButton');
+      const status = document.getElementById('status');
+      btn.disabled = true;
+      btn.textContent = 'Отправка...';
+      status.textContent = '';
+      if (fallbackTimer) clearTimeout(fallbackTimer);
+      fallbackTimer = setTimeout(()=> {
+        btn.disabled = false;
+        btn.textContent = 'Отправить заказ';
+        showModalFallback();
+      }, 12000);
+      return true; // continue submit to iframe
+    }
+
+    // message listener - recieve orderId and personalId from GAS iframe (postMessage)
+    window.addEventListener('message', function(event) {
+      // security: origin check
+      if (!event.origin || event.origin !== TRUSTED_ORIGIN) {
+        console.warn('Ignored message from', event.origin);
+        return;
+      }
+      const data = event.data || {};
+      console.log('Received from GAS:', data);
+
+      if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+      // restore button
+      const btn = document.getElementById('submitButton');
+      btn.disabled = false;
+      btn.textContent = 'Отправить заказ';
+
+      if (data && data.success) {
+        // show modal with both IDs
+        document.getElementById('orderIdValue').textContent = data.orderId || '—';
+        document.getElementById('personalIdValue').textContent = data.personalId || '—';
+        openModal();
+        // reset form
+        document.getElementById('orderForm').reset();
+        document.getElementById('status').textContent = 'Ваш заказ принят. ID показаны выше.';
+      } else {
+        const err = (data && (data.error || data.message)) || 'Ошибка сервера';
+        showError(err);
+      }
+    }, false);
+
+    function openModal() {
+      const modal = document.getElementById('successModal');
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+    }
+    function closeModal() {
+      const modal = document.getElementById('successModal');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden','true');
+    }
+    function showModalFallback() {
+      document.getElementById('orderIdValue').textContent = '—';
+      document.getElementById('personalIdValue').textContent = '—';
+      document.getElementById('status').textContent = 'Заявка отправлена (резерв). Проверьте таблицу/почту.';
+      openModal();
+    }
+    function showError(text) {
+      document.getElementById('status').textContent = 'Ошибка: ' + text;
+      openModal();
+      document.getElementById('orderIdValue').textContent = '—';
+      document.getElementById('personalIdValue').textContent = '—';
+    }
+
+    function copyIds() {
+      const orderId = document.getElementById('orderIdValue').textContent;
+      const pid = document.getElementById('personalIdValue').textContent;
+      const text = `Order ID: ${orderId}\nPersonal ID: ${pid}`;
+      navigator.clipboard && navigator.clipboard.writeText(text)
+        .then(()=> alert('Скопировано в буфер обмена'))
+        .catch(()=> alert('Не удалось скопировать — используйте Ctrl+C'));
+    }
 
     // Примечание: если захотим показывать реальный orderId — уберу этот код
     // и переключимся на postMessage (Apps Script должен постить сообщение родителю).
