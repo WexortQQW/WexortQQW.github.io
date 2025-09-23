@@ -96,10 +96,6 @@
     button:hover {
       background: #1e3a8a;
     }
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
 
     .alert {
       padding: 1rem;
@@ -144,7 +140,12 @@
     <div class="form-container">
       <div id="alertBox" class="alert"></div>
 
-      <form id="orderForm">
+      <form id="orderForm"
+            action="https://script.google.com/macros/s/AKfycbyGrlxlTeOs2mTtgCL5gQ9dsAe6T2rHr1WZPWdytdy3xG6__EItqJjXX8iqVURV5PukUQ/exec"
+            method="POST"
+            target="hidden_iframe"
+            onsubmit="return handleSubmit()">
+
         <div class="form-section">
           <h2>Контактная информация</h2>
           <div class="form-group">
@@ -199,7 +200,9 @@
 
         <button type="submit" id="submitButton">Отправить заказ</button>
       </form>
+
       <iframe name="hidden_iframe" style="display:none;"></iframe>
+
       <p class="form-footer">
         Нажимая кнопку, вы соглашаетесь с обработкой персональных данных
       </p>
@@ -207,63 +210,12 @@
   </div>
 
   <script>
-    async function submitForm(data) {
-      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGrlxlTeOs2mTtgCL5gQ9dsAe6T2rHr1WZPWdytdy3xG6__EItqJjXX8iqVURV5PukUQ/exec"; // замени на свой URL
-
-      const formData = new FormData();
-      for (const key in data) {
-        formData.append(key, data[key]);
-      }
-
-      const response = await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: formData
-      });
-
-      const text = await response.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        throw new Error("Неверный ответ сервера: " + text);
-      }
-    }
-
-    function showSuccess(orderId) {
+    function handleSubmit() {
       const alertBox = document.getElementById("alertBox");
       alertBox.className = "alert alert-success";
-      alertBox.textContent = `✅ Заказ #${orderId} успешно отправлен!`;
+      alertBox.textContent = "✅ Заявка успешно отправлена!";
+      return true; // продолжить отправку в Google Apps Script
     }
-
-    function showError(msg) {
-      const alertBox = document.getElementById("alertBox");
-      alertBox.className = "alert alert-error";
-      alertBox.textContent = `❌ ${msg}`;
-    }
-
-    document.getElementById("orderForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const submitButton = document.getElementById("submitButton");
-      submitButton.disabled = true;
-      submitButton.textContent = "Обработка...";
-
-      try {
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-        const result = await submitForm(data);
-
-        if (result.success) {
-          showSuccess(result.orderId);
-          e.target.reset();
-        } else {
-          showError(result.error || "Ошибка при отправке формы");
-        }
-      } catch (err) {
-        showError(err.message);
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Отправить заказ";
-      }
-    });
   </script>
 </body>
 </html>
