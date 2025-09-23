@@ -1,79 +1,62 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Форма заказа запчастей</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--primary:#2563eb;--dark:#1e3a8a;--muted:#6b7280}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#f5f7fa;color:#1f2937;display:flex;justify-content:center;align-items:flex-start;padding:32px}
-    .card{background:#fff;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,.08);width:100%;max-width:760px;overflow:hidden}
-    .card-header{background:var(--dark);color:#fff;padding:28px;text-align:center}
-    .form-container{padding:24px}
-    .form-section{margin-bottom:20px}
-    label{display:block;margin-bottom:6px;font-weight:600;font-size:13px}
-    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e5e7eb;font-size:14px}
-    button{background:var(--primary);color:#fff;padding:10px 16px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
-    button[disabled]{opacity:.6;cursor:not-allowed}
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);z-index:10000}
-    .modal .content{background:#fff;padding:20px;border-radius:12px;max-width:480px;width:92%;text-align:center}
-    .ids{display:flex;gap:10px;justify-content:center;margin:8px 0 12px;flex-wrap:wrap}
-    .id-box{background:#f3f4f6;padding:10px 12px;border-radius:8px;border:1px solid #e6eefc;min-width:140px}
+    /* минимальный стиль для примера */
+    body{font-family:system-ui,Arial; background:#f5f7fa; margin:0; padding:20px; display:flex;justify-content:center}
+    .card{width:720px;background:#fff;border-radius:10px;padding:20px;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+    label{display:block;margin:8px 0}
+    input,textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ddd}
+    button{background:#2563eb;color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
+    .modal .box{background:#fff;padding:18px;border-radius:10px;min-width:320px;text-align:center}
+    .ids{display:flex;gap:12px;justify-content:center;margin:12px 0}
+    .id{padding:10px 12px;border-radius:8px;background:#f3f4f6}
+    #status{margin-left:12px;color:#666}
   </style>
 </head>
 <body>
-  <div class="card" role="main">
-    <div class="card-header">
-      <h1>Форма заказа запчастей</h1>
-      <p>Заполните обязательные поля</p>
-    </div>
+  <div class="card">
+    <h2>Форма заказа запчастей</h2>
 
-    <div class="form-container">
-      <form id="orderForm" method="POST" target="hidden_iframe"
-            action="https://script.google.com/macros/s/YOUR_GAS_WEBAPP_URL/exec"
-            onsubmit="return handleSubmit(event)">
+    <!-- !!! ЗАМЕНИ GAS_URL на твой Web App URL (включая /exec) !!! -->
+    <script>const GAS_URL = "https://script.google.com/macros/s/AKfycbyGrlxlTeOs2mTtgCL5gQ9dsAe6T2rHr1WZPWdytdy3xG6__EItqJjXX8iqVURV5PukUQ/exec";</script>
 
-        <div class="form-section">
-          <label>ФИО * <input name="фио" required></label>
-          <label>Телефон * <input name="телефон" required autocomplete="tel"></label>
-          <label>Email <input name="почта" type="email" autocomplete="email"></label>
-        </div>
+    <form id="orderForm" method="POST" action="" target="hidden_iframe" onsubmit="return handleSubmit(event)">
+      <!-- form fields -->
+      <label>ФИО* <input name="фио" required></label>
+      <label>Телефон* <input name="телефон" required autocomplete="tel"></label>
+      <label>Email <input name="почта" type="email" autocomplete="email"></label>
+      <label>VIN* <input name="вин" pattern="[A-HJ-NPR-Z0-9]{17}" required></label>
+      <label>Модель <input name="модель"></label>
+      <label>Год <input type="number" name="год" min="1950" max="2099"></label>
+      <label>Название детали* <input name="деталь" required></label>
+      <label>Артикул <input name="артикул"></label>
+      <label>Количество <input type="number" name="количество" min="1" value="1" required></label>
+      <label>Коммент <textarea name="комментарии"></textarea></label>
 
-        <div class="form-section">
-          <label>VIN * <input name="вин" required pattern="[A-HJ-NPR-Z0-9]{17}"></label>
-          <label>Модель <input name="модель"></label>
-          <label>Год <input name="год" type="number" min="1950" max="2099"></label>
-        </div>
+      <div style="display:flex;align-items:center;margin-top:12px">
+        <button id="submitBtn" type="submit">Отправить</button>
+        <div id="status"></div>
+      </div>
+    </form>
 
-        <div class="form-section">
-          <label>Название детали * <input name="деталь" required></label>
-          <label>Артикул <input name="артикул"></label>
-          <label>Количество <input name="количество" type="number" min="1" value="1" required></label>
-          <label>Комментарии <textarea name="комментарии"></textarea></label>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:center">
-          <button id="submitButton" type="submit">Отправить заказ</button>
-          <div id="status" style="color:#6b7280;font-size:13px"></div>
-        </div>
-      </form>
-
-      <iframe id="hidden_iframe" name="hidden_iframe" style="display:none"></iframe>
-    </div>
+    <iframe id="hidden_iframe" name="hidden_iframe" style="display:none"></iframe>
   </div>
 
-  <!-- modal -->
-  <div class="modal" id="successModal" aria-hidden="true">
-    <div class="content">
-      <h2>✅ Заявка принята</h2>
-      <p id="modalText">Ваши идентификаторы:</p>
+  <!-- Модалка -->
+  <div class="modal" id="modal">
+    <div class="box">
+      <h3>Заявка принята</h3>
+      <p id="modalMsg">...</p>
       <div class="ids">
-        <div class="id-box"><div class="id-title">Order ID</div><div id="orderIdVal">—</div></div>
-        <div class="id-box"><div class="id-title">Personal ID</div><div id="personalIdVal">—</div></div>
+        <div class="id"><strong>Order ID</strong><div id="orderId">—</div></div>
+        <div class="id"><strong>Personal ID</strong><div id="personalId">—</div></div>
       </div>
-      <div style="display:flex;gap:8px;justify-content:center">
+      <div style="margin-top:8px">
         <button onclick="copyIds()">Копировать</button>
         <button onclick="closeModal()">Закрыть</button>
       </div>
@@ -81,58 +64,61 @@
   </div>
 
   <script>
-    // Поменяй на origin твоего сайта (без слэша)
-    const TRUSTED_ORIGIN = "https://wexortqqw.github.io"; 
+    // TRUSTED_ORIGIN должен совпадать с CONFIG.ALLOWED_ORIGIN в GAS
+    const TRUSTED_ORIGIN = location.origin; // оставь так, если ALLOWED_ORIGIN = текущий origin
 
-    let fallback = null;
-    function handleSubmit(e) {
-      const btn = document.getElementById('submitButton');
-      btn.disabled = true;
-      btn.textContent = 'Отправка...';
-      if (fallback) clearTimeout(fallback);
-      fallback = setTimeout(()=> {
-        btn.disabled = false;
-        btn.textContent = 'Отправить заказ';
-        showModal('Резерв: заявка отправлена. Проверьте таблицу/почту.');
-      }, 12000);
-      return true;
+    // Устанавливаем форму action по runtime (чтобы случайно не оставлять placeholder)
+    document.getElementById('orderForm').action = GAS_URL;
+
+    // простая проверка: если пользователь забыл заменить GAS_URL — покажем подсказку
+    if (!GAS_URL || GAS_URL.indexOf('YOUR_GAS_WEBAPP_ID') !== -1) {
+      console.warn('GAS_URL не установлен в index.html. Замените его на Web App URL из GAS (Deploy -> Web app).');
+      document.getElementById('status').textContent = 'Ошибка: замените GAS_URL в index.html на ваш Web App URL.';
     }
 
-    // Debug: лог любых сообщений (временно)
+    function handleSubmit(e) {
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('submitBtn').textContent = 'Отправка...';
+      document.getElementById('status').textContent = '';
+      // резервный таймаут
+      setTimeout(()=> {
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').textContent = 'Отправить';
+        showModal('Резерв: заявка отправлена. Проверьте таблицу/почту.');
+      }, 12000);
+      return true; // продолжить submit в iframe
+    }
+
+    // слушаем postMessage от GAS (HtmlOutput in GAS делает window.parent.postMessage(...))
     window.addEventListener('message', function(ev) {
       console.log('postMessage raw:', ev.origin, ev.data);
-      // БЕЗОПАСНОСТЬ: проверяем origin
-      if (!ev.origin || ev.origin !== TRUSTED_ORIGIN) {
-        console.warn('Ignored message from', ev.origin);
+      if (ev.origin !== TRUSTED_ORIGIN) {
+        console.warn('Ignored message from origin', ev.origin);
         return;
       }
-      if (fallback) { clearTimeout(fallback); fallback = null; }
-      const btn = document.getElementById('submitButton');
-      btn.disabled = false; btn.textContent = 'Отправить заказ';
-
       const data = ev.data || {};
-      if (data && data.success) {
-        document.getElementById('orderIdVal').textContent = data.orderId || '—';
-        document.getElementById('personalIdVal').textContent = data.personalId || '—';
-        openModal();
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('submitBtn').textContent = 'Отправить';
+      if (data.success) {
+        document.getElementById('orderId').textContent = data.orderId || '—';
+        document.getElementById('personalId').textContent = data.personalId || '—';
+        showModal('Спасибо! Ваши идентификаторы:');
         document.getElementById('orderForm').reset();
-        document.getElementById('status').textContent = 'Заказ принят';
+        document.getElementById('status').textContent = 'Заказ принят.';
       } else {
-        const err = (data && (data.error || data.message)) || 'Ошибка';
-        document.getElementById('status').textContent = 'Ошибка: ' + err;
-        openModal();
+        document.getElementById('status').textContent = 'Ошибка: ' + (data.error || 'сервер');
+        showModal('Ошибка при отправке: ' + (data.error || 'сервер'));
       }
     }, false);
 
-    function openModal(){ const m=document.getElementById('successModal'); m.style.display='flex'; m.setAttribute('aria-hidden','false'); }
-    function closeModal(){ const m=document.getElementById('successModal'); m.style.display='none'; m.setAttribute('aria-hidden','true'); }
-    function showModal(text){ document.getElementById('modalText').textContent = text; openModal(); }
-
-    function copyIds(){
-      const order = document.getElementById('orderIdVal').textContent;
-      const pid = document.getElementById('personalIdVal').textContent;
-      const txt = `Order ID: ${order}\nPersonal ID: ${pid}`;
-      navigator.clipboard ? navigator.clipboard.writeText(txt).then(()=>alert('Скопировано')) : alert('Копируйте вручную');
+    function showModal(msg) {
+      document.getElementById('modalMsg').textContent = msg;
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function copyIds() {
+      const text = `Order ID: ${document.getElementById('orderId').textContent}\nPersonal ID: ${document.getElementById('personalId').textContent}`;
+      navigator.clipboard && navigator.clipboard.writeText(text).then(()=> alert('Скопировано'));
     }
   </script>
 </body>
