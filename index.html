@@ -97,27 +97,6 @@
       background: #1e3a8a;
     }
 
-    .alert {
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
-      display: none;
-      font-size: 0.95rem;
-      font-weight: 500;
-    }
-    .alert-success {
-      display: block;
-      background: #ecfdf5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-    }
-    .alert-error {
-      display: block;
-      background: #fef2f2;
-      color: #991b1b;
-      border: 1px solid #fecaca;
-    }
-
     .form-footer {
       text-align: center;
       font-size: 0.85rem;
@@ -125,9 +104,55 @@
       margin-top: 1.5rem;
     }
 
-    @media (max-width: 640px) {
-      body { padding: 1rem; }
-      .form-container { padding: 1rem; }
+    /* ==== Модалка ==== */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content h2 {
+      color: #065f46;
+      margin-bottom: 1rem;
+    }
+
+    .modal-content p {
+      color: #374151;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-content button {
+      background: #2563eb;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .modal-content button:hover {
+      background: #1e3a8a;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
@@ -138,7 +163,6 @@
       <p>Заполните все обязательные поля</p>
     </div>
     <div class="form-container">
-      <div id="alertBox" class="alert"></div>
 
       <form id="orderForm"
             action="https://script.google.com/macros/s/AKfycbyGrlxlTeOs2mTtgCL5gQ9dsAe6T2rHr1WZPWdytdy3xG6__EItqJjXX8iqVURV5PukUQ/exec"
@@ -209,12 +233,28 @@
     </div>
   </div>
 
+  <!-- Модалка -->
+  <div class="modal" id="successModal">
+    <div class="modal-content">
+      <h2>✅ Заявка отправлена</h2>
+      <p>Спасибо! Мы свяжемся с вами в ближайшее время.</p>
+      <button onclick="closeModal()">Закрыть</button>
+    </div>
+  </div>
+
   <script>
     function handleSubmit() {
-      const alertBox = document.getElementById("alertBox");
-      alertBox.className = "alert alert-success";
-      alertBox.textContent = "✅ Заявка успешно отправлена!";
+      document.getElementById("orderForm").reset();
+      openModal();
       return true; // продолжить отправку в Google Apps Script
+    }
+
+    function openModal() {
+      document.getElementById("successModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("successModal").style.display = "none";
     }
   </script>
 </body>
