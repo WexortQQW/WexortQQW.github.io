@@ -1,159 +1,33 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Форма заказа запчастей</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #f5f7fa;
-      color: #1f2937;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 2rem;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      max-width: 720px;
-      width: 100%;
-      overflow: hidden;
-    }
-
-    .card-header {
-      background: #1e3a8a;
-      color: white;
-      padding: 2rem;
-      text-align: center;
-    }
-    .card-header h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-    .card-header p {
-      margin: 0.5rem 0 0;
-      font-size: 1rem;
-      opacity: 0.9;
-    }
-
-    .form-container {
-      padding: 2rem;
-    }
-
-    .form-section {
-      margin-bottom: 2rem;
-    }
-
-    .form-section h2 {
-      font-size: 1.2rem;
-      color: #1e3a8a;
-      margin-bottom: 1rem;
-      border-left: 4px solid #2563eb;
-      padding-left: 0.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.4rem;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.2s;
-    }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
-    }
-
-    button {
-      background: #2563eb;
-      color: white;
-      padding: 0.9rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background: #1e3a8a;
-    }
-
-    .form-footer {
-      text-align: center;
-      font-size: 0.85rem;
-      color: #6b7280;
-      margin-top: 1.5rem;
-    }
-
-    /* ==== Модалка ==== */
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 400px;
-      width: 100%;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      animation: fadeIn 0.3s ease;
-    }
-
-    .modal-content h2 {
-      color: #065f46;
-      margin-bottom: 1rem;
-    }
-
-    .modal-content p {
-      color: #374151;
-      margin-bottom: 1.5rem;
-    }
-
-    .modal-content button {
-      background: #2563eb;
-      border: none;
-      padding: 0.7rem 1.5rem;
-      border-radius: 8px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .modal-content button:hover {
-      background: #1e3a8a;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
+    /* (твой текущий CSS — скопируй сюда) */
+    body{margin:0;font-family:Inter,sans-serif;background:#f5f7fa;color:#1f2937;display:flex;justify-content:center;align-items:flex-start;padding:2rem}
+    .card{background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.05);max-width:720px;width:100%;overflow:hidden}
+    .card-header{background:#1e3a8a;color:#fff;padding:2rem;text-align:center}
+    .card-header h1{margin:0;font-size:1.8rem;font-weight:700}
+    .card-header p{margin:0.5rem 0 0;font-size:1rem;opacity:0.9}
+    .form-container{padding:2rem}
+    .form-section{margin-bottom:2rem}
+    .form-section h2{font-size:1.2rem;color:#1e3a8a;margin-bottom:1rem;border-left:4px solid #2563eb;padding-left:0.5rem}
+    .form-group{margin-bottom:1.25rem}
+    label{display:block;margin-bottom:0.4rem;font-weight:600;font-size:0.9rem}
+    input,textarea{width:100%;padding:0.75rem;border:1px solid #d1d5db;border-radius:8px;font-size:1rem;transition:border-color .2s}
+    input:focus,textarea:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.2)}
+    button{background:#2563eb;color:#fff;padding:.9rem 1.5rem;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s}
+    button:hover{background:#1e3a8a}
+    .form-footer{text-align:center;font-size:.85rem;color:#6b7280;margin-top:1.5rem}
+    .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center;z-index:1000}
+    .modal-content{background:#fff;padding:2rem;border-radius:12px;text-align:center;max-width:400px;width:100%;box-shadow:0 10px 25px rgba(0,0,0,.2)}
+    .modal-content h2{color:#065f46;margin-bottom:1rem}
+    .modal-content p{color:#374151;margin-bottom:1.5rem}
+    .modal-content button{background:#2563eb;border:none;padding:.7rem 1.5rem;border-radius:8px;color:#fff;font-weight:600;cursor:pointer}
+    .modal-content button:hover{background:#1e3a8a}
   </style>
 </head>
 <body>
@@ -162,59 +36,62 @@
       <h1>Форма заказа запчастей</h1>
       <p>Заполните все обязательные поля</p>
     </div>
-    <div class="form-container">
 
+    <div class="form-container">
       <form id="orderForm"
             action="https://script.google.com/macros/s/AKfycbyGrlxlTeOs2mTtgCL5gQ9dsAe6T2rHr1WZPWdytdy3xG6__EItqJjXX8iqVURV5PukUQ/exec"
             method="POST"
             target="hidden_iframe"
-            onsubmit="return handleSubmit()">
+            onsubmit="return handleSubmit(event)">
 
+        <!-- Контакт -->
         <div class="form-section">
           <h2>Контактная информация</h2>
           <div class="form-group">
             <label for="фио">ФИО *</label>
-            <input type="text" id="фио" name="фио" required>
+            <input id="фио" name="фио" required />
           </div>
           <div class="form-group">
             <label for="телефон">Телефон *</label>
-            <input type="tel" id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX">
+            <input id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX" />
           </div>
           <div class="form-group">
             <label for="почта">Email</label>
-            <input type="email" id="почта" name="почта" placeholder="example@mail.ru">
+            <input id="почта" name="почта" type="email" placeholder="example@mail.ru" />
           </div>
         </div>
 
+        <!-- Авто -->
         <div class="form-section">
           <h2>Информация об автомобиле</h2>
           <div class="form-group">
             <label for="вин">VIN *</label>
-            <input type="text" id="вин" name="вин" required pattern="[A-HJ-NPR-Z0-9]{17}">
+            <input id="вин" name="вин" required pattern="[A-HJ-NPR-Z0-9]{17}" />
           </div>
           <div class="form-group">
             <label for="модель">Модель</label>
-            <input type="text" id="модель" name="модель">
+            <input id="модель" name="модель" />
           </div>
           <div class="form-group">
             <label for="год">Год выпуска</label>
-            <input type="number" id="год" name="год" min="1950" max="2099">
+            <input id="год" name="год" type="number" min="1950" max="2099" />
           </div>
         </div>
 
+        <!-- Запчасти -->
         <div class="form-section">
           <h2>Информация о запчастях</h2>
           <div class="form-group">
             <label for="деталь">Название детали *</label>
-            <input type="text" id="деталь" name="деталь" required>
+            <input id="деталь" name="деталь" required />
           </div>
           <div class="form-group">
             <label for="артикул">Артикул</label>
-            <input type="text" id="артикул" name="артикул">
+            <input id="артикул" name="артикул" />
           </div>
           <div class="form-group">
             <label for="количество">Количество *</label>
-            <input type="number" id="количество" name="количество" min="1" value="1" required>
+            <input id="количество" name="количество" type="number" min="1" value="1" required />
           </div>
           <div class="form-group">
             <label for="комментарии">Комментарии</label>
@@ -222,14 +99,13 @@
           </div>
         </div>
 
-        <button type="submit" id="submitButton">Отправить заказ</button>
+        <button id="submitButton" type="submit">Отправить заказ</button>
       </form>
 
+      <!-- В режиме диагностики iframe видимый, когда всё ок — скройте style или сделайте display:none -->
       <iframe id="hidden_iframe" name="hidden_iframe" style="width:100%;height:160px;border:1px solid #ddd;"></iframe>
 
-      <p class="form-footer">
-        Нажимая кнопку, вы соглашаетесь с обработкой персональных данных
-      </p>
+      <p class="form-footer">Нажимая кнопку, вы соглашаетесь с обработкой персональных данных</p>
     </div>
   </div>
 
@@ -237,50 +113,83 @@
   <div class="modal" id="successModal">
     <div class="modal-content">
       <h2>✅ Заявка отправлена</h2>
-      <p>Спасибо! Мы свяжемся с вами в ближайшее время.</p>
+      <p id="modalMessage">Спасибо! Мы свяжемся с вами в ближайшее время.</p>
       <button onclick="closeModal()">Закрыть</button>
     </div>
   </div>
 
   <script>
-  // После отправки форма откроет iframe, а onload прочитает ответ
-  const iframe = document.getElementById('hidden_iframe');
-  iframe.onload = function() {
-    try {
-      const doc = iframe.contentDocument || iframe.contentWindow.document;
-      const text = doc.body.innerText || doc.body.textContent;
-      console.log('iframe response:', text);
-      // Попытаемся распарсить JSON (наш GAS возвращает <pre>JSON</pre>)
-      try {
-        const parsed = JSON.parse(text);
-        if (parsed.success) {
-          openModalWithId(parsed.orderId);
-        } else {
-          openModalWithError(parsed.error || 'Ошибка сервера');
-        }
-      } catch (e) {
-        // Если не JSON — покажем как текст
-        openModalWithError(text || 'Пустой ответ от сервера');
-      }
-    } catch (err) {
-      console.error('Не удалось прочитать ответ iframe:', err);
+    // Блокируем кнопку при отправке; ждем ответа в iframe
+    function handleSubmit(e) {
+      const btn = document.getElementById('submitButton');
+      btn.disabled = true;
+      btn.textContent = 'Отправка...';
+      // не сбрасываем форму здесь — дождемся ответа из iframe
+      return true; // продолжить стандартную отправку формы
     }
-  };
 
-  function openModalWithId(id) {
-    // Показываем модалку с номером заказа
-    const modal = document.getElementById('successModal');
-    modal.querySelector('.modal-content p').textContent = 'Номер заказа: #' + id;
-    modal.style.display = 'flex';
-    setTimeout(() => modal.style.display = 'none', 6000);
-  }
+    // iframe onload: читать ответ и показать модалку
+    const iframe = document.getElementById('hidden_iframe');
+    iframe.onload = function() {
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        const raw = (doc.body && (doc.body.innerText || doc.body.textContent) || '').trim();
+        if (!raw) {
+          console.log('iframe: empty response (initial or blank).');
+          return;
+        }
+        console.log('iframe raw:', raw);
+        let parsed;
+        try {
+          parsed = JSON.parse(raw);
+        } catch (e) {
+          // Если сервер вернул HTML, попробуем вытащить JSON из <pre>
+          const pre = doc.querySelector('pre');
+          const text = pre ? (pre.innerText || pre.textContent || '').trim() : raw;
+          try { parsed = JSON.parse(text); } catch (err) { parsed = null; }
+        }
 
-  function openModalWithError(msg) {
-    const modal = document.getElementById('successModal');
-    modal.querySelector('.modal-content p').textContent = 'Ошибка: ' + msg;
-    modal.style.display = 'flex';
-    setTimeout(() => modal.style.display = 'none', 8000);
-  }
-</script>
+        if (parsed && parsed.success) {
+          // показываем номер заказа
+          openModalWithId(parsed.orderId);
+          // сброс формы и восстановление кнопки
+          document.getElementById('orderForm').reset();
+          document.getElementById('submitButton').disabled = false;
+          document.getElementById('submitButton').textContent = 'Отправить заказ';
+        } else {
+          const errMsg = parsed && parsed.error ? parsed.error : raw;
+          openModalWithError(errMsg);
+          // восстановим кнопку, но не сбрасываем форму
+          document.getElementById('submitButton').disabled = false;
+          document.getElementById('submitButton').textContent = 'Отправить заказ';
+        }
+      } catch (err) {
+        console.error('iframe onload error:', err);
+        // восстановим кнопку
+        document.getElementById('submitButton').disabled = false;
+        document.getElementById('submitButton').textContent = 'Отправить заказ';
+      }
+    };
+
+    function openModalWithId(id) {
+      const modal = document.getElementById('successModal');
+      const msg = document.getElementById('modalMessage');
+      msg.textContent = 'Номер заказа: #' + id + '. Спасибо! Мы свяжемся с вами.';
+      modal.style.display = 'flex';
+      setTimeout(closeModal, 6000);
+    }
+
+    function openModalWithError(msg) {
+      const modal = document.getElementById('successModal');
+      const modalMessage = document.getElementById('modalMessage');
+      modalMessage.textContent = 'Ошибка: ' + msg;
+      modal.style.display = 'flex';
+      setTimeout(closeModal, 8000);
+    }
+
+    function closeModal() {
+      document.getElementById('successModal').style.display = 'none';
+    }
+  </script>
 </body>
 </html>
