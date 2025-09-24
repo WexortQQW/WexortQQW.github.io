@@ -2,314 +2,86 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Форма заказа запчастей</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #f5f7fa;
-      color: #1f2937;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 2rem;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      max-width: 720px;
-      width: 100%;
-      overflow: hidden;
-    }
-
-    .card-header {
-      background: #1e3a8a;
-      color: white;
-      padding: 2rem;
-      text-align: center;
-    }
-    .card-header h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-    .card-header p {
-      margin: 0.5rem 0 0;
-      font-size: 1rem;
-      opacity: 0.9;
-    }
-
-    .form-container {
-      padding: 2rem;
-    }
-
-    .form-section {
-      margin-bottom: 2rem;
-    }
-
-    .form-section h2 {
-      font-size: 1.2rem;
-      color: #1e3a8a;
-      margin-bottom: 1rem;
-      border-left: 4px solid #2563eb;
-      padding-left: 0.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.4rem;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.2s;
-    }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
-    }
-
-    button {
-      background: #2563eb;
-      color: white;
-      padding: 0.9rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover {
-      background: #1e3a8a;
-    }
-
-    .form-footer {
-      text-align: center;
-      font-size: 0.85rem;
-      color: #6b7280;
-      margin-top: 1.5rem;
-    }
-
-    /* ==== Модалка ==== */
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 400px;
-      width: 100%;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      animation: fadeIn 0.3s ease;
-    }
-
-    .modal-content h2 {
-      color: #065f46;
-      margin-bottom: 1rem;
-    }
-
-    .modal-content p {
-      color: #374151;
-      margin-bottom: 1.5rem;
-    }
-
-    .modal-content .id-box {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-
-    .id-item {
-      background: #f3f4f6;
-      border-radius: 8px;
-      padding: 0.6rem 1rem;
-      width: 45%;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .modal-content button {
-      background: #2563eb;
-      border: none;
-      padding: 0.7rem 1.5rem;
-      border-radius: 8px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      margin: 0.3rem;
-    }
-    .modal-content button:hover {
-      background: #1e3a8a;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="card">
-    <div class="card-header">
-      <h1>Форма заказа запчастей</h1>
-      <p>Заполните все обязательные поля</p>
-    </div>
-    <div class="form-container">
-      <form id="orderForm">
-        <div class="form-section">
-          <h2>Контактная информация</h2>
-          <div class="form-group">
-            <label for="фио">ФИО *</label>
-            <input type="text" id="фио" name="фио" required autocomplete="name">
-          </div>
-          <div class="form-group">
-            <label for="телефон">Телефон *</label>
-            <input type="tel" id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX" autocomplete="tel">
-          </div>
-          <div class="form-group">
-            <label for="почта">Email</label>
-            <input type="email" id="почта" name="почта" placeholder="example@mail.ru" autocomplete="email">
-          </div>
-        </div>
+    <h2>Форма заказа запчастей</h2>
+    <form id="orderForm" method="POST" target="hidden_iframe" action="https://script.google.com/macros/s/AKfycbztEHXqCD2r0GOHgZATTToKijfr8tkUD8sS6tf6Y7tT9QSjjzbrl3okP0Iff_-raqvWBw/exec">
+      <label>ФИО *
+        <input type="text" name="name" required>
+      </label>
+      <label>Телефон *
+        <input type="tel" name="phone" required>
+      </label>
+      <label>Email
+        <input type="email" name="email">
+      </label>
+      <label>VIN *
+        <input type="text" name="vin" required>
+      </label>
+      <label>Модель
+        <input type="text" name="model">
+      </label>
+      <label>Год выпуска
+        <input type="number" name="year">
+      </label>
+      <label>Название детали *
+        <input type="text" name="partName" required>
+      </label>
+      <label>Артикул
+        <input type="text" name="article">
+      </label>
+      <label>Количество *
+        <input type="number" name="qty" required value="1">
+      </label>
+      <label>Комментарий
+        <textarea name="comment"></textarea>
+      </label>
 
-        <div class="form-section">
-          <h2>Информация об автомобиле</h2>
-          <div class="form-group">
-            <label for="вин">VIN *</label>
-            <input type="text" id="вин" name="вин" required pattern="[A-HJ-NPR-Z0-9]{17}">
-          </div>
-          <div class="form-group">
-            <label for="модель">Модель</label>
-            <input type="text" id="модель" name="модель">
-          </div>
-          <div class="form-group">
-            <label for="год">Год выпуска</label>
-            <input type="number" id="год" name="год" min="1950" max="2099">
-          </div>
-        </div>
+      <!-- Скрытые поля для ID -->
+      <input type="hidden" name="orderId" id="orderId">
+      <input type="hidden" name="personalId" id="personalId">
 
-        <div class="form-section">
-          <h2>Информация о запчастях</h2>
-          <div class="form-group">
-            <label for="деталь">Название детали *</label>
-            <input type="text" id="деталь" name="деталь" required>
-          </div>
-          <div class="form-group">
-            <label for="артикул">Артикул</label>
-            <input type="text" id="артикул" name="артикул">
-          </div>
-          <div class="form-group">
-            <label for="количество">Количество *</label>
-            <input type="number" id="количество" name="количество" min="1" value="1" required>
-          </div>
-          <div class="form-group">
-            <label for="комментарии">Комментарии</label>
-            <textarea id="комментарии" name="комментарии" rows="4"></textarea>
-          </div>
-        </div>
+      <button type="submit">Отправить заказ</button>
+    </form>
 
-        <button type="submit" id="submitButton">Отправить заказ</button>
-      </form>
-
-      <p class="form-footer">Нажимая кнопку, вы соглашаетесь с обработкой персональных данных</p>
-    </div>
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
   </div>
 
-  <!-- Модалка -->
-  <div class="modal" id="successModal">
+  <!-- Модальное окно -->
+  <div id="modal" class="modal">
     <div class="modal-content">
-      <h2 id="modalTitle">Заявка принята</h2>
-      <p id="modalMessage">Спасибо! Ваша заявка успешно отправлена.</p>
-      <div class="id-box">
-        <div class="id-item" id="orderIdBox">Order ID —</div>
-        <div class="id-item" id="personalIdBox">Personal ID —</div>
-      </div>
-      <button id="copyBtn">Копировать оба</button>
+      <h3 id="modalTitle"></h3>
+      <p id="modalMsg"></p>
       <button onclick="closeModal()">Закрыть</button>
     </div>
   </div>
 
   <script>
-    const FORM_URL = "https://script.google.com/macros/s/AKfycbztEHXqCD2r0GOHgZATTToKijfr8tkUD8sS6tf6Y7tT9QSjjzbrl3okP0Iff_-raqvWBw/exec";
+    const form = document.getElementById("orderForm");
+    const iframe = document.getElementById("hidden_iframe");
 
-    document.getElementById("orderForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-
-      try {
-        const response = await fetch(FORM_URL, {
-          method: "POST",
-          body: formData
-        });
-
-        const text = await response.text();
-        console.log("Ответ сервера:", text);
-
-        let json;
-        try {
-          json = JSON.parse(text);
-        } catch {
-          json = { success: false };
-        }
-
-        if (json.success) {
-          showModal(json.orderId, json.personalId);
-        } else {
-          showModalError("Ошибка при сохранении данных");
-        }
-
-      } catch (error) {
-        console.error("Ошибка запроса:", error);
-        showModalError("Ошибка соединения!");
-      }
+    form.addEventListener("submit", () => {
+      // Перед отправкой генерим ID
+      document.getElementById("orderId").value = Date.now(); // уникальный номер заказа
+      const phone = form.querySelector("[name='phone']").value;
+      document.getElementById("personalId").value = phone.slice(-4); // последние 4 цифры
     });
 
-    function showModal(orderId, personalId) {
-      document.getElementById("modalTitle").textContent = "Заявка принята";
-      document.getElementById("modalMessage").textContent = "Спасибо! Ваша заявка сохранена.";
-      document.getElementById("orderIdBox").textContent = "Order ID: " + orderId;
-      document.getElementById("personalIdBox").textContent = "Personal ID: " + personalId;
-      document.getElementById("successModal").style.display = "flex";
+    iframe.onload = function () {
+      showModal("Заявка принята", "Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.");
+    };
 
-      document.getElementById("copyBtn").onclick = () => {
-        navigator.clipboard.writeText("Order ID: " + orderId + " | Personal ID: " + personalId);
-      };
+    function showModal(title, msg) {
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalMsg").textContent = msg;
+      document.getElementById("modal").style.display = "flex";
     }
-
-    function showModalError(message) {
-      document.getElementById("modalTitle").textContent = "Ошибка";
-      document.getElementById("modalMessage").textContent = message;
-      document.getElementById("orderIdBox").textContent = "Order ID —";
-      document.getElementById("personalIdBox").textContent = "Personal ID —";
-      document.getElementById("successModal").style.display = "flex";
-    }
-
     function closeModal() {
-      document.getElementById("successModal").style.display = "none";
+      document.getElementById("modal").style.display = "none";
+      form.reset();
     }
   </script>
 </body>
