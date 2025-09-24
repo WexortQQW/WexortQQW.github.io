@@ -134,3 +134,25 @@ button:hover::after {
 input:not(:placeholder-shown) + .input-highlight {
   animation: inputHighlight 0.4s ease-out;
 }
+
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.2rem 1.5rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+input, textarea {
+  margin-top: 0.35rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+}
+
