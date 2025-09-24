@@ -1,57 +1,132 @@
-:root{
-  --bg:#f5f7fa;
-  --card:#fff;
-  --accent:#1e73ff;
-  --text:#233;
+:root {
+  --bg: linear-gradient(135deg, #eef2f9, #f9fbff);
+  --card: rgba(255, 255, 255, 0.85);
+  --accent: #3b82f6; /* яркий неон-синий */
+  --accent-hover: #2563eb;
+  --text: #1b1f29;
+  --border: rgba(255, 255, 255, 0.35);
+  --shadow: rgba(15, 23, 42, 0.15);
 }
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-  padding:40px 16px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Inter", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
 }
 
-main{width:720px; max-width:96%}
-.card{
-  background:var(--card);
-  padding:28px;
-  border-radius:12px;
-  box-shadow:0 8px 30px rgba(20,30,50,0.08);
+/* Карточка */
+main { width: 720px; max-width: 96%; }
+.card {
+  background: var(--card);
+  padding: 32px;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px var(--shadow);
+  backdrop-filter: blur(16px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.25);
+}
+.card h2 {
+  text-align: center;
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
 }
 
-.card h2{text-align:center;margin:0 0 16px;font-size:22px}
-label{display:block;margin:10px 0;font-size:13px}
-input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea{
-  width:100%;
-  padding:10px 12px;
-  border-radius:8px;
-  border:1px solid #d4d8de;
-  background:#f9fbfd;
-  outline:none;
-  font-size:14px;
+/* Поля */
+label {
+  display: block;
+  margin: 14px 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
 }
-textarea{resize:vertical; min-height:72px}
-.buttons{margin-top:14px;text-align:center}
-button{background:var(--accent); color:#fff; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; font-size:15px}
-button[disabled]{opacity:.6; cursor:default}
+input[type="text"], input[type="email"], input[type="tel"], 
+input[type="number"], textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.75);
+  outline: none;
+  font-size: 14px;
+  transition: all 0.25s ease;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+}
+input:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  background: #fff;
+}
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
 
-/* modal */
-.modal{
-  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-  background:rgba(0,0,0,0.45); z-index:9999;
+/* Кнопки */
+.buttons { margin-top: 18px; text-align: center; }
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
 }
-.modal-body{
-  width:460px; max-width:92%;
-  background:#fff; padding:22px; border-radius:12px; text-align:center;
-  box-shadow:0 20px 40px rgba(18,28,50,0.15);
+button:hover:not([disabled]) {
+  background: var(--accent-hover);
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45);
+  transform: translateY(-2px);
 }
-.modal-body h3{margin:0 0 8px}
-.modal-actions{display:flex; gap:12px; flex-direction:column; margin-top:12px}
-.modal-actions button{width:100%}
+button[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Модалка */
+.modal {
+  position: fixed; inset: 0; display: none;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55); z-index: 9999;
+  backdrop-filter: blur(6px);
+}
+.modal-body {
+  width: 460px; max-width: 92%;
+  background: var(--card);
+  padding: 28px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(18,28,50,0.25);
+  backdrop-filter: blur(14px);
+  animation: pop 0.3s ease forwards;
+}
+.modal-body h3 { margin: 0 0 12px; font-size: 20px; }
+.modal-actions {
+  display: flex; gap: 14px;
+  flex-direction: column; margin-top: 16px;
+}
+.modal-actions button {
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* Анимация появления */
+@keyframes pop {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
