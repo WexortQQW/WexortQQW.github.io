@@ -8,7 +8,7 @@
 <body>
   <div class="card">
     <h2>Форма заказа запчастей</h2>
-    <form id="orderForm" method="POST" target="hidden_iframe" action="https://script.google.com/macros/s/AKfycbztEHXqCD2r0GOHgZATTToKijfr8tkUD8sS6tf6Y7tT9QSjjzbrl3okP0Iff_-raqvWBw/exec">
+    <form id="orderForm" method="POST" target="hidden_iframe" action="https://script.google.com/macros/s/###YOUR_GAS_ID###/exec">
       <label>ФИО *
         <input type="text" name="name" required>
       </label>
@@ -40,7 +40,7 @@
         <textarea name="comment"></textarea>
       </label>
 
-      <!-- Скрытые поля для ID -->
+      <!-- Скрытые поля -->
       <input type="hidden" name="orderId" id="orderId">
       <input type="hidden" name="personalId" id="personalId">
 
@@ -55,6 +55,9 @@
     <div class="modal-content">
       <h3 id="modalTitle"></h3>
       <p id="modalMsg"></p>
+      <p><b>Order ID:</b> <span id="orderIdDisplay">—</span></p>
+      <p><b>Personal ID:</b> <span id="personalIdDisplay">—</span></p>
+      <button onclick="copyBoth()">Копировать оба</button>
       <button onclick="closeModal()">Закрыть</button>
     </div>
   </div>
@@ -64,24 +67,46 @@
     const iframe = document.getElementById("hidden_iframe");
 
     form.addEventListener("submit", () => {
-      // Перед отправкой генерим ID
-      document.getElementById("orderId").value = Date.now(); // уникальный номер заказа
+      // Генерация ID
+      const orderId = Date.now(); // уникальный номер
       const phone = form.querySelector("[name='phone']").value;
-      document.getElementById("personalId").value = phone.slice(-4); // последние 4 цифры
+      const personalId = phone.slice(-4); // последние 4 цифры
+
+      document.getElementById("orderId").value = orderId;
+      document.getElementById("personalId").value = personalId;
+
+      // Отобразим их потом в модалке
+      form.dataset.orderId = orderId;
+      form.dataset.personalId = personalId;
     });
 
     iframe.onload = function () {
-      showModal("Заявка принята", "Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.");
+      showModal(
+        "Заявка принята",
+        "Спасибо, ваша заявка отправлена. Проверьте таблицу/почту."
+      );
     };
 
     function showModal(title, msg) {
       document.getElementById("modalTitle").textContent = title;
       document.getElementById("modalMsg").textContent = msg;
+
+      document.getElementById("orderIdDisplay").textContent = form.dataset.orderId || "—";
+      document.getElementById("personalIdDisplay").textContent = form.dataset.personalId || "—";
+
       document.getElementById("modal").style.display = "flex";
     }
+
     function closeModal() {
       document.getElementById("modal").style.display = "none";
       form.reset();
+    }
+
+    function copyBoth() {
+      const text = `Order ID: ${form.dataset.orderId}, Personal ID: ${form.dataset.personalId}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Скопировано: " + text);
+      });
     }
   </script>
 </body>
