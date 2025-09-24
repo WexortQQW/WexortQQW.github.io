@@ -8,7 +8,9 @@
 <body>
   <div class="card">
     <h2>Форма заказа запчастей</h2>
-    <form id="orderForm" method="POST" target="hidden_iframe" action="https://script.google.com/macros/s/AKfycbztEHXqCD2r0GOHgZATTToKijfr8tkUD8sS6tf6Y7tT9QSjjzbrl3okP0Iff_-raqvWBw/exec">
+    <form id="orderForm" method="POST" target="hidden_iframe" 
+          action="https://script.google.com/macros/s/AKfycbztEHXqCD2r0GOHgZATTToKijfr8tkUD8sS6tf6Y7tT9QSjjzbrl3okP0Iff_-raqvWBw/exec">
+      
       <label>ФИО *
         <input type="text" name="name" required>
       </label>
@@ -51,7 +53,7 @@
   </div>
 
   <!-- Модальное окно -->
-  <div id="modal" class="modal">
+  <div id="modal" class="modal" style="display:none;">
     <div class="modal-content">
       <h3 id="modalTitle"></h3>
       <p id="modalMsg"></p>
@@ -75,7 +77,6 @@
       document.getElementById("orderId").value = orderId;
       document.getElementById("personalId").value = personalId;
 
-      // Отобразим их потом в модалке
       form.dataset.orderId = orderId;
       form.dataset.personalId = personalId;
     });
@@ -83,17 +84,15 @@
     iframe.onload = function () {
       showModal(
         "Заявка принята",
-        "Спасибо, ваша заявка отправлена. Проверьте таблицу/почту."
+        "Спасибо, ваша заявка отправлена."
       );
     };
 
     function showModal(title, msg) {
       document.getElementById("modalTitle").textContent = title;
       document.getElementById("modalMsg").textContent = msg;
-
       document.getElementById("orderIdDisplay").textContent = form.dataset.orderId || "—";
       document.getElementById("personalIdDisplay").textContent = form.dataset.personalId || "—";
-
       document.getElementById("modal").style.display = "flex";
     }
 
