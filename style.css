@@ -1,48 +1,82 @@
 :root {
-  --bg: #f5f7fa;
-  --card: #fff;
-  --accent: #1e73ff;
-  --text: #233;
+  --bg: linear-gradient(160deg, #f8f9ff 0%, #f2f4f8 100%);
+  --card: rgba(255, 255, 255, 0.95);
+  --accent: linear-gradient(135deg, #2a5ee8 0%, #4285f4 100%);
+  --text: #1a1d24;
+  --border: rgba(160, 174, 192, 0.2);
+  --shadow: 0 12px 40px rgba(18, 34, 64, 0.08);
+  --glass: rgba(255, 255, 255, 0.7);
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   margin: 0;
-  font-family: Inter, Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 40px 16px;
+  padding: 4rem 1rem;
+  line-height: 1.6;
 }
 
 main {
-  width: 720px;
-  max-width: 96%;
+  width: 760px;
+  max-width: 100%;
+  perspective: 1000px;
 }
 
 .card {
   background: var(--card);
-  padding: 28px;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(20, 30, 50, 0.08);
+  padding: 2.5rem;
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px) rotateX(1deg);
 }
 
 .card h2 {
   text-align: center;
-  margin: 0 0 16px;
-  font-size: 22px;
+  margin: 0 0 2rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #1a1d24;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.card h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
 }
 
 label {
   display: block;
-  margin: 10px 0;
-  font-size: 13px;
+  margin: 1.25rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
 }
 
 input[type="text"],
@@ -51,71 +85,122 @@ input[type="tel"],
 input[type="number"],
 textarea {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #d4d8de;
-  background: #f9fbfd;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--glass);
   outline: none;
-  font-size: 14px;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: rgba(66, 133, 244, 0.4);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+  background: white;
 }
 
 textarea {
   resize: vertical;
-  min-height: 72px;
+  min-height: 100px;
 }
 
 .buttons {
-  margin-top: 14px;
+  margin-top: 2rem;
   text-align: center;
 }
 
 button {
   background: var(--accent);
-  color: #fff;
+  color: white;
   border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
+  padding: 0.875rem 2rem;
+  border-radius: 0.75rem;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+button:hover {
+  box-shadow: 0 8px 20px rgba(66, 133, 244, 0.2);
+  transform: translateY(-1px);
+}
+
+button:hover::after {
+  opacity: 1;
 }
 
 button[disabled] {
-  opacity: 0.6;
-  cursor: default;
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #cbd5e0;
 }
 
-/* Modal Styles */
 .modal {
   position: fixed;
   inset: 0;
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
   z-index: 9999;
 }
 
 .modal-body {
-  width: 460px;
-  max-width: 92%;
-  background: #fff;
-  padding: 22px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(18, 28, 50, 0.15);
+  width: 480px;
+  max-width: 94%;
+  background: var(--card);
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  animation: modalEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-body h3 {
-  margin: 0 0 8px;
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
 }
 
 .modal-actions {
   display: flex;
-  gap: 12px;
+  gap: 1rem;
   flex-direction: column;
-  margin-top: 12px;
+  margin-top: 1.5rem;
 }
 
-.modal-actions button {
-  width: 100%;
+#orderIdDisplay,
+#personalIdDisplay {
+  font-family: 'JetBrains Mono', monospace;
+  color: #2a5ee8;
+  font-weight: 600;
 }
