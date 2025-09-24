@@ -4,54 +4,91 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Форма заказа запчастей</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f7fa;
+      font-family: 'Inter', sans-serif;
+      background-color: #f5f7fa;
+      color: #1f2937;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       padding: 2rem;
     }
     .card {
       background: #fff;
       border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
       max-width: 720px;
       width: 100%;
+      overflow: hidden;
+    }
+    .card-header {
+      background: #1e3a8a;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    .card-header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .card-header p {
+      margin: 0.5rem 0 0;
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+    .form-container {
       padding: 2rem;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-      color: #1e3a8a;
+    .form-section {
+      margin-bottom: 2rem;
     }
-    label { font-weight: 600; display: block; margin-bottom: 0.4rem; }
+    .form-section h2 {
+      font-size: 1.2rem;
+      color: #1e3a8a;
+      margin-bottom: 1rem;
+      border-left: 4px solid #2563eb;
+      padding-left: 0.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
     input, textarea {
       width: 100%;
-      padding: 0.6rem;
-      margin-bottom: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
     }
     button {
       background: #2563eb;
-      color: #fff;
-      padding: 0.7rem 1.4rem;
+      color: white;
+      padding: 0.9rem 1.5rem;
       border: none;
       border-radius: 8px;
-      cursor: pointer;
+      font-size: 1rem;
       font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
     }
-    button:hover { background: #1e3a8a; }
-    .form-footer {
-      text-align: center;
-      margin-top: 1rem;
-      font-size: 0.85rem;
-      color: #555;
+    button:hover {
+      background: #1e3a8a;
     }
-
-    /* ===== Модалка ===== */
     .modal {
       position: fixed;
       top: 0; left: 0;
@@ -60,130 +97,146 @@
       display: none;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
+      z-index: 1000;
     }
     .modal-content {
-      background: #fff;
+      background: white;
       padding: 2rem;
       border-radius: 12px;
       text-align: center;
       max-width: 400px;
       width: 100%;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s ease;
     }
-    .modal-content h2 { margin-bottom: 1rem; }
-    .id-boxes {
-      display: flex;
-      justify-content: space-around;
-      margin: 1rem 0;
+    .modal-content h2 {
+      color: #065f46;
+      margin-bottom: 1rem;
     }
-    .id-box {
-      background: #f3f4f6;
-      padding: 0.7rem 1rem;
+    .modal-content p {
+      color: #374151;
+      margin-bottom: 1.5rem;
+    }
+    .modal-content button {
+      background: #2563eb;
+      border: none;
+      padding: 0.7rem 1.5rem;
       border-radius: 8px;
-      min-width: 120px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
     }
-    .id-box strong { display: block; font-size: 0.85rem; color: #374151; }
-    .id-box span { font-size: 1.1rem; font-weight: bold; }
+    .modal-content button:hover {
+      background: #1e3a8a;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Форма заказа запчастей</h1>
-    <form id="orderForm" method="POST" target="hidden_iframe"
-          action="https://script.google.com/macros/s/AKfycbzJehj8KaBbesd6tUBpNWRGLS5nNvGNr1slAncGmPRpJLJK6ZXdibb_APvi5rMhoEklVQ/exec">
-
-      <label>ФИО *</label>
-      <input type="text" name="фио" required>
-
-      <label>Телефон *</label>
-      <input type="tel" name="телефон" required placeholder="+7XXXXXXXXXX">
-
-      <label>Email</label>
-      <input type="email" name="почта">
-
-      <label>VIN *</label>
-      <input type="text" name="вин" required pattern="[A-HJ-NPR-Z0-9]{17}">
-
-      <label>Модель</label>
-      <input type="text" name="модель">
-
-      <label>Год выпуска</label>
-      <input type="number" name="год" min="1950" max="2099">
-
-      <label>Название детали *</label>
-      <input type="text" name="деталь" required>
-
-      <label>Артикул</label>
-      <input type="text" name="артикул">
-
-      <label>Количество *</label>
-      <input type="number" name="количество" value="1" min="1" required>
-
-      <label>Комментарии</label>
-      <textarea name="комментарии" rows="4"></textarea>
-
-      <button type="submit">Отправить заказ</button>
-    </form>
-    <iframe name="hidden_iframe" style="display:none;"></iframe>
-    <p class="form-footer">Нажимая кнопку, вы соглашаетесь с обработкой персональных данных</p>
+    <div class="card-header">
+      <h1>Форма заказа запчастей</h1>
+      <p>Заполните все обязательные поля</p>
+    </div>
+    <div class="form-container">
+      <form id="orderForm">
+        <div class="form-section">
+          <h2>Контактная информация</h2>
+          <div class="form-group">
+            <label for="фио">ФИО *</label>
+            <input type="text" id="фио" name="фио" required>
+          </div>
+          <div class="form-group">
+            <label for="телефон">Телефон *</label>
+            <input type="tel" id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX">
+          </div>
+          <div class="form-group">
+            <label for="почта">Email</label>
+            <input type="email" id="почта" name="почта" placeholder="example@mail.ru">
+          </div>
+        </div>
+        <div class="form-section">
+          <h2>Информация об автомобиле</h2>
+          <div class="form-group">
+            <label for="вин">VIN *</label>
+            <input type="text" id="вин" name="вин" required>
+          </div>
+          <div class="form-group">
+            <label for="модель">Модель</label>
+            <input type="text" id="модель" name="модель">
+          </div>
+          <div class="form-group">
+            <label for="год">Год выпуска</label>
+            <input type="number" id="год" name="год" min="1950" max="2099">
+          </div>
+        </div>
+        <div class="form-section">
+          <h2>Информация о запчастях</h2>
+          <div class="form-group">
+            <label for="деталь">Название детали *</label>
+            <input type="text" id="деталь" name="деталь" required>
+          </div>
+          <div class="form-group">
+            <label for="артикул">Артикул</label>
+            <input type="text" id="артикул" name="артикул">
+          </div>
+          <div class="form-group">
+            <label for="количество">Количество *</label>
+            <input type="number" id="количество" name="количество" min="1" value="1" required>
+          </div>
+          <div class="form-group">
+            <label for="комментарии">Комментарии</label>
+            <textarea id="комментарии" name="комментарии" rows="4"></textarea>
+          </div>
+        </div>
+        <button type="submit">Отправить заказ</button>
+      </form>
+    </div>
   </div>
 
-  <!-- Модалка -->
   <div class="modal" id="successModal">
     <div class="modal-content">
-      <h2 id="modalTitle">Заявка принята</h2>
-      <p class="modal-message">Спасибо! Ваши идентификаторы:</p>
-      <div class="id-boxes">
-        <div class="id-box">
-          <strong>Order ID</strong>
-          <span id="orderId">—</span>
-        </div>
-        <div class="id-box">
-          <strong>Personal ID</strong>
-          <span id="personalId">—</span>
-        </div>
-      </div>
+      <h2>✅ Заявка принята</h2>
+      <p id="modalText">Спасибо! Мы свяжемся с вами в ближайшее время.</p>
       <button onclick="closeModal()">Закрыть</button>
     </div>
   </div>
 
   <script>
-    const iframe = document.querySelector("iframe");
+    const FORM = document.getElementById("orderForm");
+    const MODAL = document.getElementById("successModal");
+    const MODAL_TEXT = document.getElementById("modalText");
 
-    iframe.onload = function() {
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzzFZaxK68DHfJG52nN55YOTPE8um9WzG6E1DaLaheT2r-R-wiLmn8-_-X3kJl65abwWw/exec";
+
+    FORM.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(FORM);
       try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        const text = doc.body.innerText || doc.body.textContent;
-        console.log("Ответ из GAS:", text);
-
-        const parsed = JSON.parse(text);
-        if (parsed.status === "ok") {
-          showModal(parsed.orderId, parsed.personalId);
+        const response = await fetch(GAS_URL, {
+          method: "POST",
+          body: formData,
+        });
+        const result = await response.json();
+        if (result.success) {
+          MODAL_TEXT.textContent = `Номер заказа: #${result.orderId}, Personal ID: ${result.personalId}`;
+          MODAL.style.display = "flex";
         } else {
-          showModal("-", "-", "Ошибка: " + parsed.message);
+          MODAL_TEXT.textContent = "Ошибка сервера!";
+          MODAL.style.display = "flex";
         }
-      } catch (e) {
-        console.error("Ошибка чтения:", e);
-        showModal("-", "-", "Не удалось обработать ответ");
+      } catch (err) {
+        MODAL_TEXT.textContent = "Ошибка соединения!";
+        MODAL.style.display = "flex";
       }
-    };
+    });
 
-    function showModal(orderId, personalId, errorMsg) {
-      const modal = document.getElementById("successModal");
-      if (errorMsg) {
-        document.getElementById("modalTitle").textContent = "Ошибка";
-        document.querySelector(".modal-message").textContent = errorMsg;
-      } else {
-        document.getElementById("modalTitle").textContent = "✅ Заявка принята";
-        document.querySelector(".modal-message").textContent = "Спасибо! Ваши идентификаторы:";
-        document.getElementById("orderId").textContent = orderId;
-        document.getElementById("personalId").textContent = personalId;
-      }
-      modal.style.display = "flex";
-    }
     function closeModal() {
-      document.getElementById("successModal").style.display = "none";
+      MODAL.style.display = "none";
     }
   </script>
 </body>
