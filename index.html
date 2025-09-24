@@ -16,6 +16,7 @@
       align-items: flex-start;
       padding: 2rem;
     }
+
     .card {
       background: #fff;
       border-radius: 12px;
@@ -24,6 +25,7 @@
       width: 100%;
       overflow: hidden;
     }
+
     .card-header {
       background: #1e3a8a;
       color: white;
@@ -40,12 +42,15 @@
       font-size: 1rem;
       opacity: 0.9;
     }
+
     .form-container {
       padding: 2rem;
     }
+
     .form-section {
       margin-bottom: 2rem;
     }
+
     .form-section h2 {
       font-size: 1.2rem;
       color: #1e3a8a;
@@ -53,6 +58,7 @@
       border-left: 4px solid #2563eb;
       padding-left: 0.5rem;
     }
+
     .form-group {
       margin-bottom: 1.25rem;
     }
@@ -75,6 +81,7 @@
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
     }
+
     button {
       background: #2563eb;
       color: white;
@@ -89,6 +96,15 @@
     button:hover {
       background: #1e3a8a;
     }
+
+    .form-footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 1.5rem;
+    }
+
+    /* ==== Модалка ==== */
     .modal {
       position: fixed;
       top: 0; left: 0;
@@ -99,6 +115,7 @@
       align-items: center;
       z-index: 1000;
     }
+
     .modal-content {
       background: white;
       padding: 2rem;
@@ -109,14 +126,32 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
       animation: fadeIn 0.3s ease;
     }
+
     .modal-content h2 {
       color: #065f46;
       margin-bottom: 1rem;
     }
+
     .modal-content p {
       color: #374151;
       margin-bottom: 1.5rem;
     }
+
+    .modal-content .id-box {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .id-item {
+      background: #f3f4f6;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      width: 45%;
+      text-align: center;
+      font-weight: 600;
+    }
+
     .modal-content button {
       background: #2563eb;
       border: none;
@@ -125,10 +160,12 @@
       color: white;
       font-weight: 600;
       cursor: pointer;
+      margin: 0.3rem;
     }
     .modal-content button:hover {
       background: #1e3a8a;
     }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.9); }
       to { opacity: 1; transform: scale(1); }
@@ -147,22 +184,23 @@
           <h2>Контактная информация</h2>
           <div class="form-group">
             <label for="фио">ФИО *</label>
-            <input type="text" id="фио" name="фио" required>
+            <input type="text" id="фио" name="фио" required autocomplete="name">
           </div>
           <div class="form-group">
             <label for="телефон">Телефон *</label>
-            <input type="tel" id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX">
+            <input type="tel" id="телефон" name="телефон" required placeholder="+7 (XXX) XXX-XX-XX" autocomplete="tel">
           </div>
           <div class="form-group">
             <label for="почта">Email</label>
-            <input type="email" id="почта" name="почта" placeholder="example@mail.ru">
+            <input type="email" id="почта" name="почта" placeholder="example@mail.ru" autocomplete="email">
           </div>
         </div>
+
         <div class="form-section">
           <h2>Информация об автомобиле</h2>
           <div class="form-group">
             <label for="вин">VIN *</label>
-            <input type="text" id="вин" name="вин" required>
+            <input type="text" id="вин" name="вин" required pattern="[A-HJ-NPR-Z0-9]{17}">
           </div>
           <div class="form-group">
             <label for="модель">Модель</label>
@@ -173,6 +211,7 @@
             <input type="number" id="год" name="год" min="1950" max="2099">
           </div>
         </div>
+
         <div class="form-section">
           <h2>Информация о запчастях</h2>
           <div class="form-group">
@@ -192,51 +231,85 @@
             <textarea id="комментарии" name="комментарии" rows="4"></textarea>
           </div>
         </div>
-        <button type="submit">Отправить заказ</button>
+
+        <button type="submit" id="submitButton">Отправить заказ</button>
       </form>
+
+      <p class="form-footer">Нажимая кнопку, вы соглашаетесь с обработкой персональных данных</p>
     </div>
   </div>
 
+  <!-- Модалка -->
   <div class="modal" id="successModal">
     <div class="modal-content">
-      <h2>✅ Заявка принята</h2>
-      <p id="modalText">Спасибо! Мы свяжемся с вами в ближайшее время.</p>
+      <h2 id="modalTitle">Заявка принята</h2>
+      <p id="modalMessage">Спасибо! Ваша заявка успешно отправлена.</p>
+      <div class="id-box">
+        <div class="id-item" id="orderIdBox">Order ID —</div>
+        <div class="id-item" id="personalIdBox">Personal ID —</div>
+      </div>
+      <button id="copyBtn">Копировать оба</button>
       <button onclick="closeModal()">Закрыть</button>
     </div>
   </div>
 
   <script>
-    const FORM = document.getElementById("orderForm");
-    const MODAL = document.getElementById("successModal");
-    const MODAL_TEXT = document.getElementById("modalText");
+    const FORM_URL = "https://script.google.com/macros/s/AKfycbztEHXqCD2r0GOHgZATTToKijfr8tkUD8sS6tf6Y7tT9QSjjzbrl3okP0Iff_-raqvWBw/exec";
 
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzJehj8KaBbesd6tUBpNWRGLS5nNvGNr1slAncGmPRpJLJK6ZXdibb_APvi5rMhoEklVQ/exec";
-
-    FORM.addEventListener("submit", async (e) => {
+    document.getElementById("orderForm").addEventListener("submit", async function(e) {
       e.preventDefault();
+      const formData = new FormData(this);
 
-      const formData = new FormData(FORM);
       try {
-        const response = await fetch(GAS_URL, {
+        const response = await fetch(FORM_URL, {
           method: "POST",
-          body: formData,
+          body: formData
         });
-        const result = await response.json();
-        if (result.success) {
-          MODAL_TEXT.textContent = `Номер заказа: #${result.orderId}, Personal ID: ${result.personalId}`;
-          MODAL.style.display = "flex";
-        } else {
-          MODAL_TEXT.textContent = "Ошибка сервера!";
-          MODAL.style.display = "flex";
+
+        const text = await response.text();
+        console.log("Ответ сервера:", text);
+
+        let json;
+        try {
+          json = JSON.parse(text);
+        } catch {
+          json = { success: false };
         }
-      } catch (err) {
-        MODAL_TEXT.textContent = "Ошибка соединения!";
-        MODAL.style.display = "flex";
+
+        if (json.success) {
+          showModal(json.orderId, json.personalId);
+        } else {
+          showModalError("Ошибка при сохранении данных");
+        }
+
+      } catch (error) {
+        console.error("Ошибка запроса:", error);
+        showModalError("Ошибка соединения!");
       }
     });
 
+    function showModal(orderId, personalId) {
+      document.getElementById("modalTitle").textContent = "Заявка принята";
+      document.getElementById("modalMessage").textContent = "Спасибо! Ваша заявка сохранена.";
+      document.getElementById("orderIdBox").textContent = "Order ID: " + orderId;
+      document.getElementById("personalIdBox").textContent = "Personal ID: " + personalId;
+      document.getElementById("successModal").style.display = "flex";
+
+      document.getElementById("copyBtn").onclick = () => {
+        navigator.clipboard.writeText("Order ID: " + orderId + " | Personal ID: " + personalId);
+      };
+    }
+
+    function showModalError(message) {
+      document.getElementById("modalTitle").textContent = "Ошибка";
+      document.getElementById("modalMessage").textContent = message;
+      document.getElementById("orderIdBox").textContent = "Order ID —";
+      document.getElementById("personalIdBox").textContent = "Personal ID —";
+      document.getElementById("successModal").style.display = "flex";
+    }
+
     function closeModal() {
-      MODAL.style.display = "none";
+      document.getElementById("successModal").style.display = "none";
     }
   </script>
 </body>
