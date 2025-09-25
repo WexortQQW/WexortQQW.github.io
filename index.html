@@ -108,11 +108,14 @@
 
     #copyBtn{ background:linear-gradient(90deg,#00c7a8, #2dd0ff); color:#04121a }
     #closeBtn{ background:linear-gradient(180deg,#1677d1,#0f5fb0); color:#fff }
+    #downloadPdfBtn{ background:#f1f5f9; color:#072036; box-shadow:inset 0 -1px 0 rgba(0,0,0,0.04) }
 
     /* QR image */
-    .qr { width:120px; height:120px; border-radius:8px; background:#f7f9fb; display:inline-block; padding:6px; }
-
-    /* small bottom block removed: we keep only modal controls (no duplicates) */
+    .qr {
+      width:120px; height:120px; border-radius:8px; background:#f7f9fb;
+      display:flex; align-items:center; justify-content:center; padding:6px; overflow:hidden;
+    }
+    .qr img{ display:block; width:100%; height:100%; object-fit:contain; border-radius:6px; }
 
     /* responsive */
     @media (max-width:560px){
@@ -155,7 +158,7 @@
         <!-- VIN -->
         <label for="vin">
           VIN *
-          <input id="vin" name="vin" type="text" required placeholder="17 символов, без I/O/Q" aria-describedby="vinHelp">
+          <input id="vin" name="vin" type="text" required placeholder="17 символов, без I, O, Q" aria-describedby="vinHelp">
           <div id="vinHelp" class="hint">VIN должен состоять из 17 символов (буквы и цифры), без I, O, Q.</div>
           <div id="vinError" class="error">Некорректный VIN.</div>
         </label>
@@ -246,9 +249,8 @@
 
   <script>
   /* ==========================================================================
-     Enhanced behavior: validation, masking, autosave, modal focus-trap, AJAX fallback
+     Enhanced behavior: validation, masking, autosave, modal focus-trap, QR fallback
      ========================================================================== */
-
   document.addEventListener('DOMContentLoaded', () => {
     // Elements
     const form = document.getElementById('orderForm');
@@ -285,24 +287,20 @@
 
     // Profanity list (простой): можно расширять
     const profanity = [
-      'хуй', 'бляд', 'сука', 'пизд', 'еба' // обрезки слов — чтобы поймать разные формы
+      'хуй', 'бляд', 'сука', 'пизд', 'еба'
     ];
 
-    // Helper: sanitize/normalize text for checks
+    // Helper funcs
     function norm(s){ return (s||'').toLowerCase().trim(); }
 
-    // Validate name: only Cyrillic letters and spaces, at least 2 words, starts with uppercase ideally
+    // Name validation
     function validateName() {
       const v = nameEl.value.trim();
       if (!v) return {ok:false, msg:'Поле обязательно'};
-      // must contain cyrillic letters and spaces only
       const cyrillicOnly = /^[А-ЯЁа-яё\s\-]+$/u.test(v);
       if (!cyrillicOnly) return {ok:false, msg:'ФИО должно быть кириллицей, без латиницы/цифр.'};
-      // at least two words
       const parts = v.split(/\s+/).filter(Boolean);
       if (parts.length < 2) return {ok:false, msg:'Укажите как минимум фамилию и имя.'};
-      // check capitalized (optional): we won't force but suggest
-      // profanity check
       const low = v.toLowerCase();
       for (const p of profanity) {
         if (low.includes(p)) return {ok:false, msg:'Поле содержит недопустимые слова.'};
@@ -310,33 +308,24 @@
       return {ok:true};
     }
 
-    // Detect "keyboard gibberish" — if contains many Latin letters only or translit, reject
     function isLikelyLatinGibberish(s){
       if (!s) return false;
-      // if string contains Latin letters and no Cyrillic -> gibberish
       const hasLatin = /[A-Za-z]/.test(s);
       const hasCyr = /[А-Яа-яЁё]/.test(s);
       if (hasLatin && !hasCyr) return true;
-      // also detect typical translit pairs (ybrbnf etc) — if >50% letters from Latin and vowels pattern
       const letters = s.replace(/[^A-Za-z]/g,'');
       if (letters.length >= 4 && (letters.length / s.replace(/[^A-Za-zА-Яа-яЁё]/g,'').length) > 0.6 && hasLatin) return true;
       return false;
     }
 
-    // Phone mask + validation (russian)
+    // Phone
     function formatPhone(value){
-      // keep digits only
       const d = (value || '').replace(/\D/g,'');
-      // if starts with 8, convert to 7
       let digits = d;
       if (digits.startsWith('8')) digits = '7' + digits.slice(1);
-      if (!digits.startsWith('7')) {
-        // allow starting without country code and add +7 when displaying
-      }
-      // Build formatted: +7 (XXX) XXX-XX-XX
-      let out = '+7 ';
       const p = digits.replace(/^7/,'');
-      if (p.length > 0) out = '+7 (';
+      let out = '+7';
+      if (p.length > 0) out += ' (';
       if (p.length <= 3) out += p;
       else out += p.slice(0,3) + ') ';
       if (p.length > 3) {
@@ -353,22 +342,20 @@
     function validatePhone(){
       const raw = phoneEl.value;
       const digits = (raw||'').replace(/\D/g,'');
-      // expect 11 digits starting with 7 (7xxxxxxxxxx) or user typed 10 digits -> accept as local
       if (digits.length === 11 && digits.startsWith('7')) return {ok:true};
       if (digits.length === 10) return {ok:true};
       return {ok:false, msg:'Введите корректный телефон (+7 и 10 цифр).'};
     }
 
-    // Email simple regex
+    // Email
     function validateEmail(){
       const v = (emailEl.value||'').trim();
-      if (!v) return {ok:true}; // optional
-      // simple robust regex (not perfect)
+      if (!v) return {ok:true};
       const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return re.test(v) ? {ok:true} : {ok:false, msg:'Некорректный email.'};
     }
 
-    // VIN validation: 17 chars, uppercase letters and digits, no I,O,Q
+    // VIN
     function validateVIN(){
       const v = (vinEl.value||'').trim().toUpperCase();
       if (!v) return {ok:false, msg:'VIN обязателен'};
@@ -378,21 +365,21 @@
       return {ok:true};
     }
 
-    // Part name required
     function validatePart(){
       const v = (partEl.value||'').trim();
       return v ? {ok:true} : {ok:false, msg:'Укажите название детали.'};
     }
 
-    // realtime validation wiring with debouncing
+    // show/hide errors
     function showError(node, text){
       if (!node) return;
       node.textContent = text || '';
       node.style.display = text ? 'block' : 'none';
     }
+
+    // Autosave
     let saveTimer = null;
     function autosave(){
-      // gather form values
       const data = {
         name: nameEl.value||'',
         phone: phoneEl.value||'',
@@ -406,23 +393,18 @@
         comment: document.getElementById('comment')?.value||'',
         consent: consentEl.checked||false
       };
-      localStorage.setItem('orderFormDraft', JSON.stringify(data));
-      // small console.log for debugging
-      // console.log('saved draft');
+      try { localStorage.setItem('orderFormDraft', JSON.stringify(data)); }
+      catch(e){ console.warn('autosave failed', e); }
     }
-
     function scheduleAutosave(){
       if (saveTimer) clearTimeout(saveTimer);
-      saveTimer = setTimeout(autosave, 500);
+      saveTimer = setTimeout(autosave, 600);
     }
-
-    // load draft if exists
     function loadDraftIfAny(){
       try {
         const raw = localStorage.getItem('orderFormDraft');
         if (!raw) return;
         const data = JSON.parse(raw);
-        // populate fields
         if (data.name) nameEl.value = data.name;
         if (data.phone) phoneEl.value = data.phone;
         if (data.email) emailEl.value = data.email;
@@ -434,88 +416,66 @@
         if (data.qty) document.getElementById('qty').value = data.qty;
         if (data.comment) document.getElementById('comment').value = data.comment;
         if (data.consent) consentEl.checked = !!data.consent;
-        // show small hint that draft restored (alert or console)
-        if (data.name || data.phone || data.partName) {
-          console.info('Черновик восстановлен.');
-        }
-      } catch(e){ console.warn('draft parse error', e) }
+      } catch(e){ console.warn('draft parse error', e); }
     }
 
-    // mask phone on input
-    phoneEl.addEventListener('input', (e) => {
-      const pos = phoneEl.selectionStart;
-      const before = phoneEl.value;
-      const formatted = formatPhone(before);
+    // Wiring
+    phoneEl.addEventListener('input', () => {
+      const formatted = formatPhone(phoneEl.value);
       phoneEl.value = formatted;
       scheduleAutosave();
     });
 
-    // name: on input check for latin gibberish
-    nameEl.addEventListener('input', (e) => {
+    nameEl.addEventListener('input', () => {
       const v = nameEl.value;
       if (isLikelyLatinGibberish(v)) {
-        nameError.textContent = 'Пожалуйста, введите ФИО кириллицей (не используйте латиницу).';
-        nameError.style.display = 'block';
+        showError(nameError, 'Пожалуйста, введите ФИО кириллицей (не используйте латиницу).');
       } else {
-        nameError.style.display = 'none';
+        showError(nameError, '');
       }
       scheduleAutosave();
     });
 
-    // basic other oninput autosave
-    [emailEl, vinEl, partEl, document.getElementById('model'), document.getElementById('year'),
-     document.getElementById('article'), document.getElementById('qty'), document.getElementById('comment')].forEach(el=>{
+    [emailEl, vinEl, partEl, document.getElementById('model'),
+     document.getElementById('year'), document.getElementById('article'),
+     document.getElementById('qty'), document.getElementById('comment')].forEach(el=>{
       if (!el) return;
       el.addEventListener('input', scheduleAutosave);
     });
     consentEl.addEventListener('change', scheduleAutosave);
 
-    // Preload draft
     loadDraftIfAny();
 
-    // Validate before submit and display errors
+    // Validation before submit
     function validateAll(){
       let ok = true;
 
-      // name
-      const nameV = nameEl.value;
-      if (isLikelyLatinGibberish(nameV)) {
+      if (isLikelyLatinGibberish(nameEl.value)) {
         showError(nameError, 'ФИО должно быть кириллицей, не используйте латиницу.');
         ok = false;
       } else {
-        const nameRes = validateName();
-        if (!nameRes.ok) { showError(nameError, nameRes.msg); ok=false; }
-        else showError(nameError, '');
+        const r = validateName();
+        if (!r.ok){ showError(nameError, r.msg); ok=false; } else showError(nameError, '');
       }
 
-      // phone
-      const phoneRes = validatePhone();
-      if (!phoneRes.ok) { showError(phoneError, phoneRes.msg); ok=false; }
-      else showError(phoneError, '');
+      const pr = validatePhone();
+      if (!pr.ok){ showError(phoneError, pr.msg); ok=false; } else showError(phoneError, '');
 
-      // email
-      const emailRes = validateEmail();
-      if (!emailRes.ok) { showError(emailError, emailRes.msg); ok=false; }
-      else showError(emailError, '');
+      const er = validateEmail();
+      if (!er.ok){ showError(emailError, er.msg); ok=false; } else showError(emailError, '');
 
-      // vin
-      const vinRes = validateVIN();
-      if (!vinRes.ok) { showError(vinError, vinRes.msg); ok=false; }
-      else showError(vinError, '');
+      const vr = validateVIN();
+      if (!vr.ok){ showError(vinError, vr.msg); ok=false; } else showError(vinError, '');
 
-      // part
-      const partRes = validatePart();
-      if (!partRes.ok) { showError(partError, partRes.msg); ok=false; }
-      else showError(partError, '');
+      const partr = validatePart();
+      if (!partr.ok){ showError(partError, partr.msg); ok=false; } else showError(partError, '');
 
-      // consent
-      if (!consentEl.checked) { showError(consentError, 'Для отправки формы необходимо ваше согласие.'); ok=false; }
-      else showError(consentError, '');
+      if (!consentEl.checked){ showError(consentError, 'Для отправки формы необходимо ваше согласие.'); ok=false; } else showError(consentError, '');
 
       return ok;
     }
 
-    // Focus trap for modal
+    // Focus trap
     let lastFocused = null;
     function trapFocus(modalEl){
       const focusable = 'a, button, textarea, input, select, [tabindex]:not([tabindex="-1"])';
@@ -543,25 +503,57 @@
       }
     }
 
-    // Show / close modal with hiding rest of page from assistive tech
+    // QR rendering with fallback
+    function renderQR(orderId, personalId) {
+      qrContainer.innerHTML = '';
+      qrContainer.style.color = '';
+      qrContainer.style.fontSize = '';
+      qrContainer.style.textAlign = '';
+
+      const payload = `Order:${orderId};Personal:${personalId}`;
+      const googleUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=' + encodeURIComponent(payload);
+      const qrserverUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(payload);
+
+      const img = new Image();
+      img.alt = 'QR-код заказа';
+      img.title = 'QR-код заказа';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'contain';
+      img.style.borderRadius = '6px';
+      img.decoding = 'async';
+
+      img.onload = () => {
+        qrContainer.appendChild(img);
+      };
+
+      img.onerror = () => {
+        console.warn('QR: google failed, trying qrserver fallback');
+        img.onerror = () => {
+          console.warn('QR: both services failed, showing text fallback');
+          qrContainer.innerHTML = 'QR недоступен';
+          qrContainer.style.color = '#666';
+          qrContainer.style.fontSize = '13px';
+          qrContainer.style.padding = '8px';
+        };
+        img.src = qrserverUrl;
+      };
+
+      img.src = googleUrl;
+    }
+
+    // Show / close modal
     function showModal(title, msg, orderId, personalId) {
       modalTitle.textContent = title||'';
       modalMsg.textContent = msg||'';
       orderIdDisplay.textContent = orderId || '—';
       personalIdDisplay.textContent = personalId || '—';
-      // generate QR code (via Google Chart API)
-      try {
-        const payload = encodeURIComponent(`Order:${orderId};Personal:${personalId}`);
-        const url = `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${payload}&chld=L|1&choe=UTF-8`;
-        qrContainer.innerHTML = `<img src="${url}" alt="QR-код заказа" style="width:100%;height:100%;object-fit:contain;border-radius:6px">`;
-      } catch(e){ qrContainer.textContent = 'QR недоступен'; }
-      // mark modal visible
+      // render QR with fallback
+      try { renderQR(orderId, personalId); } catch(e){ qrContainer.textContent = 'QR недоступен'; }
       modal.setAttribute('aria-hidden','false');
       modal.style.display = 'flex';
-      // accessibility
       lastFocused = document.activeElement;
       trapFocus(modal);
-      // hide scroll on body
       document.body.style.overflow = 'hidden';
     }
     function closeModal(){
@@ -572,7 +564,7 @@
       document.body.style.overflow = '';
     }
 
-    // Download printable summary (user can Save as PDF)
+    // Printable summary (for save-as-pdf)
     function openPrintable(orderId, personalId){
       const payload = {
         orderId, personalId,
@@ -597,48 +589,36 @@
       const w = window.open('', '_blank');
       w.document.write(html);
       w.document.close();
-      // try to call print (user will be prompted)
       setTimeout(()=>{ try{ w.print(); }catch(e){} }, 500);
     }
 
-    // Copy both IDs
+    // Modal buttons
     copyBtn.addEventListener('click', () => {
       const text = `Order ID: ${orderIdDisplay.textContent}, Personal ID: ${personalIdDisplay.textContent}`;
       if (navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(text).then(()=> alert('Скопировано: ' + text)).catch(()=> prompt('Скопируйте вручную:', text));
       } else { prompt('Скопируйте вручную:', text); }
     });
-
-    // Download PDF
     downloadPdfBtn.addEventListener('click', () => {
       openPrintable(orderIdDisplay.textContent, personalIdDisplay.textContent);
     });
-
-    // Close modal
     closeBtn.addEventListener('click', closeModal);
-
-    // Close on outside click
     modal.addEventListener('click', (ev) => { if (ev.target === modal) closeModal(); });
-
-    // Close on Escape also via trapFocus but safety:
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-    // Validate on blur or change
+    // Blur validation
     nameEl.addEventListener('blur', ()=>{ const r = validateName(); showError(nameError, r.ok ? '' : r.msg); });
     phoneEl.addEventListener('blur', ()=>{ const r = validatePhone(); showError(phoneError, r.ok ? '' : r.msg); });
     emailEl.addEventListener('blur', ()=>{ const r = validateEmail(); showError(emailError, r.ok ? '' : r.msg); });
     vinEl.addEventListener('blur', ()=>{ const r = validateVIN(); showError(vinError, r.ok ? '' : r.msg); });
     partEl.addEventListener('blur', ()=>{ const r = validatePart(); showError(partError, r.ok ? '' : r.msg); });
 
-    // Submit handler: validate, generate IDs, show spinner, send to iframe and fallback via timeout
+    // Submit handler: validation + generate IDs + submit to iframe + fallback
     form.addEventListener('submit', (ev) => {
-      // prevent default to manage spinner and validation; we'll submit programmatically to ensure iframe receives form
       ev.preventDefault();
 
-      // validate
       const ok = validateAll();
       if (!ok) {
-        // focus first invalid field
         const firstErr = document.querySelector('.error[style*="display: block"], .error:not([style])');
         if (firstErr) {
           const field = firstErr.previousElementSibling;
@@ -647,7 +627,6 @@
         return;
       }
 
-      // generate IDs
       const orderId = String(Date.now());
       const phoneDigits = (phoneEl.value||'').replace(/\D/g,'');
       const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
@@ -657,59 +636,32 @@
       form.dataset.orderId = orderId;
       form.dataset.personalId = personalId;
 
-      // spinner on button
       submitBtn.disabled = true;
       btnText.innerHTML = '<span class="spinner" aria-hidden="true"></span> Отправляется...';
       submitBtn.setAttribute('aria-busy','true');
 
-      // Submit to iframe by creating a temporary form submission
-      // Using original form but programmatically submit so we control fallback
-      // Start fallback timer
       let fallback = setTimeout(()=> {
-        // fallback after 10s: show modal anyway
         submitBtn.disabled = false;
         btnText.textContent = 'Отправить заказ';
         showModal('Заявка принята', 'Спасибо, ваша заявка отправлена (без подтверждения от сервера). Проверьте таблицу/почту.', orderId, personalId);
-        // clear draft
         try { localStorage.removeItem('orderFormDraft'); } catch(e){}
       }, 10000);
 
-      // iframe load handler (once)
       function onIframeLoad(){
         clearTimeout(fallback);
         submitBtn.disabled = false;
         btnText.textContent = 'Отправить заказ';
         showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', orderId, personalId);
         try { localStorage.removeItem('orderFormDraft'); } catch(e){}
-        // cleanup
         iframe.removeEventListener('load', onIframeLoad);
       }
-      iframe.addEventListener('load', onIframeLoad, { once: true });
+      if (iframe) iframe.addEventListener('load', onIframeLoad, { once: true });
 
       // native submit (send to the iframe)
       form.submit();
     });
 
-    // Autosave bits: save on input with debounce
-    [nameEl, phoneEl, emailEl, vinEl, partEl, document.getElementById('model'),
-      document.getElementById('year'), document.getElementById('article'),
-      document.getElementById('qty'), document.getElementById('comment')].forEach(el=>{
-      if (!el) return;
-      el.addEventListener('input', ()=> {
-        if (saveTimer) clearTimeout(saveTimer);
-        saveTimer = setTimeout(autosave, 600);
-      });
-    });
-    consentEl.addEventListener('change', ()=> { if (saveTimer) clearTimeout(saveTimer); saveTimer = setTimeout(autosave,600); });
-
-    // load draft on start (already called earlier) and show small console note
-    // call loadDraftIfAny was earlier; but ensure UI consistent:
-    const maybeDraft = localStorage.getItem('orderFormDraft');
-    if (maybeDraft) {
-      // optional: show a small non-blocking note to the user
-      console.info('Найден черновик формы — поля восстановлены.');
-    }
-  });
+  }); // DOMContentLoaded end
   </script>
 </body>
 </html>
