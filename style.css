@@ -1,134 +1,221 @@
-/* Центровка основной формы */
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* === Общая центровка === */
+*{box-sizing:border-box}
+html,body{height:100%; margin:0}
+body{
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: #ef7f4f; /* фон страницы как в референсе (можно поменять) */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:36px;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
-/* Карточка формы */
-.card {
-  background: #fff;
-  padding: 20px 25px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 480px;
+/* Основной контейнер (центруем один столбик) */
+main{
+  width:100%;
+  max-width:420px; /* как в референсе — компактно */
+  margin:0 auto;
 }
 
-.card h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #e67e22;
+/* Карточка */
+.card{
+  position:relative;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 28px 28px 32px 28px;
+  box-shadow: 0 18px 40px rgba(15,20,30,0.12);
+  overflow:visible;
 }
 
-/* Поля формы */
-form label {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
-  font-size: 14px;
-  color: #333;
+/* Декоративные вырезы/капли (левый и правый) */
+.card::before,
+.card::after{
+  content:"";
+  position:absolute;
+  width:36px; height:36px;
+  background:#ffffff;
+  border-radius:50%;
+  box-shadow: 0 10px 24px rgba(15,20,30,0.06);
+  z-index:0;
+}
+/* маленькая капля слева */
+.card::before{
+  left:-18px;
+  bottom:18px;
+}
+/* декоративный вырез справа (прямоугольный закругл.) */
+.card::after{
+  right:-26px;
+  top:18px;
+  width:56px; height:120px;
+  border-radius: 18px 0 0 18px;
 }
 
-form input,
-form textarea {
-  margin-top: 6px;
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 15px;
-  transition: border 0.2s;
+/* Заголовок */
+.card h2{
+  margin:0 0 12px 0;
+  font-size:20px;
+  font-weight:700;
+  color:#2b2b2b;
+  z-index:2;
+  position:relative;
 }
 
-form input:focus,
-form textarea:focus {
-  border-color: #e67e22;
+/* Форма — вертикальная */
+form{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  position:relative;
+  z-index:2;
+}
+
+/* Лейблы */
+label{ display:flex; flex-direction:column; font-size:13px; color:#4b4b4b; font-weight:600; }
+
+/* Инпуты — pill-like */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+textarea{
+  border: none;
+  background: #f0f3f8; /* нежный серо-голубой фон поля */
+  padding:12px 16px;
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 3px 10px rgba(10,20,30,0.03);
+  font-size:14px;
+  color:#111;
+  transition: box-shadow .18s ease, transform .12s ease;
   outline: none;
 }
 
-/* Кнопка */
-.buttons {
-  text-align: center;
-  margin-top: 15px;
+/* textarea чуть выше по высоте */
+textarea{ min-height:110px; resize:vertical; }
+
+/* Фокус на поле */
+input:focus, textarea:focus{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(16,32,64,0.08), 0 0 0 6px rgba(224,123,47,0.06);
+  background:#ffffff;
 }
 
-button {
-  background: #e67e22;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s;
+/* Контейнер кнопок — делаем кнопку шириной всей карточки */
+.buttons{
+  margin-top:6px;
+  display:flex;
+  justify-content:center;
 }
 
-button:hover:not(:disabled) {
-  background: #cf6d17;
+/* Кнопка отправки — большой pill */
+button#submitBtn{
+  width:100%;
+  max-width:360px;
+  background: linear-gradient(180deg,#e07a2f 0%, #d06322 100%);
+  color:#fff;
+  border:none;
+  padding:14px 22px;
+  border-radius:999px;
+  font-weight:700;
+  letter-spacing:0.2px;
+  cursor:pointer;
+  box-shadow: 0 10px 22px rgba(224,123,47,0.28);
+  transition: transform .12s ease, box-shadow .18s ease;
 }
 
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* hover/active */
+button#submitBtn:hover:not(:disabled){
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px rgba(224,123,47,0.34);
+}
+button#submitBtn:active:not(:disabled){
+  transform: translateY(0);
+}
+button[disabled]{
+  opacity:.6; cursor:not-allowed; transform:none; box-shadow:none;
 }
 
-/* ======= Модалка ======= */
-.modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.4);
-  display: none; /* скрыто по умолчанию */
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
+/* ===== Модалка (по центру, затемнённый фон) ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none; /* скрыта по умолчанию — твой скрипт ставит style.display='flex' */
+  align-items:center;
+  justify-content:center;
+  background: rgba(10,10,12,0.45);
+  z-index:9999;
+  padding:20px;
 }
 
-.modal-body {
-  background: #fff;
-  padding: 25px 30px;
-  border-radius: 12px;
-  max-width: 400px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-  animation: fadeIn 0.3s ease-out;
+/* тело модалки — похожее на карточку, но компактнее */
+.modal-body{
+  width:420px;
+  max-width:96%;
+  background:#fff;
+  padding:20px 22px;
+  border-radius:14px;
+  box-shadow: 0 20px 50px rgba(10,15,30,0.18);
+  text-align:left;
+  font-family:inherit;
 }
 
-.modal-body h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: #2c3e50;
+/* модалка — заголовок и строки */
+.modal-body h3{ margin:0 0 8px; font-size:18px; color:#1f2937; }
+.modal-body p{ margin:6px 0; color:#374151; font-size:15px; }
+
+/* ID элементы — подчёркиваем акцентом */
+#orderIdDisplay, #personalIdDisplay{
+  color:#e07a2f;
+  font-weight:700;
+  font-family: "JetBrains Mono", monospace;
+  display:inline-block;
+  margin-left:8px;
 }
 
-.modal-body p {
-  margin: 8px 0;
-  font-size: 15px;
+/* Кнопки в модалке — горизонтально на ширине */
+.modal-actions{
+  display:flex;
+  gap:12px;
+  margin-top:14px;
+}
+.modal-actions button{
+  padding:10px 14px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
+  min-width:120px;
 }
 
-/* Кнопки в модалке */
-.modal-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
+/* кнопка копировать — яркая */
+#copyBtn{
+  background: linear-gradient(90deg,#00d1b8 0%, #2dd0ff 100%);
+  color:#072227;
+  box-shadow: 0 10px 22px rgba(0,209,184,0.16);
 }
 
-.modal-actions button {
-  flex: 1;
-  padding: 10px;
-  font-size: 14px;
+/* кнопка закрыть — оранжевая, но тоньше */
+#closeBtn{
+  background: linear-gradient(180deg,#e07a2f 0%, #d06322 100%);
+  color:#fff;
+  box-shadow: 0 8px 18px rgba(224,123,47,0.18);
 }
 
-/* Анимация */
-@keyframes fadeIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
+/* Анимация появления модалки (масштаб + плавность) */
+@keyframes modalPop {
+  0%{ opacity:0; transform: translateY(-8px) scale(.98); }
+  100%{ opacity:1; transform: translateY(0) scale(1); }
+}
+.modal[style*="display: flex"] .modal-body{
+  animation: modalPop .26s cubic-bezier(.2,.9,.3,1);
+}
+
+/* Адаптив: на маленьких экранах чуть меньше padding */
+@media (max-width:520px){
+  .card{ padding:18px; border-radius:18px; }
+  input, textarea{ border-radius:14px; }
+  .card::after{ display:none; }
+  .card::before{ left:-12px; bottom:12px; width:28px; height:28px; }
 }
