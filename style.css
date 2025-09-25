@@ -1,158 +1,134 @@
-:root {
-  --bg: radial-gradient(circle at 50% 0%, #f6faff 0%, #f0f4ff 100%);
-  --card: linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(247,250,255,0.98) 100%);
-  --accent: #2563eb;
-  --neon: #00f2c3;
-  --text: #0f172a;
-  --border: rgba(160, 174, 192, 0.15);
-  --shadow: 0 12px 40px rgba(18, 34, 64, 0.1);
-  --glow: 0 0 15px rgba(0, 242, 195, 0.2);
+/* Центровка основной формы */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-body {
-  background: var(--bg);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--text);
-}
-
+/* Карточка формы */
 .card {
-  background: var(--card);
-  padding: 2.5rem;
-  border-radius: 1.5rem;
-  box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,0.3) inset;
-  border: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  transform: perspective(1000px) rotateX(0.5deg);
-  position: relative;
-  overflow: hidden;
-}
-
-.card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, 
-    rgba(66, 133, 244, 0.03) 0%,
-    rgba(0, 242, 195, 0.02) 50%,
-    rgba(66, 133, 244, 0.03) 100%
-  );
-  animation: gradientRotate 20s linear infinite;
-}
-
-@keyframes gradientRotate {
-  100% { transform: rotate(360deg); }
+  background: #fff;
+  padding: 20px 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 480px;
 }
 
 .card h2 {
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -0.75px;
-  margin-bottom: 2.5rem;
-  position: relative;
-  background: linear-gradient(45deg, #2563eb 30%, #00f2c3 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #e67e22;
 }
 
-input, textarea {
-  background: rgba(255,255,255,0.9);
-  border: 1px solid var(--border);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Поля формы */
+form label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #333;
 }
 
-input:focus, textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15), 
-              inset 0 1px 2px rgba(255,255,255,0.3);
-  background: white;
+form input,
+form textarea {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border 0.2s;
+}
+
+form input:focus,
+form textarea:focus {
+  border-color: #e67e22;
+  outline: none;
+}
+
+/* Кнопка */
+.buttons {
+  text-align: center;
+  margin-top: 15px;
 }
 
 button {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  padding: 1rem 2.25rem;
-  border-radius: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #e67e22;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-button::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(45deg, 
-    rgba(255,255,255,0.15) 0%,
-    rgba(0,242,195,0.1) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
+button:hover:not(:disabled) {
+  background: #cf6d17;
 }
 
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25), var(--glow);
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-button:hover::after {
-  opacity: 1;
+/* ======= Модалка ======= */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: none; /* скрыто по умолчанию */
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
 
 .modal-body {
-  background: linear-gradient(335deg, 
-    rgba(255,255,255,0.98) 0%,
-    rgba(241,245,255,0.98) 100%
-  );
-  border: 1px solid rgba(255,255,255,0.3);
-  box-shadow: 0 25px 50px rgba(18, 34, 64, 0.15), 
-              0 0 30px rgba(0, 242, 195, 0.1);
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  animation: fadeIn 0.3s ease-out;
 }
 
-#orderIdDisplay, #personalIdDisplay {
-  color: var(--accent);
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-  letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+.modal-body h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #2c3e50;
 }
 
-.modal-actions button:first-child {
-  background: linear-gradient(45deg, #2563eb 0%, #00f2c3 100%);
+.modal-body p {
+  margin: 8px 0;
+  font-size: 15px;
 }
 
-/* Анимация ввода */
-@keyframes inputHighlight {
-  0% { transform: scaleX(0); opacity: 0; }
-  100% { transform: scaleX(1); opacity: 1; }
-}
-
-input:not(:placeholder-shown) + .input-highlight {
-  animation: inputHighlight 0.4s ease-out;
-}
-
-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.2rem 1.5rem;
-}
-
-label {
+/* Кнопки в модалке */
+.modal-actions {
+  margin-top: 20px;
   display: flex;
-  flex-direction: column;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text);
+  justify-content: center;
+  gap: 12px;
 }
 
-input, textarea {
-  margin-top: 0.35rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  font-size: 0.95rem;
+.modal-actions button {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
 }
 
+/* Анимация */
+@keyframes fadeIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
