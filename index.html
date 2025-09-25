@@ -4,7 +4,186 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Форма заказа запчастей</title>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- Встроенные стили: белая страница, вертикальная карточка, модалка -->
+  <style>
+    /* Reset / base */
+    * { box-sizing: border-box; }
+    html,body { height:100%; margin:0; padding:0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #ffffff; /* белый фон всей страницы */
+      color: #0b1b2b;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start; /* сверху-вниз, как просили */
+      padding:36px;
+    }
+
+    /* Главный контейнер — вертикальная колонка */
+    main {
+      width:100%;
+      max-width:520px; /* сохранён вертикальный вид */
+      margin: 0;
+    }
+
+    /* Карточка */
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 26px;
+      box-shadow: 0 18px 40px rgba(6,20,40,0.06);
+      border: 1px solid rgba(11,27,43,0.04);
+      overflow: hidden;
+    }
+
+    .card h2 {
+      font-size:20px;
+      margin: 0 0 14px 0;
+      color: #0b1b2b;
+      font-weight:700;
+    }
+
+    /* Форма — вертикальная последовательность */
+    form {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    label {
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:13px;
+      color:#475569;
+      font-weight:600;
+    }
+
+    /* Поля — легкие "pill" */
+    input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea {
+      background:#f7f9fb;
+      border:1px solid rgba(11,27,43,0.06);
+      padding:12px 14px;
+      border-radius:12px;
+      font-size:14px;
+      color:#0b1b2b;
+      transition: box-shadow .14s ease, transform .12s ease, border-color .12s;
+      outline:none;
+    }
+
+    textarea { min-height:110px; resize:vertical; }
+
+    input:focus, textarea:focus {
+      border-color: #2aa3ff;
+      box-shadow: 0 8px 24px rgba(42,163,255,0.12);
+      transform: translateY(-1px);
+      background:#fff;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: rgba(11,27,43,0.35);
+    }
+
+    /* Дисклеймер (чекбокс) */
+    .consent {
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      font-size:13px;
+      color:#475569;
+      line-height:1.25;
+      margin-top:6px;
+    }
+    .consent input[type="checkbox"]{
+      width:18px; height:18px; margin-top:3px; accent-color:#2aa3ff;
+    }
+    .consent a { color:#2aa3ff; text-decoration:underline; text-underline-offset:3px; }
+
+    .consent-error {
+      display:none;
+      color:#b00020;
+      font-size:13px;
+      margin-top:6px;
+    }
+
+    /* Кнопка отправки */
+    .buttons { margin-top:10px; display:flex; justify-content:center; }
+    button#submitBtn {
+      width:100%;
+      max-width:360px;
+      padding:14px 22px;
+      border-radius:999px;
+      border:none;
+      background: linear-gradient(180deg,#2aa3ff 0%, #1677d1 100%);
+      color:#001827;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow: 0 12px 30px rgba(26,128,255,0.14);
+      transition: transform .14s ease, box-shadow .18s ease;
+    }
+    button#submitBtn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(26,128,255,0.2);
+    }
+    button[disabled] { opacity:.6; cursor:not-allowed; box-shadow:none; transform:none; }
+
+    /* Секция ниже карточки (по структуре твоего HTML) */
+    .below {
+      margin-top:18px;
+      background: #fff;
+      padding: 12px 16px;
+      border-radius:8px;
+      box-shadow: 0 10px 30px rgba(6,20,40,0.04);
+      border:1px solid rgba(11,27,43,0.03);
+    }
+
+    /* Модалка (оверлей + белое окно) */
+    .modal {
+      position: fixed;
+      inset:0;
+      display:none; /* скрипт ставит 'flex' */
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,0.45);
+      z-index:9999;
+      padding:20px;
+    }
+    .modal-body {
+      width:420px;
+      max-width:96%;
+      background:#ffffff; /* белый фон модалки */
+      color:#0b1b2b;
+      padding:18px 20px;
+      border-radius:12px;
+      box-shadow: 0 20px 60px rgba(6,20,40,0.12);
+      text-align:left;
+    }
+    .modal-body h3 { margin:0 0 6px; font-size:18px; }
+    .modal-body p { margin:6px 0; color:#475569; font-size:15px; }
+    #orderIdDisplay, #personalIdDisplay { color:#1677d1; font-weight:700; font-family: "JetBrains Mono", monospace; margin-left:8px; }
+
+    .modal-actions { display:flex; gap:12px; margin-top:12px; }
+    .modal-actions button {
+      min-width:120px; padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:700;
+    }
+    #copyBtn { background: linear-gradient(90deg,#00c7a8 0%, #2dd0ff 100%); color:#04121a; box-shadow: 0 8px 18px rgba(45,208,255,0.12); }
+    #closeBtn { background: linear-gradient(180deg,#1677d1 0%, #0f5fb0 100%); color:#fff; box-shadow: 0 8px 18px rgba(14,78,157,0.12); }
+
+    /* Подсказки/мелкие стили */
+    .small { font-size:13px; color:#475569; }
+    .muted { color:#94a3b8; }
+
+    /* Адаптив */
+    @media (max-width:520px) {
+      body { padding:18px; }
+      .card { padding:18px; border-radius:12px; }
+      button#submitBtn { padding:12px 16px; }
+      .modal-body { padding:16px; }
+    }
+  </style>
 </head>
 <body>
   <main>
@@ -13,36 +192,37 @@
 
       <form id="orderForm" method="POST" target="hidden_iframe"
             action="https://script.google.com/macros/s/AKfycby7lHiick8xcyXC61bTxbji2jl6keEuU6ZhCNzY8_POl1Gim7nYrn-GBUxanaifQUdnIg/exec" autocomplete="on">
+
         <label>ФИО *
-          <input name="name" type="text" required autocomplete="name">
+          <input name="name" type="text" required autocomplete="name" placeholder="Иванов Иван">
         </label>
 
         <label>Телефон *
-          <input name="phone" type="tel" required autocomplete="tel">
+          <input name="phone" type="tel" required autocomplete="tel" placeholder="+7 (___) ___-__-__">
         </label>
 
         <label>Email
-          <input name="email" type="email" autocomplete="email">
+          <input name="email" type="email" autocomplete="email" placeholder="example@mail.com">
         </label>
 
         <label>VIN *
-          <input name="vin" type="text" required autocomplete="off">
+          <input name="vin" type="text" required autocomplete="off" placeholder="VIN">
         </label>
 
         <label>Модель
-          <input name="model" type="text" autocomplete="off">
+          <input name="model" type="text" autocomplete="off" placeholder="Например: Ford Focus">
         </label>
 
         <label>Год выпуска
-          <input name="year" type="number" min="1900" max="2099" step="1" autocomplete="off">
+          <input name="year" type="number" min="1900" max="2099" step="1" autocomplete="off" placeholder="2020">
         </label>
 
         <label>Название детали *
-          <input name="partName" type="text" required autocomplete="off">
+          <input name="partName" type="text" required autocomplete="off" placeholder="Амортизатор">
         </label>
 
         <label>Артикул
-          <input name="article" type="text" autocomplete="off">
+          <input name="article" type="text" autocomplete="off" placeholder="12345-AB">
         </label>
 
         <label>Количество *
@@ -50,8 +230,16 @@
         </label>
 
         <label>Комментарий
-          <textarea name="comment" rows="3"></textarea>
+          <textarea name="comment" rows="3" placeholder="Доп. информация"></textarea>
         </label>
+
+        <!-- Consent -->
+        <label class="consent">
+          <input type="checkbox" id="consentCheckbox" name="consent">
+          Нажимая «Отправить заказ», я даю согласие на обработку моих персональных данных в соответствии с
+          <a href="#" target="_blank" rel="noopener">Политикой конфиденциальности</a>.
+        </label>
+        <div id="consentError" class="consent-error" aria-live="polite">Для отправки формы необходимо ваше согласие на обработку персональных данных.</div>
 
         <!-- скрытые поля -->
         <input type="hidden" name="orderId" id="orderId">
@@ -62,6 +250,17 @@
         </div>
       </form>
     </div>
+
+    <!-- Блок под формой (как в твоём исходном HTML) -->
+    <div class="below" aria-hidden="false">
+      <p class="small"><strong>Номер заказа:</strong> —</p>
+      <p class="small"><strong>Персональный ID:</strong> —</p>
+
+      <div style="margin-top:10px; display:flex; gap:10px;">
+        <button id="copyBtnBelow" style="padding:8px 12px; border-radius:8px; border:none; cursor:pointer; background:linear-gradient(90deg,#00c7a8,#2dd0ff); color:#04121a;">Копировать</button>
+        <button id="closeBtnBelow" style="padding:8px 12px; border-radius:8px; border:none; cursor:pointer; background:linear-gradient(180deg,#1677d1,#0f5fb0); color:#fff;">Закрыть</button>
+      </div>
+    </div>
   </main>
 
   <!-- скрытый iframe для POST -->
@@ -70,146 +269,127 @@
   <!-- модалка -->
   <div id="modal" class="modal" aria-hidden="true">
     <div class="modal-body" role="dialog" aria-modal="true">
-      <h3 id="modalTitle"></h3>
-      <p id="modalMsg"></p>
+      <h3 id="modalTitle">Заявка принята</h3>
+      <p id="modalMsg">Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.</p>
       <p><strong>Номер заказа:</strong> <span id="orderIdDisplay">—</span></p>
       <p><strong>Персональный ID:</strong> <span id="personalIdDisplay">—</span></p>
       <div class="modal-actions">
-        <button id="copyBtn">Копировать</button>
+        <button id="copyBtn">Копировать оба</button>
         <button id="closeBtn">Закрыть</button>
       </div>
     </div>
   </div>
 
+  <!-- Скрипт: надёжный, ждёт DOM, валидирует чекбокс, показывает модалку -->
   <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('orderForm');
-  const submitBtn = document.getElementById('submitBtn');
-  const iframe = document.getElementById('hidden_iframe');
-  const modal = document.getElementById('modal');
-  const orderIdInput = document.getElementById('orderId');
-  const personalIdInput = document.getElementById('personalId');
-  const copyBtn = document.getElementById('copyBtn');
-  const closeBtn = document.getElementById('closeBtn');
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('orderForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const iframe = document.getElementById('hidden_iframe');
+      const modal = document.getElementById('modal');
+      const orderIdInput = document.getElementById('orderId');
+      const personalIdInput = document.getElementById('personalId');
+      const copyBtn = document.getElementById('copyBtn');
+      const closeBtn = document.getElementById('closeBtn');
+      const consentEl = document.getElementById('consentCheckbox');
+      const consentError = document.getElementById('consentError');
 
-  // Утилиты: безопасное отображение/скрытие модалки
-  function showModal(title, msg, orderId, personalId) {
-    // если модалка не найдена — fallback: alert + просто лог
-    if (!modal) {
-      console.warn('Modal element not found — falling back to alert.');
-      alert(`${title}\n\n${msg}\n\nOrder ID: ${orderId || '—'}\nPersonal ID: ${personalId || '—'}`);
-      return;
-    }
-    const titleEl = document.getElementById('modalTitle');
-    const msgEl = document.getElementById('modalMsg');
-    const orderDisplay = document.getElementById('orderIdDisplay');
-    const personalDisplay = document.getElementById('personalIdDisplay');
-
-    if (titleEl) titleEl.textContent = title || '';
-    if (msgEl) msgEl.textContent = msg || '';
-    if (orderDisplay) orderDisplay.textContent = orderId || '—';
-    if (personalDisplay) personalDisplay.textContent = personalId || '—';
-
-    modal.style.display = 'flex';
-    modal.setAttribute('aria-hidden', 'false');
-  }
-
-  function closeModal() {
-    if (!modal) return;
-    modal.style.display = 'none';
-    modal.setAttribute('aria-hidden', 'true');
-  }
-
-  // Если формы нет — выходим
-  if (!form) {
-    console.warn('orderForm not found in DOM. Aborting script.');
-    return;
-  }
-
-  // Обработчик отправки формы — с проверкой чекбокса согласия (если есть)
-  form.addEventListener('submit', (ev) => {
-    // проверим наличие чекбокса согласия (если у тебя есть)
-    const consentEl = document.getElementById('consentCheckbox');
-    const consentError = document.getElementById('consentError');
-    if (consentEl && !consentEl.checked) {
-      // блокируем отправку, показываем ошибку
-      ev.preventDefault();
-      if (consentError) consentError.style.display = 'block';
-      consentEl.focus();
-      return;
-    } else if (consentError) {
-      consentError.style.display = 'none';
-    }
-
-    // Сгенерируем ID'ы ДО отправки (как было ранее)
-    const orderId = String(Date.now());
-    const phone = (form.querySelector("[name='phone']")?.value || '');
-    const phoneDigits = phone.replace(/\D/g, '');
-    const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
-
-    if (orderIdInput) orderIdInput.value = orderId;
-    if (personalIdInput) personalIdInput.value = personalId;
-
-    // Сохраним для показа после ответа (iframe.onload)
-    form.dataset.orderId = orderId;
-    form.dataset.personalId = personalId;
-
-    // Защита от дублей
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Отправляется...';
-    }
-
-    // НЕ вызываем ev.preventDefault() — форма отправляется в hidden_iframe
-    // (если тебе нужно отправить AJAX — скажи, и я перепишу)
-  });
-
-  // Когда iframe загрузится (ответ от сервера) — показываем модалку
-  if (iframe) {
-    iframe.addEventListener('load', () => {
-      const orderId = form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—';
-      const personalId = form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—';
-
-      showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', orderId, personalId);
-
-      // вернём кнопку в исходное состояние
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Отправить заказ';
+      if (!form) {
+        console.warn('orderForm not found — script aborted');
+        return;
       }
-      // очистка формы (пока оставляем, как было)
-      form.reset();
-    });
-  } else {
-    console.warn('hidden_iframe not found — iframe load handler skipped.');
-  }
 
-  // Кнопка копирования — безопасно
-  if (copyBtn) {
-    copyBtn.addEventListener('click', () => {
-      const text = `Order ID: ${form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—'}, Personal ID: ${form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—'}`;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => {
-          alert('Скопировано: ' + text);
-        }).catch(() => {
-          prompt('Скопируйте вручную:', text);
+      function showModal(title, msg, orderId, personalId) {
+        if (!modal) {
+          alert(title + "\n\n" + msg + "\nOrder ID: " + (orderId || '—') + "\nPersonal ID: " + (personalId || '—'));
+          return;
+        }
+        document.getElementById('modalTitle').textContent = title || '';
+        document.getElementById('modalMsg').textContent = msg || '';
+        document.getElementById('orderIdDisplay').textContent = orderId || '—';
+        document.getElementById('personalIdDisplay').textContent = personalId || '—';
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      form.addEventListener('submit', (ev) => {
+        // проверим согласие
+        if (consentEl && !consentEl.checked) {
+          ev.preventDefault();
+          if (consentError) consentError.style.display = 'block';
+          consentEl.focus();
+          return;
+        } else if (consentError) {
+          consentError.style.display = 'none';
+        }
+
+        // генерируем ID'ы
+        const orderId = String(Date.now());
+        const phone = (form.querySelector("[name='phone']")?.value || '');
+        const phoneDigits = phone.replace(/\D/g, '');
+        const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
+
+        if (orderIdInput) orderIdInput.value = orderId;
+        if (personalIdInput) personalIdInput.value = personalId;
+
+        form.dataset.orderId = orderId;
+        form.dataset.personalId = personalId;
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Отправляется...';
+        }
+        // отправка происходит естественно в hidden_iframe (не отменяем)
+      });
+
+      if (iframe) {
+        iframe.addEventListener('load', () => {
+          const orderId = form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—';
+          const personalId = form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—';
+          showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', orderId, personalId);
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Отправить заказ';
+          }
+          form.reset();
         });
-      } else {
-        prompt('Скопируйте вручную:', text);
       }
-    });
-  }
 
-  // Кнопка закрытия модалки
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          const text = `Order ID: ${form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—'}, Personal ID: ${form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—'}`;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => { alert('Скопировано: ' + text); }).catch(() => { prompt('Скопируйте вручную:', text); });
+          } else { prompt('Скопируйте вручную:', text); }
+        });
+      }
 
-  // Закрытие кликом по фону модалки (если она есть)
-  if (modal) {
-    modal.addEventListener('click', (ev) => {
-      if (ev.target === modal) closeModal();
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+      if (modal) {
+        modal.addEventListener('click', (ev) => {
+          if (ev.target === modal) closeModal();
+        });
+      }
+
+      // Вспомогательные нижние кнопки (на случай, если они используются)
+      const copyBtnBelow = document.getElementById('copyBtnBelow');
+      const closeBtnBelow = document.getElementById('closeBtnBelow');
+      if (copyBtnBelow) {
+        copyBtnBelow.addEventListener('click', () => {
+          const text = `Order ID: ${form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—'}, Personal ID: ${form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—'}`;
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
+          alert('Скопировано: ' + text);
+        });
+      }
+      if (closeBtnBelow) closeBtnBelow.addEventListener('click', () => alert('Закрыть — можно использовать модалку или очистить форму'));
     });
-  }
-});
-</script>
+  </script>
 </body>
 </html>
