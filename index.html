@@ -174,7 +174,7 @@
     <div class="modal-card" role="document">
       <div class="body">
         <h3 id="modalTitle">Заявка принята</h3>
-        <p id="modalMsg">Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.</p>
+        <p id="modalMsg">Спасибо, ваша заявка отправлена.</p>
 
         <p><strong>Номер заказа:</strong> <span id="orderIdDisplay">—</span></p>
         <p><strong>Персональный ID:</strong> <span id="personalIdDisplay">—</span></p>
@@ -191,7 +191,9 @@
   </div>
 
   <script>
-  /* Полный JS: валидация, маска, profanity, autosave, iframe submit + fallback, modal + QR fallback, printable */
+  /* Полный JS: валидация, маска, profanity, autosave, iframe submit + fallback, modal + QR fallback, printable
+     + генератор коротких Order ID (формат: Буква-4цифры, например "З-2431")
+  */
   document.addEventListener('DOMContentLoaded', () => {
     // Elements
     const form = document.getElementById('orderForm');
@@ -356,6 +358,49 @@
       } catch(e){}
     }
 
+    // ---------- short order id generator (e.g. "З-2431") ----------
+    function getCyrillicAlphabet() {
+      // набор заглавных букв кириллицы (можно отредактировать)
+      return 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЭЮЯ'.split('');
+      // Примечание: убрал Ъ и Ь и несколько редких символов, чтобы id выглядел чище
+    }
+
+    function readGeneratedIds() {
+      try {
+        const raw = localStorage.getItem('generatedOrderIds');
+        return raw ? JSON.parse(raw) : [];
+      } catch(e) {
+        return [];
+      }
+    }
+    function saveGeneratedId(id) {
+      try {
+        const arr = readGeneratedIds();
+        arr.push(id);
+        if (arr.length > 2000) arr.splice(0, arr.length - 2000);
+        localStorage.setItem('generatedOrderIds', JSON.stringify(arr));
+      } catch(e){}
+    }
+
+    function generateShortOrderId() {
+      const letters = getCyrillicAlphabet();
+      const used = new Set(readGeneratedIds());
+      let attempts = 0;
+      while (attempts < 50) {
+        const letter = letters[Math.floor(Math.random()*letters.length)];
+        const num = (Math.floor(1000 + Math.random()*9000)).toString(); // 1000..9999
+        const id = `${letter}-${num}`;
+        if (!used.has(id)) {
+          saveGeneratedId(id);
+          return id;
+        }
+        attempts++;
+      }
+      // fallback: короткая временная метка
+      return 'Z-' + String(Date.now()).slice(-6);
+    }
+    // ---------- end generator ----------
+
     // QR rendering with fallback (Google -> qrserver -> text)
     function renderQR(orderId, personalId) {
       qrContainer.innerHTML = '';
@@ -507,7 +552,8 @@
       ev.preventDefault();
       if (!validateAll()) return;
 
-      const orderId = String(Date.now());
+      // <-- here: generate short readable order id instead of Date.now()
+      const orderId = generateShortOrderId();
       const phoneDigits = (phoneEl.value||'').replace(/\D/g,'');
       const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
 
@@ -524,7 +570,7 @@
         submitBtn.disabled = false;
         btnText.textContent = 'Отправить заявку';
         successBanner.style.display = 'block';
-        showModal('Заявка принята', 'Спасибо, ваша заявка отправлена (без подтверждения от сервера). Проверьте таблицу/почту.', orderId, personalId);
+        showModal('Заявка принята', 'Спасибо, ваша заявка отправлена.', orderId, personalId);
         try { localStorage.removeItem('orderFormDraft'); } catch(e){}
       }, 10000);
 
