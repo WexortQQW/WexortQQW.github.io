@@ -4,9 +4,163 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Форма заказа запчастей</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --accent: #00e5ff;
+      --accent-glow: rgba(0, 229, 255, 0.6);
+      --text: #e6edf3;
+      --muted: #8b949e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6), 0 0 25px var(--accent-glow);
+      max-width: 800px;
+      width: 100%;
+      animation: fadeIn 0.5s ease;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem 1.5rem;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    input, textarea {
+      margin-top: 0.35rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--muted);
+      background: #0d1117;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .buttons {
+      grid-column: 1 / -1;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 0.9rem 1.8rem;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px var(--accent-glow);
+    }
+
+    button:disabled {
+      background: var(--muted);
+      color: #555;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* модалка */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-body {
+      background: var(--card);
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 25px var(--accent-glow);
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .modal h3 {
+      margin-top: 0;
+      color: var(--accent);
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .modal-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
   <main>
@@ -82,9 +236,7 @@
       </div>
     </div>
   </div>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
-</style>
+
   <script>
     (function () {
       const form = document.getElementById('orderForm');
@@ -109,7 +261,6 @@
       }
 
       form.addEventListener('submit', (ev) => {
-        // Сгенерируем ID'ы ДО отправки
         const orderId = String(Date.now());
         const phone = (form.querySelector("[name='phone']").value || '');
         const phoneDigits = phone.replace(/\D/g, '');
@@ -118,27 +269,21 @@
         orderIdInput.value = orderId;
         personalIdInput.value = personalId;
 
-        // Сохраним для показа после ответа (iframe.onload)
         form.dataset.orderId = orderId;
         form.dataset.personalId = personalId;
 
-        // Защита от дублей
         submitBtn.disabled = true;
         submitBtn.textContent = 'Отправляется...';
       });
 
-      // Когда iframe загрузится (ответ от сервера) — показываем модалку
       iframe.addEventListener('load', () => {
-        // Подстрахуемся: данные уже на форме datasets
         const orderId = form.dataset.orderId || orderIdInput.value;
         const personalId = form.dataset.personalId || personalIdInput.value;
 
         showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', orderId, personalId);
 
-        // вернём кнопку в исходное состояние
         submitBtn.disabled = false;
         submitBtn.textContent = 'Отправить заказ';
-        // очистка формы не сразу — пользователь может захотеть скопировать ID
         form.reset();
       });
 
@@ -155,7 +300,6 @@
         closeModal();
       });
 
-      // Закрытие кликом по фону
       modal.addEventListener('click', (ev) => {
         if (ev.target === modal) closeModal();
       });
