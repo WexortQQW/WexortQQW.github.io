@@ -171,28 +171,30 @@ button[disabled]{ opacity: .6; cursor: not-allowed; }
 .consent-error{ color:#ff6b6b; font-size:13px; margin-top:6px; display:none; }
 
 /* ===== Модалка: скрыта по умолчанию; скрипт делает display:flex ===== */
-.modal{
+/* ---- плотный оверлей + яркое белое окно модалки ---- */
+.modal {
+  display: none;
   position: fixed;
   inset: 0;
-  display: none; /* script -> modal.style.display = 'flex' */
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.85) !important;
   z-index: 9999;
   padding: 20px;
 }
 
-/* Тело модалки — компактное, контрастное */
-.modal-body{
+.modal-body {
   width: 420px;
   max-width: 96%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  background: #ffffff !important; /* сплошной белый */
+  color: #0b1b2b;
   padding: 20px 22px;
-  border-radius: 14px;
-  box-shadow: 0 20px 50px rgba(2,6,18,0.6);
-  text-align: left;
-  color: var(--text);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(2,6,18,0.6);
+  opacity: 1 !important;
+  backdrop-filter: none !important;
 }
+
 
 /* Заголовки и строки внутри модалки */
 .modal-body h3{ margin: 0 0 8px; font-size: 18px; }
