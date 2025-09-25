@@ -1,255 +1,84 @@
-/* ===========================
-   Dark Navy theme — vertical flow
-   Replaces previous style.css
-   =========================== */
-
-/* Базовые установки */
-* { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; padding: 0; }
-:root{
-  --page-1: #071428;      /* верхняя тёмная область */
-  --page-2: #041526;      /* нижняя тёмная */
-  --card-bg: #071a2a;     /* фон карточки (чуть светлее) */
-  --field-bg: rgba(255,255,255,0.02);
-  --field-border: rgba(255,255,255,0.06);
-  --accent: #2aa3ff;      /* акцентный голубой */
-  --accent-2: #1e90ff;
-  --text: #e6f2ff;        /* светлый текст */
-  --muted: #8ea6c4;
-  --shadow-strong: rgba(2,8,20,0.7);
-  --shadow-soft: rgba(0,0,0,0.45);
-  --glass: rgba(255,255,255,0.02);
+/* === Поменять фон всей страницы на белый (override в конце style.css) === */
+body, html {
+  background: #ffffff !important;    /* белый фон для всей страницы */
+  color: #0b1b2b !important;         /* основной цвет текста — тёмный */
 }
 
-/* Страница и центровка — форма остаётся колонкой сверху вниз */
-body{
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  background: linear-gradient(180deg, var(--page-1) 0%, var(--page-2) 100%);
-  color: var(--text);
-  display: flex;
-  align-items: flex-start;   /* сверху вниз — начало страницы */
-  justify-content: center;
-  padding: 36px 18px;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+/* Если у тебя использовались градиенты для page-bg, переопределим их */
+:root {
+  --page-1: #ffffff !important;
+  --page-2: #ffffff !important;
+  --text: #0b1b2b !important;
+  --muted: #6b7280 !important;
 }
 
-/* контейнер — узкий вертикальный столб */
-main{
-  width: 100%;
-  max-width: 520px;   /* оставляем вертикальную форму, как в коде */
-  margin: 0;
+/* Карточка: делаем её светлой на белом фоне, добавим лёгкую тень и рамку */
+.card {
+  background: #ffffff !important;
+  border: 1px solid rgba(11,27,43,0.04) !important;
+  box-shadow: 0 12px 30px rgba(6,20,40,0.06) !important;
 }
 
-/* карточка формы */
-.card{
-  position: relative;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-radius: 18px;
-  padding: 28px;
-  box-shadow: 0 18px 40px var(--shadow-soft), 0 2px 8px rgba(0,0,0,0.35);
-  border: 1px solid rgba(255,255,255,0.03);
-  overflow: hidden;
-}
-
-/* Заголовок — аккуратно, сверху как в оригинале */
-.card h2{
-  margin: 0 0 18px 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.2px;
-}
-
-/* Форма — вертикально, сохраняем порядок полей сверху вниз */
-form{
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 1;
-}
-
-/* Лейблы и подписи */
-label{
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-/* Поля ввода — ближе к минималистичному референсу:
-   тонкая линия, лёгкий фон, большие радиусы, вертикальная последовательность */
+/* Поля ввода: светлые, читаемые на белом фоне */
 input[type="text"],
 input[type="email"],
 input[type="tel"],
 input[type="number"],
-textarea{
-  background: var(--field-bg);
-  border: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04); /* тонкая разделительная линия */
-  padding: 12px 14px;
-  border-radius: 12px; /* мягкие края, но визуально поле выглядит тонким */
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.01);
-  color: var(--text);
-  font-size: 14px;
-  transition: box-shadow .14s ease, background .14s ease, transform .12s ease;
-  outline: none;
+textarea {
+  background: #f7f9fb !important;      /* лёгкий серо-голубой фон полей */
+  color: #0b1b2b !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
 }
 
-/* textarea — больше места */
-textarea{
-  min-height: 120px;
-  resize: vertical;
+/* Placeholder цвет */
+input::placeholder, textarea::placeholder {
+  color: rgba(11,27,43,0.35) !important;
 }
 
-/* Фокус: подчёркиваем акцентом и лёгким свечением */
-input:focus, textarea:focus{
-  background: rgba(255,255,255,0.015);
-  border-bottom-color: var(--accent);
-  box-shadow: 0 6px 20px rgba(26,128,255,0.06), 0 1px 0 rgba(255,255,255,0.01) inset;
-  transform: translateY(-1px);
+/* Подсветка при фокусе — оставляем акцент (если он синий/циан) */
+input:focus, textarea:focus {
+  box-shadow: 0 6px 18px rgba(26,128,255,0.06) !important;
+  background: #ffffff !important;
 }
 
-/* Мелкие метки внутри поля (если понадобятся) — остаются нейтральными */
-input::placeholder, textarea::placeholder{
-  color: rgba(230,242,255,0.45);
+/* Кнопка отправки — проверяем контраст на белом фоне */
+button#submitBtn {
+  /* если надо, можно сменить фон кнопки тут. Оставляем текущий градиент, но задаём тёмный текст */
+  color: #ffffff !important;
+  box-shadow: 0 12px 30px rgba(26,128,255,0.14) !important;
 }
 
-/* Блок кнопок — занимаем полную ширину карточки */
-.buttons {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-}
-
-/* Кнопка отправки — крупная, контрастная, с тёмно-синим градиентом */
-button#submitBtn{
-  width: 100%;
-  max-width: 360px;
-  padding: 14px 22px;
-  border-radius: 999px;
-  border: none;
-  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 100%);
-  color: #001827;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  box-shadow: 0 12px 30px rgba(26,128,255,0.18), 0 4px 8px rgba(0,0,0,0.35);
-  transition: transform .14s ease, box-shadow .18s ease;
-}
-
-/* hover/active */
-button#submitBtn:hover:not(:disabled){
-  transform: translateY(-3px);
-  box-shadow: 0 20px 40px rgba(26,128,255,0.22), 0 6px 14px rgba(0,0,0,0.36);
-}
-button#submitBtn:active:not(:disabled){ transform: translateY(0); }
-button[disabled]{ opacity: .6; cursor: not-allowed; }
-
-/* Дисклеймер (чекбокс согласия) — компактно и читаемо */
-.consent{
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.25;
-  margin-top: 6px;
-  margin-bottom: 6px;
-}
-.consent input[type="checkbox"]{
-  margin-top: 3px;
-  width: 18px;
-  height: 18px;
-  accent-color: var(--accent);
-  flex: 0 0 18px;
-}
-.consent a{ color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
-.consent-error{ color:#ff6b6b; font-size:13px; margin-top:6px; display:none; }
-
-/* ===== Модалка: скрыта по умолчанию; скрипт делает display:flex ===== */
-/* ---- плотный оверлей + яркое белое окно модалки ---- */
+/* Модалка: затемняющий оверлей и белое окно */
 .modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.85) !important;
-  z-index: 9999;
-  padding: 20px;
+  background: rgba(0,0,0,0.45) !important; /* тёмный полупрозрачный фон за модалкой */
 }
 
+/* Само окно модалки — делаем сплошным белым, текст тёмный */
 .modal-body {
-  width: 420px;
-  max-width: 96%;
-  background: #ffffff !important; /* сплошной белый */
-  color: #0b1b2b;
-  padding: 20px 22px;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(2,6,18,0.6);
+  background: #ffffff !important;
+  color: #0b1b2b !important;
+  box-shadow: 0 20px 60px rgba(6,20,40,0.12) !important;
   opacity: 1 !important;
   backdrop-filter: none !important;
 }
 
-
-/* Заголовки и строки внутри модалки */
-.modal-body h3{ margin: 0 0 8px; font-size: 18px; }
-.modal-body p{ margin: 6px 0; color: var(--muted); font-size: 15px; }
-
-/* ID — акцентные, моноширинный шрифт */
-#orderIdDisplay, #personalIdDisplay{
-  color: var(--accent);
-  font-weight: 700;
-  font-family: "JetBrains Mono", monospace;
-  margin-left: 8px;
+/* Кнопки в модалке: читаемый текст на их цветных фонах */
+.modal-actions button { 
+  color: #ffffff !important; 
 }
 
-/* Кнопки модалки — горизонтально */
-.modal-actions{
-  display: flex;
-  gap: 12px;
-  margin-top: 14px;
-}
-.modal-actions button{
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  min-width: 120px;
+/* Если у кнопки "Копировать" тёмный текст нужен (например, cyan bg) — корректируем */
+#copyBtn { color: #04121a !important; }   /* если фон светлый-циан, делаем текст тёмным */
+#closeBtn { color: #ffffff !important; }  /* тёмный bg -> белый текст */
+
+/* Небольшая корректировка шрифтов/цветов меток */
+label, .consent, .modal-body p {
+  color: #475569 !important; /* нейтральный тёмно-серый текст для подписей */
 }
 
-/* Стили для кнопок внутри модалки */
-#copyBtn{
-  background: linear-gradient(90deg,#00d1b8 0%, #2dd0ff 100%);
-  color: #061a1a;
-  box-shadow: 0 10px 22px rgba(0,209,184,0.12);
-}
-#closeBtn{
-  background: linear-gradient(180deg,var(--accent) 0%, var(--accent-2) 100%);
-  color: #001827;
-  box-shadow: 0 8px 18px rgba(26,128,255,0.12);
-}
-
-/* Анимация появления модалки (script показывает модалку через display:flex) */
-@keyframes modalPop {
-  0%{ opacity: 0; transform: translateY(-8px) scale(.98); }
-  100%{ opacity: 1; transform: translateY(0) scale(1); }
-}
-.modal[style*="display: flex"] .modal-body{
-  animation: modalPop .26s cubic-bezier(.2,.9,.3,1);
-}
-
-/* Адаптив: на узких экранах уменьшаем отступы и радиусы */
-@media (max-width: 520px){
-  main{ max-width: 420px; }
-  .card{ padding: 18px; border-radius: 14px; }
-  input, textarea{ border-radius: 10px; }
-  button#submitBtn{ padding: 12px 16px; }
-  .modal-body{ padding: 16px; border-radius: 12px; }
-  .consent{ font-size: 12px; }
+/* Адаптив: убедимся, что на мобилках вид остаётся корректным */
+@media (max-width:520px) {
+  body { padding: 18px !important; }
+  .card { padding: 18px !important; border-radius: 14px !important; }
+  .modal-body { padding: 16px !important; }
 }
