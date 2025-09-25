@@ -94,7 +94,7 @@
     }
     .modal[aria-hidden="false"]{ display:flex }
     .modal-body{
-      width:480px; max-width:96%;
+      width:520px; max-width:96%;
       background:#ffffff; color:#0b1b2b;
       padding:18px 20px; border-radius:12px;
       box-shadow:0 20px 60px rgba(6,20,40,0.12);
@@ -110,17 +110,19 @@
     #closeBtn{ background:linear-gradient(180deg,#1677d1,#0f5fb0); color:#fff }
     #downloadPdfBtn{ background:#f1f5f9; color:#072036; box-shadow:inset 0 -1px 0 rgba(0,0,0,0.04) }
 
-    /* QR image */
-    .qr {
-      width:120px; height:120px; border-radius:8px; background:#f7f9fb;
-      display:flex; align-items:center; justify-content:center; padding:6px; overflow:hidden;
+    /* LARGE QR */
+    .qr-large {
+      width:260px; height:260px; border-radius:12px; background:#f7f9fb;
+      display:flex; align-items:center; justify-content:center; padding:10px; overflow:hidden;
+      box-shadow: 0 8px 20px rgba(2,6,18,0.04); margin: 16px auto 0;
     }
-    .qr img{ display:block; width:100%; height:100%; object-fit:contain; border-radius:6px; }
+    .qr-large img{ display:block; width:100%; height:100%; object-fit:contain; border-radius:8px; }
 
     /* responsive */
     @media (max-width:560px){
       main{ padding:0 6px }
       .modal-body{ width:100% }
+      .qr-large { width:200px; height:200px; }
     }
   </style>
 </head>
@@ -223,7 +225,7 @@
   <!-- hidden iframe -->
   <iframe name="hidden_iframe" id="hidden_iframe" style="display:none"></iframe>
 
-  <!-- MODAL -->
+  <!-- MODAL (buttons first, large QR below) -->
   <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-body">
       <h3 id="modalTitle">Заявка принята</h3>
@@ -232,24 +234,25 @@
       <p><strong>Номер заказа:</strong> <span id="orderIdDisplay">—</span></p>
       <p><strong>Персональный ID:</strong> <span id="personalIdDisplay">—</span></p>
 
-      <div style="display:flex; gap:12px; align-items:center; margin-top:6px;">
-        <div class="qr" id="qrContainer" aria-hidden="false" title="QR-код заказа">
-          <!-- filled dynamically -->
-        </div>
-        <div style="flex:1">
-          <div class="modal-actions">
+      <div style="display:flex; gap:12px; align-items:center; margin-top:10px; justify-content:center;">
+        <div style="flex:0 0 auto;">
+          <div class="modal-actions" style="gap:10px; display:flex; flex-wrap:wrap;">
             <button id="copyBtn" type="button">Копировать оба</button>
             <button id="downloadPdfBtn" type="button">Скачать PDF</button>
             <button id="closeBtn" type="button">Закрыть</button>
           </div>
         </div>
       </div>
+
+      <div style="display:flex; justify-content:center; margin-top:16px;">
+        <div class="qr-large" id="qrContainer" title="QR-код заказа" aria-hidden="false"></div>
+      </div>
     </div>
   </div>
 
   <script>
   /* ==========================================================================
-     Enhanced behavior: validation, masking, autosave, modal focus-trap, QR fallback
+     validation, masking, autosave, modal focus-trap, QR fallback (large)
      ========================================================================== */
   document.addEventListener('DOMContentLoaded', () => {
     // Elements
@@ -285,15 +288,12 @@
     const qrContainer = document.getElementById('qrContainer');
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
-    // Profanity list (простой): можно расширять
-    const profanity = [
-      'хуй', 'бляд', 'сука', 'пизд', 'еба'
-    ];
+    // Profanity list (simple)
+    const profanity = ['хуй','бляд','сука','пизд','еба'];
 
-    // Helper funcs
+    // Helpers
     function norm(s){ return (s||'').toLowerCase().trim(); }
 
-    // Name validation
     function validateName() {
       const v = nameEl.value.trim();
       if (!v) return {ok:false, msg:'Поле обязательно'};
@@ -302,9 +302,7 @@
       const parts = v.split(/\s+/).filter(Boolean);
       if (parts.length < 2) return {ok:false, msg:'Укажите как минимум фамилию и имя.'};
       const low = v.toLowerCase();
-      for (const p of profanity) {
-        if (low.includes(p)) return {ok:false, msg:'Поле содержит недопустимые слова.'};
-      }
+      for (const p of profanity) if (low.includes(p)) return {ok:false, msg:'Поле содержит недопустимые слова.'};
       return {ok:true};
     }
 
@@ -419,7 +417,7 @@
       } catch(e){ console.warn('draft parse error', e); }
     }
 
-    // Wiring
+    // Wiring events
     phoneEl.addEventListener('input', () => {
       const formatted = formatPhone(phoneEl.value);
       phoneEl.value = formatted;
@@ -475,7 +473,7 @@
       return ok;
     }
 
-    // Focus trap
+    // Focus trap helpers
     let lastFocused = null;
     function trapFocus(modalEl){
       const focusable = 'a, button, textarea, input, select, [tabindex]:not([tabindex="-1"])';
@@ -503,7 +501,7 @@
       }
     }
 
-    // QR rendering with fallback
+    // QR rendering (large) with fallback
     function renderQR(orderId, personalId) {
       qrContainer.innerHTML = '';
       qrContainer.style.color = '';
@@ -511,8 +509,9 @@
       qrContainer.style.textAlign = '';
 
       const payload = `Order:${orderId};Personal:${personalId}`;
-      const googleUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=' + encodeURIComponent(payload);
-      const qrserverUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(payload);
+      const sizePx = 260;
+      const googleUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=' + sizePx + 'x' + sizePx + '&chl=' + encodeURIComponent(payload);
+      const qrserverUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=' + sizePx + 'x' + sizePx + '&data=' + encodeURIComponent(payload);
 
       const img = new Image();
       img.alt = 'QR-код заказа';
@@ -548,7 +547,6 @@
       modalMsg.textContent = msg||'';
       orderIdDisplay.textContent = orderId || '—';
       personalIdDisplay.textContent = personalId || '—';
-      // render QR with fallback
       try { renderQR(orderId, personalId); } catch(e){ qrContainer.textContent = 'QR недоступен'; }
       modal.setAttribute('aria-hidden','false');
       modal.style.display = 'flex';
@@ -564,7 +562,7 @@
       document.body.style.overflow = '';
     }
 
-    // Printable summary (for save-as-pdf)
+    // Printable summary (save-as-pdf)
     function openPrintable(orderId, personalId){
       const payload = {
         orderId, personalId,
