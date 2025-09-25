@@ -1,131 +1,126 @@
-/* === Общая центровка === */
-*{box-sizing:border-box}
-html,body{height:100%; margin:0}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; padding: 0; }
+
+:root{
+  --bg: #ef7f4f;              
+  --card-bg: #ffffff;
+  --accent: #e07a2f;
+  --accent-dark: #d06322;
+  --field-bg: #f0f3f8;
+  --text: #222;
+  --muted: #6b7280;
+  --shadow: rgba(15,20,30,0.12);
+}
+
+/* Page center */
 body{
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: #ef7f4f; /* фон страницы как в референсе (можно поменять) */
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:36px;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Основной контейнер (центруем один столбик) */
+/* Main container */
 main{
-  width:100%;
-  max-width:420px; /* как в референсе — компактно */
-  margin:0 auto;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
 }
 
-/* Карточка */
+/* Card (no decorative "shards") */
 .card{
-  position:relative;
-  background: #ffffff;
+  position: relative;
+  background: var(--card-bg);
   border-radius: 24px;
-  padding: 28px 28px 32px 28px;
-  box-shadow: 0 18px 40px rgba(15,20,30,0.12);
-  overflow:visible;
+  padding: 28px;
+  box-shadow: 0 18px 40px var(--shadow);
+  overflow: hidden; /* important — hides any overflow, removes "ogryzki" */
 }
 
-/* Декоративные вырезы/капли (левый и правый) */
-.card::before,
-.card::after{
-  content:"";
-  position:absolute;
-  width:36px; height:36px;
-  background:#ffffff;
-  border-radius:50%;
-  box-shadow: 0 10px 24px rgba(15,20,30,0.06);
-  z-index:0;
-}
-/* маленькая капля слева */
-.card::before{
-  left:-18px;
-  bottom:18px;
-}
-/* декоративный вырез справа (прямоугольный закругл.) */
-.card::after{
-  right:-26px;
-  top:18px;
-  width:56px; height:120px;
-  border-radius: 18px 0 0 18px;
-}
-
-/* Заголовок */
+/* Header */
 .card h2{
-  margin:0 0 12px 0;
-  font-size:20px;
-  font-weight:700;
-  color:#2b2b2b;
-  z-index:2;
-  position:relative;
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
 }
 
-/* Форма — вертикальная */
+/* Form layout */
 form{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  position:relative;
-  z-index:2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1;
 }
 
-/* Лейблы */
-label{ display:flex; flex-direction:column; font-size:13px; color:#4b4b4b; font-weight:600; }
+/* Labels */
+label{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #4b4b4b;
+  font-weight: 600;
+}
 
-/* Инпуты — pill-like */
+/* Pill-style inputs */
 input[type="text"],
 input[type="email"],
 input[type="tel"],
 input[type="number"],
 textarea{
   border: none;
-  background: #f0f3f8; /* нежный серо-голубой фон поля */
-  padding:12px 16px;
+  background: var(--field-bg);
+  padding: 12px 16px;
   border-radius: 20px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 3px 10px rgba(10,20,30,0.03);
-  font-size:14px;
-  color:#111;
-  transition: box-shadow .18s ease, transform .12s ease;
+  font-size: 14px;
+  color: var(--text);
+  transition: box-shadow .18s ease, transform .12s ease, background .12s;
   outline: none;
 }
 
-/* textarea чуть выше по высоте */
-textarea{ min-height:110px; resize:vertical; }
+/* textarea size */
+textarea{
+  min-height: 110px;
+  resize: vertical;
+}
 
-/* Фокус на поле */
+/* Field focus */
 input:focus, textarea:focus{
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(16,32,64,0.08), 0 0 0 6px rgba(224,123,47,0.06);
-  background:#ffffff;
+  background: #fff;
 }
 
-/* Контейнер кнопок — делаем кнопку шириной всей карточки */
+/* Buttons container */
 .buttons{
-  margin-top:6px;
-  display:flex;
-  justify-content:center;
+  margin-top: 6px;
+  display: flex;
+  justify-content: center;
 }
 
-/* Кнопка отправки — большой pill */
+/* Submit button - pill */
 button#submitBtn{
-  width:100%;
-  max-width:360px;
-  background: linear-gradient(180deg,#e07a2f 0%, #d06322 100%);
-  color:#fff;
-  border:none;
-  padding:14px 22px;
-  border-radius:999px;
-  font-weight:700;
-  letter-spacing:0.2px;
-  cursor:pointer;
+  width: 100%;
+  max-width: 360px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color: #fff;
+  border: none;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
   box-shadow: 0 10px 22px rgba(224,123,47,0.28);
   transition: transform .12s ease, box-shadow .18s ease;
 }
 
-/* hover/active */
+/* Submit hover/active */
 button#submitBtn:hover:not(:disabled){
   transform: translateY(-3px);
   box-shadow: 0 18px 34px rgba(224,123,47,0.34);
@@ -134,88 +129,121 @@ button#submitBtn:active:not(:disabled){
   transform: translateY(0);
 }
 button[disabled]{
-  opacity:.6; cursor:not-allowed; transform:none; box-shadow:none;
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-/* ===== Модалка (по центру, затемнённый фон) ===== */
+/* Consent (disclaimer) styles */
+.consent{
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.25;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+.consent input[type="checkbox"]{
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex: 0 0 18px;
+}
+.consent a{
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.consent-error{
+  color: #b00020;
+  font-size: 13px;
+  margin-top: 6px;
+  display: none;
+}
+
+/* Modal overlay */
 .modal{
-  position:fixed;
-  inset:0;
-  display:none; /* скрыта по умолчанию — твой скрипт ставит style.display='flex' */
-  align-items:center;
-  justify-content:center;
+  position: fixed;
+  inset: 0;
+  display: none; /* hidden by default, script sets display='flex' */
+  align-items: center;
+  justify-content: center;
   background: rgba(10,10,12,0.45);
-  z-index:9999;
-  padding:20px;
+  z-index: 9999;
+  padding: 20px;
 }
 
-/* тело модалки — похожее на карточку, но компактнее */
+/* Modal body */
 .modal-body{
-  width:420px;
-  max-width:96%;
-  background:#fff;
-  padding:20px 22px;
-  border-radius:14px;
+  width: 420px;
+  max-width: 96%;
+  background: var(--card-bg);
+  padding: 20px 22px;
+  border-radius: 14px;
   box-shadow: 0 20px 50px rgba(10,15,30,0.18);
-  text-align:left;
-  font-family:inherit;
+  text-align: left;
+  font-family: inherit;
 }
 
-/* модалка — заголовок и строки */
-.modal-body h3{ margin:0 0 8px; font-size:18px; color:#1f2937; }
-.modal-body p{ margin:6px 0; color:#374151; font-size:15px; }
+/* Modal text */
+.modal-body h3{ margin: 0 0 8px; font-size: 18px; color: #1f2937; }
+.modal-body p{ margin: 6px 0; color: #374151; font-size: 15px; }
 
-/* ID элементы — подчёркиваем акцентом */
+/* Highlighted IDs */
 #orderIdDisplay, #personalIdDisplay{
-  color:#e07a2f;
-  font-weight:700;
+  color: var(--accent);
+  font-weight: 700;
   font-family: "JetBrains Mono", monospace;
-  display:inline-block;
-  margin-left:8px;
+  display: inline-block;
+  margin-left: 8px;
 }
 
-/* Кнопки в модалке — горизонтально на ширине */
+/* Modal actions buttons */
 .modal-actions{
-  display:flex;
-  gap:12px;
-  margin-top:14px;
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
 }
 .modal-actions button{
-  padding:10px 14px;
-  border-radius:10px;
-  border:none;
-  cursor:pointer;
-  font-weight:700;
-  min-width:120px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  min-width: 120px;
 }
 
-/* кнопка копировать — яркая */
+/* Copy button style */
 #copyBtn{
   background: linear-gradient(90deg,#00d1b8 0%, #2dd0ff 100%);
-  color:#072227;
+  color: #072227;
   box-shadow: 0 10px 22px rgba(0,209,184,0.16);
 }
 
-/* кнопка закрыть — оранжевая, но тоньше */
+/* Close button style */
 #closeBtn{
-  background: linear-gradient(180deg,#e07a2f 0%, #d06322 100%);
-  color:#fff;
+  background: linear-gradient(180deg,var(--accent) 0%, var(--accent-dark) 100%);
+  color: #fff;
   box-shadow: 0 8px 18px rgba(224,123,47,0.18);
 }
 
-/* Анимация появления модалки (масштаб + плавность) */
+/* Modal pop animation trigger (script sets display:flex) */
 @keyframes modalPop {
-  0%{ opacity:0; transform: translateY(-8px) scale(.98); }
-  100%{ opacity:1; transform: translateY(0) scale(1); }
+  0%{ opacity: 0; transform: translateY(-8px) scale(.98); }
+  100%{ opacity: 1; transform: translateY(0) scale(1); }
 }
 .modal[style*="display: flex"] .modal-body{
   animation: modalPop .26s cubic-bezier(.2,.9,.3,1);
 }
 
-/* Адаптив: на маленьких экранах чуть меньше padding */
-@media (max-width:520px){
-  .card{ padding:18px; border-radius:18px; }
-  input, textarea{ border-radius:14px; }
-  .card::after{ display:none; }
-  .card::before{ left:-12px; bottom:12px; width:28px; height:28px; }
+/* Responsive adjustments */
+@media (max-width: 520px){
+  .card{ padding: 18px; border-radius: 18px; }
+  input, textarea{ border-radius: 14px; }
+  .modal-body{ padding: 16px; }
+  .consent{ font-size: 12px; }
 }
