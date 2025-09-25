@@ -82,96 +82,134 @@
   </div>
 
   <script>
-    (function () {
-      const form = document.getElementById('orderForm');
-      const submitBtn = document.getElementById('submitBtn');
-      const iframe = document.getElementById('hidden_iframe');
-      const modal = document.getElementById('modal');
-      const orderIdInput = document.getElementById('orderId');
-      const personalIdInput = document.getElementById('personalId');
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('orderForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const iframe = document.getElementById('hidden_iframe');
+  const modal = document.getElementById('modal');
+  const orderIdInput = document.getElementById('orderId');
+  const personalIdInput = document.getElementById('personalId');
+  const copyBtn = document.getElementById('copyBtn');
+  const closeBtn = document.getElementById('closeBtn');
 
-      function showModal(title, msg, orderId, personalId) {
-        document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalMsg').textContent = msg;
-        document.getElementById('orderIdDisplay').textContent = orderId || '—';
-        document.getElementById('personalIdDisplay').textContent = personalId || '—';
-        modal.style.display = 'flex';
-        modal.setAttribute('aria-hidden', 'false');
-      }
+  // Утилиты: безопасное отображение/скрытие модалки
+  function showModal(title, msg, orderId, personalId) {
+    // если модалка не найдена — fallback: alert + просто лог
+    if (!modal) {
+      console.warn('Modal element not found — falling back to alert.');
+      alert(`${title}\n\n${msg}\n\nOrder ID: ${orderId || '—'}\nPersonal ID: ${personalId || '—'}`);
+      return;
+    }
+    const titleEl = document.getElementById('modalTitle');
+    const msgEl = document.getElementById('modalMsg');
+    const orderDisplay = document.getElementById('orderIdDisplay');
+    const personalDisplay = document.getElementById('personalIdDisplay');
 
-      function closeModal() {
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
-      }
+    if (titleEl) titleEl.textContent = title || '';
+    if (msgEl) msgEl.textContent = msg || '';
+    if (orderDisplay) orderDisplay.textContent = orderId || '—';
+    if (personalDisplay) personalDisplay.textContent = personalId || '—';
 
-      form.addEventListener('submit', (ev) => {
-  // проверим согласие
-  const consentEl = document.getElementById('consentCheckbox');
-  const consentError = document.getElementById('consentError');
-
-  if (!consentEl || !consentEl.checked) {
-    // если чекбокс не найден или не отмечен — блокируем отправку и показываем ошибку
-    ev.preventDefault();
-    consentError.style.display = 'block';
-    consentEl?.focus();
-    return;
-  } else {
-    consentError.style.display = 'none';
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
   }
 
-  // Сгенерируем ID'ы ДО отправки (как было раньше)
-  const orderId = String(Date.now());
-  const phone = (form.querySelector("[name='phone']").value || '');
-  const phoneDigits = phone.replace(/\D/g, '');
-  const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
+  function closeModal() {
+    if (!modal) return;
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+  }
 
-  orderIdInput.value = orderId;
-  personalIdInput.value = personalId;
+  // Если формы нет — выходим
+  if (!form) {
+    console.warn('orderForm not found in DOM. Aborting script.');
+    return;
+  }
 
-  // Сохраним для показа после ответа (iframe.onload)
-  form.dataset.orderId = orderId;
-  form.dataset.personalId = personalId;
+  // Обработчик отправки формы — с проверкой чекбокса согласия (если есть)
+  form.addEventListener('submit', (ev) => {
+    // проверим наличие чекбокса согласия (если у тебя есть)
+    const consentEl = document.getElementById('consentCheckbox');
+    const consentError = document.getElementById('consentError');
+    if (consentEl && !consentEl.checked) {
+      // блокируем отправку, показываем ошибку
+      ev.preventDefault();
+      if (consentError) consentError.style.display = 'block';
+      consentEl.focus();
+      return;
+    } else if (consentError) {
+      consentError.style.display = 'none';
+    }
 
-  // Защита от дублей
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Отправляется...';
-  // (Не вызываем ev.preventDefault() — отправляем форму естественным образом в iframe)
-});
+    // Сгенерируем ID'ы ДО отправки (как было ранее)
+    const orderId = String(Date.now());
+    const phone = (form.querySelector("[name='phone']")?.value || '');
+    const phoneDigits = phone.replace(/\D/g, '');
+    const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
 
+    if (orderIdInput) orderIdInput.value = orderId;
+    if (personalIdInput) personalIdInput.value = personalId;
 
-      // Когда iframe загрузится (ответ от сервера) — показываем модалку
-      iframe.addEventListener('load', () => {
-        // Подстрахуемся: данные уже на форме datasets
-        const orderId = form.dataset.orderId || orderIdInput.value;
-        const personalId = form.dataset.personalId || personalIdInput.value;
+    // Сохраним для показа после ответа (iframe.onload)
+    form.dataset.orderId = orderId;
+    form.dataset.personalId = personalId;
 
-        showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Мы свяжемся с вами!', orderId, personalId);
+    // Защита от дублей
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправляется...';
+    }
 
-        // вернём кнопку в исходное состояние
+    // НЕ вызываем ev.preventDefault() — форма отправляется в hidden_iframe
+    // (если тебе нужно отправить AJAX — скажи, и я перепишу)
+  });
+
+  // Когда iframe загрузится (ответ от сервера) — показываем модалку
+  if (iframe) {
+    iframe.addEventListener('load', () => {
+      const orderId = form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—';
+      const personalId = form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—';
+
+      showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', orderId, personalId);
+
+      // вернём кнопку в исходное состояние
+      if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Отправить заказ';
-        // очистка формы не сразу — пользователь может захотеть скопировать ID
-        form.reset();
-      });
+      }
+      // очистка формы (пока оставляем, как было)
+      form.reset();
+    });
+  } else {
+    console.warn('hidden_iframe not found — iframe load handler skipped.');
+  }
 
-      document.getElementById('copyBtn').addEventListener('click', () => {
-        const text = `Order ID: ${form.dataset.orderId || orderIdInput.value}, Personal ID: ${form.dataset.personalId || personalIdInput.value}`;
-        navigator.clipboard?.writeText(text).then(() => {
+  // Кнопка копирования — безопасно
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const text = `Order ID: ${form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—'}, Personal ID: ${form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—'}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
           alert('Скопировано: ' + text);
         }).catch(() => {
           prompt('Скопируйте вручную:', text);
         });
-      });
+      } else {
+        prompt('Скопируйте вручную:', text);
+      }
+    });
+  }
 
-      document.getElementById('closeBtn').addEventListener('click', () => {
-        closeModal();
-      });
+  // Кнопка закрытия модалки
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
 
-      // Закрытие кликом по фону
-      modal.addEventListener('click', (ev) => {
-        if (ev.target === modal) closeModal();
-      });
-    })();
-  </script>
+  // Закрытие кликом по фону модалки (если она есть)
+  if (modal) {
+    modal.addEventListener('click', (ev) => {
+      if (ev.target === modal) closeModal();
+    });
+  }
+});
+</script>
 </body>
 </html>
