@@ -3,257 +3,250 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Форма заказа запчастей — улучшенная</title>
-
+  <title>Форма заказа запчастей — компактный дизайн</title>
   <style>
-    /* ====== BASIC RESET ====== */
+    /* Reset */
     *{box-sizing:border-box}
-    html,body{height:100%; margin:0; padding:0}
+    html,body{height:100%;margin:0;padding:0}
     body{
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-      background:#ffffff;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background:#f3f6f9;
       color:#0b1b2b;
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
       display:flex;
-      align-items:flex-start; /* верх->низ flow */
+      align-items:flex-start;
       justify-content:center;
-      padding:28px;
+      padding:24px;
     }
 
-    /* MAIN LAYOUT */
-    main{ width:100%; max-width:560px; margin:0 auto; }
-
+    /* Layout: mobile-like narrow card */
+    main{ width:100%; max-width:380px; margin:0 auto; }
     .card{
       background:#fff;
-      border-radius:14px;
-      padding:22px;
-      box-shadow:0 18px 40px rgba(6,20,40,0.06);
-      border:1px solid rgba(11,27,43,0.04);
-      overflow:hidden;
-    }
-    h2{ margin:0 0 12px; font-size:20px; font-weight:700; color:#0b1b2b; }
-
-    /* FORM */
-    form{ display:flex; flex-direction:column; gap:12px; }
-    label{ display:flex; flex-direction:column; gap:8px; font-size:13px; color:#475569; font-weight:600; }
-    input, textarea {
-      background:#f7f9fb;
-      border:1px solid rgba(11,27,43,0.06);
-      padding:10px 12px;
       border-radius:10px;
+      overflow:hidden;
+      box-shadow:0 10px 30px rgba(2,6,23,0.06);
+      border:1px solid rgba(11,27,43,0.06);
+    }
+
+    /* Header bar (dark blue) */
+    .card .header{
+      background: linear-gradient(180deg,#17334f 0%, #0f2a44 100%);
+      color:#fff;
+      padding:14px 16px;
+      font-weight:700;
+      font-size:15px;
+      text-align:center;
+    }
+
+    .card .content{ padding:18px; }
+
+    label{ display:block; margin-bottom:8px; font-size:13px; color:#344154; font-weight:600; }
+    .field{ margin-bottom:12px; }
+    input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea {
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid rgba(22,38,58,0.06);
+      background:#fbfdff;
       font-size:14px;
-      color:#0b1b2b;
-      transition:box-shadow .12s, border-color .12s, transform .08s;
+      color:#061427;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      transition:box-shadow .12s, border-color .12s, transform .06s;
       outline:none;
     }
     textarea{ min-height:110px; resize:vertical; }
 
     input:focus, textarea:focus{
-      border-color:#2aa3ff;
-      box-shadow:0 10px 30px rgba(42,163,255,0.10);
+      border-color:#3aa0ff;
+      box-shadow:0 10px 30px rgba(51,153,255,0.08);
       transform:translateY(-1px);
       background:#fff;
     }
-    ::placeholder{ color: rgba(11,27,43,0.35); }
+    ::placeholder{ color:#95a3b5; }
 
-    .row{ display:flex; gap:12px; }
-    .row .col{ flex:1; }
+    .small-hint{ font-size:12px; color:#7b8a99; margin-top:6px; }
+    .error{ color:#c23b3b; font-size:13px; margin-top:6px; display:none; }
 
-    /* small helper text & errors */
-    .hint{ font-size:12px; color:#94a3b8; margin-top:6px }
-    .error{ color:#b00020; font-size:13px; margin-top:6px; display:none }
+    /* consent area */
+    .consent{ display:flex; gap:10px; align-items:flex-start; font-size:13px; color:#4b5b6b; margin-top:8px; }
+    .consent input[type="checkbox"]{ width:18px; height:18px; margin-top:3px; accent-color:#0f6ee6; }
 
-    /* submit button + spinner */
-    .buttons{ margin-top:8px; display:flex; justify-content:center; }
-    button#submitBtn{
-      width:100%; max-width:420px; padding:12px 18px;
-      border-radius:999px; border:none; cursor:pointer;
-      background:linear-gradient(180deg,#1677d1 0%, #0e66c9 100%); color:#fff; font-weight:700;
-      box-shadow:0 12px 30px rgba(14,78,157,0.18);
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    /* submit button */
+    .actions{ padding:18px 18px 20px; }
+    .submit-btn{
+      width:100%;
+      padding:12px 14px;
+      border-radius:8px;
+      border:none;
+      background:linear-gradient(180deg,#2a9df4,#0f6ee6);
+      color:#fff; font-weight:700; font-size:15px;
+      box-shadow:0 8px 22px rgba(15,110,230,0.18);
+      cursor:pointer;
     }
-    button[disabled]{ opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
+    .submit-btn[disabled]{ opacity:0.6; cursor:not-allowed; box-shadow:none; }
 
     .spinner{
-      width:18px; height:18px; border-radius:50%;
-      border:3px solid rgba(255,255,255,0.3); border-top-color:#fff;
-      animation:spin .9s linear infinite; display:inline-block;
+      width:16px; height:16px; border-radius:50%;
+      border:3px solid rgba(255,255,255,0.35); border-top-color:#fff;
+      animation:spin .85s linear infinite; display:inline-block; vertical-align:middle;
     }
     @keyframes spin{ to{ transform:rotate(360deg) } }
 
-    /* consent */
-    .consent{ display:flex; gap:10px; align-items:flex-start; font-size:13px; color:#475569; line-height:1.25 }
-    .consent input[type="checkbox"]{ width:18px; height:18px; margin-top:3px; accent-color:#1677d1 }
-    .consent a{ color:#1677d1; text-decoration:underline }
+    /* success banner under form (green) */
+    .success-banner{
+      display:none;
+      margin-top:12px;
+      background:linear-gradient(180deg,#e8f9f1,#dff6ea);
+      border-radius:8px;
+      border:1px solid rgba(22,153,120,0.12);
+      padding:12px;
+      color:#0a4f34;
+      font-weight:600;
+      box-shadow:0 6px 18px rgba(4,25,15,0.02);
+    }
 
-    /* modal overlay */
+    /* modal (adapted visual) */
     .modal{
       position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-      background:rgba(0,0,0,0.55); z-index:9999; padding:20px;
+      background:rgba(2,6,23,0.45); z-index:9999; padding:18px;
     }
     .modal[aria-hidden="false"]{ display:flex }
-    .modal-body{
-      width:520px; max-width:96%;
-      background:#ffffff; color:#0b1b2b;
-      padding:18px 20px; border-radius:12px;
-      box-shadow:0 20px 60px rgba(6,20,40,0.12);
-      text-align:left;
+    .modal-card{
+      width:100%; max-width:520px;
+      background:#0f2b46; /* dark-blue panel background to contrast */
+      color:#fff;
+      border-radius:10px;
+      padding:18px;
+      box-shadow:0 30px 80px rgba(2,6,23,0.5);
+      position:relative;
+      overflow:hidden;
     }
-    .modal h3{ margin:0 0 6px; font-size:18px }
-    .modal p{ margin:6px 0; color:#475569 }
+    .modal-card .body{
+      background:#fff;
+      color:#061427;
+      padding:18px;
+      border-radius:8px;
+    }
+    .modal-card h3{ margin:0 0 6px; color:#061427 }
+    .modal-card p{ margin:6px 0; color:#475569 }
 
-    .modal-actions{ display:flex; gap:12px; margin-top:12px; }
-    .modal-actions button{ min-width:120px; padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:700 }
+    .modal-actions{ display:flex; gap:12px; margin-top:10px; justify-content:center; flex-wrap:wrap; }
+    .modal-actions button{ min-width:120px; padding:10px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:700 }
 
     #copyBtn{ background:linear-gradient(90deg,#00c7a8, #2dd0ff); color:#04121a }
+    #downloadPdfBtn{ background:#eef2f6; color:#072036; }
     #closeBtn{ background:linear-gradient(180deg,#1677d1,#0f5fb0); color:#fff }
-    #downloadPdfBtn{ background:#f1f5f9; color:#072036; box-shadow:inset 0 -1px 0 rgba(0,0,0,0.04) }
 
-    /* LARGE QR */
     .qr-large {
-      width:260px; height:260px; border-radius:12px; background:#f7f9fb;
-      display:flex; align-items:center; justify-content:center; padding:10px; overflow:hidden;
-      box-shadow: 0 8px 20px rgba(2,6,18,0.04); margin: 16px auto 0;
+      width:260px; height:260px; border-radius:10px; background:#f7fafb;
+      display:flex; align-items:center; justify-content:center; padding:12px; overflow:hidden;
+      margin:12px auto 0;
     }
-    .qr-large img{ display:block; width:100%; height:100%; object-fit:contain; border-radius:8px; }
+    .qr-large img{ display:block; width:100%; height:100%; object-fit:contain; border-radius:6px; }
 
-    /* responsive */
-    @media (max-width:560px){
-      main{ padding:0 6px }
-      .modal-body{ width:100% }
-      .qr-large { width:200px; height:200px; }
+    /* responsive small screens */
+    @media (max-width:420px){
+      main{ padding:0 8px; max-width:360px; }
+      .modal-card{ padding:12px; }
+      .qr-large{ width:200px; height:200px; }
     }
   </style>
 </head>
 <body>
   <main>
     <div class="card" role="region" aria-label="Форма заказа">
-      <h2>Форма заказа запчастей</h2>
+      <div class="header">Заполните форму для быстрого поиска деталей</div>
 
-      <form id="orderForm" method="POST" target="hidden_iframe"
-            action="https://script.google.com/macros/s/AKfycby7lHiick8xcyXC61bTxbji2jl6keEuU6ZhCNzY8_POl1Gim7nYrn-GBUxanaifQUdnIg/exec" autocomplete="on" novalidate>
+      <div class="content">
+        <form id="orderForm" method="POST" target="hidden_iframe"
+              action="https://script.google.com/macros/s/AKfycby7lHiick8xcyXC61bTxbji2jl6keEuU6ZhCNzY8_POl1Gim7nYrn-GBUxanaifQUdnIg/exec" autocomplete="on" novalidate>
 
-        <!-- ФИО -->
-        <label for="name">
-          ФИО *
-          <input id="name" name="name" type="text" required placeholder="Иванов Иван" aria-describedby="nameHelp">
-          <div id="nameHelp" class="hint">Имя и фамилия кириллицей, минимум 2 слова.</div>
-          <div id="nameError" class="error">Введите корректное ФИО (кириллица, 2 слова, без нецензурных слов).</div>
-        </label>
+          <div class="field">
+            <label for="vin">VIN-код автомобиля *</label>
+            <input id="vin" name="vin" type="text" placeholder="Введите 17-значный VIN-код" required>
+            <div class="small-hint">VIN из 17 символов (без I, O, Q)</div>
+            <div id="vinError" class="error">Некорректный VIN.</div>
+          </div>
 
-        <!-- Телефон -->
-        <label for="phone">
-          Телефон *
-          <input id="phone" name="phone" type="tel" required placeholder="+7 (900) 123-45-67" aria-describedby="phoneHelp">
-          <div id="phoneHelp" class="hint">Формат: +7 (xxx) xxx-xx-xx</div>
-          <div id="phoneError" class="error">Введите корректный российский номер.</div>
-        </label>
+          <div class="field">
+            <label for="model">Марка автомобиля</label>
+            <input id="model" name="model" type="text" placeholder="Например: Toyota, BMW, Volkswagen">
+          </div>
 
-        <!-- Email -->
-        <label for="email">
-          Email
-          <input id="email" name="email" type="email" placeholder="example@mail.com" aria-describedby="emailHelp">
-          <div id="emailError" class="error">Некорректный email.</div>
-        </label>
+          <div class="field">
+            <label for="year">Год выпуска</label>
+            <input id="year" name="year" type="number" min="1900" max="2099" placeholder="Например: 2018">
+          </div>
 
-        <!-- VIN -->
-        <label for="vin">
-          VIN *
-          <input id="vin" name="vin" type="text" required placeholder="17 символов, без I, O, Q" aria-describedby="vinHelp">
-          <div id="vinHelp" class="hint">VIN должен состоять из 17 символов (буквы и цифры), без I, O, Q.</div>
-          <div id="vinError" class="error">Некорректный VIN.</div>
-        </label>
+          <div class="field">
+            <label for="article">Артикул детали (при наличии)</label>
+            <input id="article" name="article" type="text" placeholder="Если известен артикул нужной детали">
+            <div class="small-hint">Необязательное поле</div>
+          </div>
 
-        <!-- Модель -->
-        <label for="model">
-          Модель
-          <input id="model" name="model" type="text" placeholder="Например: Ford Focus">
-        </label>
+          <div class="field">
+            <label for="partName">Описание проблемы / Название детали *</label>
+            <textarea id="partName" name="partName" placeholder="Подробно опишите проблему или нужную деталь..." required></textarea>
+            <div id="partError" class="error">Укажите описание или название детали.</div>
+          </div>
 
-        <!-- Год -->
-        <label for="year">
-          Год выпуска
-          <input id="year" name="year" type="number" min="1900" max="2099" step="1" placeholder="2020">
-        </label>
+          <div class="field">
+            <label for="phone">Ваш телефон для связи *</label>
+            <input id="phone" name="phone" type="tel" placeholder="+7 (XXX) XXX-XX-XX" required>
+            <div id="phoneError" class="error">Введите корректный телефон.</div>
+          </div>
 
-        <!-- Название детали -->
-        <label for="partName">
-          Название детали *
-          <input id="partName" name="partName" type="text" required placeholder="Амортизатор">
-          <div id="partError" class="error">Укажите название детали.</div>
-        </label>
+          <div class="field consent">
+            <input id="consentCheckbox" type="checkbox" name="consent">
+            <div style="font-size:13px;color:#4b5b6b;">
+              Нажимая «Отправить заявку», я даю согласие на обработку моих персональных данных в соответствии с <a href="#" target="_blank" rel="noopener" style="color:#0f6ee6;text-decoration:underline">Политикой конфиденциальности</a>.
+            </div>
+          </div>
+          <div id="consentError" class="error">Для отправки формы необходимо ваше согласие.</div>
 
-        <!-- Артикул -->
-        <label for="article">
-          Артикул
-          <input id="article" name="article" type="text" placeholder="12345-AB">
-        </label>
+          <!-- hidden ids -->
+          <input type="hidden" name="orderId" id="orderId">
+          <input type="hidden" name="personalId" id="personalId">
 
-        <!-- Количество -->
-        <label for="qty">
-          Количество *
-          <input id="qty" name="qty" type="number" required min="1" value="1">
-        </label>
+          <div class="actions">
+            <button id="submitBtn" class="submit-btn" type="submit"><span id="btnText">Отправить заявку</span></button>
 
-        <!-- Комментарий -->
-        <label for="comment">
-          Комментарий
-          <textarea id="comment" name="comment" rows="3" placeholder="Доп. информация"></textarea>
-        </label>
-
-        <!-- Consent -->
-        <label class="consent" for="consentCheckbox">
-          <input id="consentCheckbox" type="checkbox" name="consent">
-          Нажимая «Отправить заказ», я даю согласие на обработку моих персональных данных в соответствии с <a href="#" target="_blank" rel="noopener">Политикой конфиденциальности</a>.
-        </label>
-        <div id="consentError" class="error">Для отправки формы необходимо ваше согласие.</div>
-
-        <!-- hidden IDs -->
-        <input type="hidden" name="orderId" id="orderId">
-        <input type="hidden" name="personalId" id="personalId">
-
-        <div class="buttons">
-          <button id="submitBtn" type="submit" aria-live="polite">
-            <span id="btnText">Отправить заказ</span>
-          </button>
-        </div>
-      </form>
+            <div id="successBanner" class="success-banner" role="status" aria-live="polite">
+              Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   </main>
 
   <!-- hidden iframe -->
   <iframe name="hidden_iframe" id="hidden_iframe" style="display:none"></iframe>
 
-  <!-- MODAL (buttons first, large QR below) -->
+  <!-- Modal (dark header + white body) -->
   <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-body">
-      <h3 id="modalTitle">Заявка принята</h3>
-      <p id="modalMsg">Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.</p>
+    <div class="modal-card" role="document">
+      <div class="body">
+        <h3 id="modalTitle">Заявка принята</h3>
+        <p id="modalMsg">Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.</p>
 
-      <p><strong>Номер заказа:</strong> <span id="orderIdDisplay">—</span></p>
-      <p><strong>Персональный ID:</strong> <span id="personalIdDisplay">—</span></p>
+        <p><strong>Номер заказа:</strong> <span id="orderIdDisplay">—</span></p>
+        <p><strong>Персональный ID:</strong> <span id="personalIdDisplay">—</span></p>
 
-      <div style="display:flex; gap:12px; align-items:center; margin-top:10px; justify-content:center;">
-        <div style="flex:0 0 auto;">
-          <div class="modal-actions" style="gap:10px; display:flex; flex-wrap:wrap;">
-            <button id="copyBtn" type="button">Копировать оба</button>
-            <button id="downloadPdfBtn" type="button">Скачать PDF</button>
-            <button id="closeBtn" type="button">Закрыть</button>
-          </div>
+        <div class="modal-actions">
+          <button id="copyBtn" type="button">Копировать оба</button>
+          <button id="downloadPdfBtn" type="button">Скачать PDF</button>
+          <button id="closeBtn" type="button">Закрыть</button>
         </div>
-      </div>
 
-      <div style="display:flex; justify-content:center; margin-top:16px;">
         <div class="qr-large" id="qrContainer" title="QR-код заказа" aria-hidden="false"></div>
       </div>
     </div>
   </div>
 
   <script>
-  /* ==========================================================================
-     validation, masking, autosave, modal focus-trap, QR fallback (large)
-     ========================================================================== */
   document.addEventListener('DOMContentLoaded', () => {
     // Elements
     const form = document.getElementById('orderForm');
@@ -264,20 +257,20 @@
     const orderIdInput = document.getElementById('orderId');
     const personalIdInput = document.getElementById('personalId');
 
-    const nameEl = document.getElementById('name');
-    const phoneEl = document.getElementById('phone');
-    const emailEl = document.getElementById('email');
     const vinEl = document.getElementById('vin');
+    const modelEl = document.getElementById('model');
+    const yearEl = document.getElementById('year');
+    const articleEl = document.getElementById('article');
     const partEl = document.getElementById('partName');
+    const phoneEl = document.getElementById('phone');
     const consentEl = document.getElementById('consentCheckbox');
 
-    // Error nodes
-    const nameError = document.getElementById('nameError');
-    const phoneError = document.getElementById('phoneError');
-    const emailError = document.getElementById('emailError');
     const vinError = document.getElementById('vinError');
     const partError = document.getElementById('partError');
+    const phoneError = document.getElementById('phoneError');
     const consentError = document.getElementById('consentError');
+
+    const successBanner = document.getElementById('successBanner');
 
     const modalTitle = document.getElementById('modalTitle');
     const modalMsg = document.getElementById('modalMsg');
@@ -288,35 +281,32 @@
     const qrContainer = document.getElementById('qrContainer');
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
-    // Profanity list (simple)
+    // Profanity simple list (optional expand)
     const profanity = ['хуй','бляд','сука','пизд','еба'];
 
-    // Helpers
-    function norm(s){ return (s||'').toLowerCase().trim(); }
+    function showError(node, text){
+      if (!node) return;
+      node.textContent = text || '';
+      node.style.display = text ? 'block' : 'none';
+    }
 
-    function validateName() {
-      const v = nameEl.value.trim();
-      if (!v) return {ok:false, msg:'Поле обязательно'};
-      const cyrillicOnly = /^[А-ЯЁа-яё\s\-]+$/u.test(v);
-      if (!cyrillicOnly) return {ok:false, msg:'ФИО должно быть кириллицей, без латиницы/цифр.'};
-      const parts = v.split(/\s+/).filter(Boolean);
-      if (parts.length < 2) return {ok:false, msg:'Укажите как минимум фамилию и имя.'};
-      const low = v.toLowerCase();
-      for (const p of profanity) if (low.includes(p)) return {ok:false, msg:'Поле содержит недопустимые слова.'};
+    // VIN validation
+    function validateVIN(){
+      const v = (vinEl.value||'').trim().toUpperCase();
+      if (!v) return {ok:false, msg:'VIN обязателен'};
+      if (v.length !== 17) return {ok:false, msg:'VIN должен содержать ровно 17 символов.'};
+      if (/[IOQ]/.test(v)) return {ok:false, msg:'VIN не должен содержать буквы I, O, Q.'};
+      if (!/^[A-Z0-9]+$/.test(v)) return {ok:false, msg:'VIN может содержать только латинские буквы и цифры.'};
       return {ok:true};
     }
 
-    function isLikelyLatinGibberish(s){
-      if (!s) return false;
-      const hasLatin = /[A-Za-z]/.test(s);
-      const hasCyr = /[А-Яа-яЁё]/.test(s);
-      if (hasLatin && !hasCyr) return true;
-      const letters = s.replace(/[^A-Za-z]/g,'');
-      if (letters.length >= 4 && (letters.length / s.replace(/[^A-Za-zА-Яа-яЁё]/g,'').length) > 0.6 && hasLatin) return true;
-      return false;
+    // Part required
+    function validatePart(){
+      const v = (partEl.value||'').trim();
+      return v ? {ok:true} : {ok:false, msg:'Укажите название детали/описание проблемы.'};
     }
 
-    // Phone
+    // Phone format and validation
     function formatPhone(value){
       const d = (value || '').replace(/\D/g,'');
       let digits = d;
@@ -338,142 +328,71 @@
       return out.trim();
     }
     function validatePhone(){
-      const raw = phoneEl.value;
-      const digits = (raw||'').replace(/\D/g,'');
+      const digits = (phoneEl.value||'').replace(/\D/g,'');
       if (digits.length === 11 && digits.startsWith('7')) return {ok:true};
       if (digits.length === 10) return {ok:true};
       return {ok:false, msg:'Введите корректный телефон (+7 и 10 цифр).'};
     }
 
-    // Email
-    function validateEmail(){
-      const v = (emailEl.value||'').trim();
-      if (!v) return {ok:true};
-      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(v) ? {ok:true} : {ok:false, msg:'Некорректный email.'};
-    }
-
-    // VIN
-    function validateVIN(){
-      const v = (vinEl.value||'').trim().toUpperCase();
-      if (!v) return {ok:false, msg:'VIN обязателен'};
-      if (v.length !== 17) return {ok:false, msg:'VIN должен содержать ровно 17 символов.'};
-      if (/[IOQ]/.test(v)) return {ok:false, msg:'VIN не должен содержать буквы I, O, Q.'};
-      if (!/^[A-Z0-9]+$/.test(v)) return {ok:false, msg:'VIN может содержать только латинские буквы и цифры.'};
-      return {ok:true};
-    }
-
-    function validatePart(){
-      const v = (partEl.value||'').trim();
-      return v ? {ok:true} : {ok:false, msg:'Укажите название детали.'};
-    }
-
-    // show/hide errors
-    function showError(node, text){
-      if (!node) return;
-      node.textContent = text || '';
-      node.style.display = text ? 'block' : 'none';
-    }
-
-    // Autosave
+    // Autosave draft
     let saveTimer = null;
     function autosave(){
       const data = {
-        name: nameEl.value||'',
-        phone: phoneEl.value||'',
-        email: emailEl.value||'',
-        vin: vinEl.value||'',
-        model: document.getElementById('model')?.value||'',
-        year: document.getElementById('year')?.value||'',
-        partName: partEl.value||'',
-        article: document.getElementById('article')?.value||'',
-        qty: document.getElementById('qty')?.value||'1',
-        comment: document.getElementById('comment')?.value||'',
+        vin: vinEl.value||'', model: modelEl.value||'', year: yearEl.value||'',
+        article: articleEl.value||'', partName: partEl.value||'', phone: phoneEl.value||'',
         consent: consentEl.checked||false
       };
-      try { localStorage.setItem('orderFormDraft', JSON.stringify(data)); }
-      catch(e){ console.warn('autosave failed', e); }
+      try { localStorage.setItem('orderFormDraftCompact', JSON.stringify(data)); } catch(e){}
     }
     function scheduleAutosave(){
       if (saveTimer) clearTimeout(saveTimer);
       saveTimer = setTimeout(autosave, 600);
     }
-    function loadDraftIfAny(){
+    function loadDraft(){
       try {
-        const raw = localStorage.getItem('orderFormDraft');
+        const raw = localStorage.getItem('orderFormDraftCompact');
         if (!raw) return;
         const data = JSON.parse(raw);
-        if (data.name) nameEl.value = data.name;
-        if (data.phone) phoneEl.value = data.phone;
-        if (data.email) emailEl.value = data.email;
         if (data.vin) vinEl.value = data.vin;
-        if (data.model) document.getElementById('model').value = data.model;
-        if (data.year) document.getElementById('year').value = data.year;
+        if (data.model) modelEl.value = data.model;
+        if (data.year) yearEl.value = data.year;
+        if (data.article) articleEl.value = data.article;
         if (data.partName) partEl.value = data.partName;
-        if (data.article) document.getElementById('article').value = data.article;
-        if (data.qty) document.getElementById('qty').value = data.qty;
-        if (data.comment) document.getElementById('comment').value = data.comment;
+        if (data.phone) phoneEl.value = data.phone;
         if (data.consent) consentEl.checked = !!data.consent;
-      } catch(e){ console.warn('draft parse error', e); }
+      } catch(e){}
     }
 
-    // Wiring events
-    phoneEl.addEventListener('input', () => {
-      const formatted = formatPhone(phoneEl.value);
-      phoneEl.value = formatted;
-      scheduleAutosave();
-    });
+    // QR rendering with fallback (uses external services; if blocked shows text)
+    function renderQR(orderId, personalId) {
+      qrContainer.innerHTML = '';
+      const payload = `Order:${orderId};Personal:${personalId}`;
+      const sizePx = 260;
+      const googleUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=' + sizePx + 'x' + sizePx + '&chl=' + encodeURIComponent(payload);
+      const qrserverUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=' + sizePx + 'x' + sizePx + '&data=' + encodeURIComponent(payload);
 
-    nameEl.addEventListener('input', () => {
-      const v = nameEl.value;
-      if (isLikelyLatinGibberish(v)) {
-        showError(nameError, 'Пожалуйста, введите ФИО кириллицей (не используйте латиницу).');
-      } else {
-        showError(nameError, '');
-      }
-      scheduleAutosave();
-    });
+      const img = new Image();
+      img.alt = 'QR-код заказа';
+      img.title = 'QR-код заказа';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'contain';
+      img.decoding = 'async';
 
-    [emailEl, vinEl, partEl, document.getElementById('model'),
-     document.getElementById('year'), document.getElementById('article'),
-     document.getElementById('qty'), document.getElementById('comment')].forEach(el=>{
-      if (!el) return;
-      el.addEventListener('input', scheduleAutosave);
-    });
-    consentEl.addEventListener('change', scheduleAutosave);
-
-    loadDraftIfAny();
-
-    // Validation before submit
-    function validateAll(){
-      let ok = true;
-
-      if (isLikelyLatinGibberish(nameEl.value)) {
-        showError(nameError, 'ФИО должно быть кириллицей, не используйте латиницу.');
-        ok = false;
-      } else {
-        const r = validateName();
-        if (!r.ok){ showError(nameError, r.msg); ok=false; } else showError(nameError, '');
-      }
-
-      const pr = validatePhone();
-      if (!pr.ok){ showError(phoneError, pr.msg); ok=false; } else showError(phoneError, '');
-
-      const er = validateEmail();
-      if (!er.ok){ showError(emailError, er.msg); ok=false; } else showError(emailError, '');
-
-      const vr = validateVIN();
-      if (!vr.ok){ showError(vinError, vr.msg); ok=false; } else showError(vinError, '');
-
-      const partr = validatePart();
-      if (!partr.ok){ showError(partError, partr.msg); ok=false; } else showError(partError, '');
-
-      if (!consentEl.checked){ showError(consentError, 'Для отправки формы необходимо ваше согласие.'); ok=false; } else showError(consentError, '');
-
-      return ok;
+      img.onload = () => { qrContainer.appendChild(img); };
+      img.onerror = () => {
+        img.onerror = () => {
+          qrContainer.textContent = 'QR недоступен';
+          qrContainer.style.color = '#666';
+          qrContainer.style.fontSize = '13px';
+          qrContainer.style.padding = '8px';
+        };
+        img.src = qrserverUrl;
+      };
+      img.src = googleUrl;
     }
 
-    // Focus trap helpers
+    // modal focus trap
     let lastFocused = null;
     function trapFocus(modalEl){
       const focusable = 'a, button, textarea, input, select, [tabindex]:not([tabindex="-1"])';
@@ -501,50 +420,9 @@
       }
     }
 
-    // QR rendering (large) with fallback
-    function renderQR(orderId, personalId) {
-      qrContainer.innerHTML = '';
-      qrContainer.style.color = '';
-      qrContainer.style.fontSize = '';
-      qrContainer.style.textAlign = '';
-
-      const payload = `Order:${orderId};Personal:${personalId}`;
-      const sizePx = 260;
-      const googleUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=' + sizePx + 'x' + sizePx + '&chl=' + encodeURIComponent(payload);
-      const qrserverUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=' + sizePx + 'x' + sizePx + '&data=' + encodeURIComponent(payload);
-
-      const img = new Image();
-      img.alt = 'QR-код заказа';
-      img.title = 'QR-код заказа';
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'contain';
-      img.style.borderRadius = '6px';
-      img.decoding = 'async';
-
-      img.onload = () => {
-        qrContainer.appendChild(img);
-      };
-
-      img.onerror = () => {
-        console.warn('QR: google failed, trying qrserver fallback');
-        img.onerror = () => {
-          console.warn('QR: both services failed, showing text fallback');
-          qrContainer.innerHTML = 'QR недоступен';
-          qrContainer.style.color = '#666';
-          qrContainer.style.fontSize = '13px';
-          qrContainer.style.padding = '8px';
-        };
-        img.src = qrserverUrl;
-      };
-
-      img.src = googleUrl;
-    }
-
-    // Show / close modal
-    function showModal(title, msg, orderId, personalId) {
-      modalTitle.textContent = title||'';
-      modalMsg.textContent = msg||'';
+    function showModal(title, msg, orderId, personalId){
+      modalTitle.textContent = title || 'Заявка принята';
+      modalMsg.textContent = msg || 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.';
       orderIdDisplay.textContent = orderId || '—';
       personalIdDisplay.textContent = personalId || '—';
       try { renderQR(orderId, personalId); } catch(e){ qrContainer.textContent = 'QR недоступен'; }
@@ -562,69 +440,62 @@
       document.body.style.overflow = '';
     }
 
-    // Printable summary (save-as-pdf)
     function openPrintable(orderId, personalId){
       const payload = {
         orderId, personalId,
-        name: nameEl.value, phone: phoneEl.value, email: emailEl.value,
-        vin: vinEl.value, model: document.getElementById('model').value,
-        year: document.getElementById('year').value, partName: partEl.value,
-        article: document.getElementById('article').value, qty: document.getElementById('qty').value,
-        comment: document.getElementById('comment').value
+        vin: vinEl.value, model: modelEl.value, year: yearEl.value,
+        article: articleEl.value, partName: partEl.value, phone: phoneEl.value
       };
       const html = `
         <html><head><title>Заявка ${orderId}</title>
-        <style>
-          body{font-family:Arial,Helvetica,sans-serif;padding:20px;color:#071428}
-          h1{font-size:18px}
-          .k{margin:8px 0}
-          .k b{display:inline-block;width:150px}
-        </style></head><body>
+        <style>body{font-family:Arial,sans-serif;padding:16px;color:#071428} h1{font-size:18px}</style></head><body>
         <h1>Заявка №${orderId}</h1>
-        ${Object.keys(payload).map(k=>`<div class="k"><b>${k}:</b> ${payload[k] || '—'}</div>`).join('')}
-        <p style="margin-top:20px;color:#666">Сгенерировано: ${new Date().toLocaleString()}</p>
+        ${Object.keys(payload).map(k=>`<div style="margin:6px 0"><b>${k}:</b> ${payload[k] || '—'}</div>`).join('')}
+        <p style="margin-top:12px;color:#666">Сформировано: ${new Date().toLocaleString()}</p>
         </body></html>`;
       const w = window.open('', '_blank');
       w.document.write(html);
       w.document.close();
-      setTimeout(()=>{ try{ w.print(); }catch(e){} }, 500);
+      setTimeout(()=>{ try{ w.print(); }catch(e){} }, 400);
     }
 
-    // Modal buttons
+    // Buttons handlers
     copyBtn.addEventListener('click', () => {
       const text = `Order ID: ${orderIdDisplay.textContent}, Personal ID: ${personalIdDisplay.textContent}`;
-      if (navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(text).then(()=> alert('Скопировано: ' + text)).catch(()=> prompt('Скопируйте вручную:', text));
-      } else { prompt('Скопируйте вручную:', text); }
+      if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(()=> alert('Скопировано: ' + text)).catch(()=> prompt('Скопируйте вручную:', text));
+      else prompt('Скопируйте вручную:', text);
     });
-    downloadPdfBtn.addEventListener('click', () => {
-      openPrintable(orderIdDisplay.textContent, personalIdDisplay.textContent);
-    });
+    downloadPdfBtn.addEventListener('click', () => openPrintable(orderIdDisplay.textContent, personalIdDisplay.textContent));
     closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', (ev) => { if (ev.target === modal) closeModal(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+    modal.addEventListener('click', (e)=> { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e)=> { if (e.key === 'Escape') closeModal(); });
 
-    // Blur validation
-    nameEl.addEventListener('blur', ()=>{ const r = validateName(); showError(nameError, r.ok ? '' : r.msg); });
-    phoneEl.addEventListener('blur', ()=>{ const r = validatePhone(); showError(phoneError, r.ok ? '' : r.msg); });
-    emailEl.addEventListener('blur', ()=>{ const r = validateEmail(); showError(emailError, r.ok ? '' : r.msg); });
-    vinEl.addEventListener('blur', ()=>{ const r = validateVIN(); showError(vinError, r.ok ? '' : r.msg); });
-    partEl.addEventListener('blur', ()=>{ const r = validatePart(); showError(partError, r.ok ? '' : r.msg); });
+    // Input events
+    vinEl.addEventListener('blur', ()=> { const r = validateVIN(); showError(vinError, r.ok ? '' : r.msg); scheduleAutosave(); });
+    partEl.addEventListener('blur', ()=> { const r = validatePart(); showError(partError, r.ok ? '' : r.msg); scheduleAutosave(); });
+    phoneEl.addEventListener('input', ()=> { phoneEl.value = formatPhone(phoneEl.value); scheduleAutosave(); });
+    phoneEl.addEventListener('blur', ()=> { const r = validatePhone(); showError(phoneError, r.ok ? '' : r.msg); scheduleAutosave(); });
+    [modelEl, yearEl, articleEl].forEach(el => el && el.addEventListener('input', scheduleAutosave));
+    consentEl.addEventListener('change', scheduleAutosave);
 
-    // Submit handler: validation + generate IDs + submit to iframe + fallback
+    loadDraft();
+
+    // Validate all
+    function validateAll(){
+      let ok = true;
+      const vr = validateVIN(); if (!vr.ok){ showError(vinError, vr.msg); ok=false; } else showError(vinError,'');
+      const pr = validatePart(); if (!pr.ok){ showError(partError, pr.msg); ok=false; } else showError(partError,'');
+      const ph = validatePhone(); if (!ph.ok){ showError(phoneError, ph.msg); ok=false; } else showError(phoneError,'');
+      if (!consentEl.checked){ showError(consentError, 'Для отправки формы необходимо ваше согласие.'); ok=false; } else showError(consentError,'');
+      return ok;
+    }
+
+    // Submit
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
+      if (!validateAll()) return;
 
-      const ok = validateAll();
-      if (!ok) {
-        const firstErr = document.querySelector('.error[style*="display: block"], .error:not([style])');
-        if (firstErr) {
-          const field = firstErr.previousElementSibling;
-          if (field && field.focus) field.focus();
-        }
-        return;
-      }
-
+      // generate ids
       const orderId = String(Date.now());
       const phoneDigits = (phoneEl.value||'').replace(/\D/g,'');
       const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
@@ -634,32 +505,38 @@
       form.dataset.orderId = orderId;
       form.dataset.personalId = personalId;
 
+      // button spinner
       submitBtn.disabled = true;
       btnText.innerHTML = '<span class="spinner" aria-hidden="true"></span> Отправляется...';
-      submitBtn.setAttribute('aria-busy','true');
 
+      // fallback timer
       let fallback = setTimeout(()=> {
         submitBtn.disabled = false;
-        btnText.textContent = 'Отправить заказ';
+        btnText.textContent = 'Отправить заявку';
+        // show inline success banner
+        successBanner.style.display = 'block';
+        // show modal also
         showModal('Заявка принята', 'Спасибо, ваша заявка отправлена (без подтверждения от сервера). Проверьте таблицу/почту.', orderId, personalId);
-        try { localStorage.removeItem('orderFormDraft'); } catch(e){}
+        try { localStorage.removeItem('orderFormDraftCompact'); } catch(e){}
       }, 10000);
 
+      // iframe load handler
       function onIframeLoad(){
         clearTimeout(fallback);
         submitBtn.disabled = false;
-        btnText.textContent = 'Отправить заказ';
+        btnText.textContent = 'Отправить заявку';
+        successBanner.style.display = 'block';
         showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', orderId, personalId);
-        try { localStorage.removeItem('orderFormDraft'); } catch(e){}
+        try { localStorage.removeItem('orderFormDraftCompact'); } catch(e){}
         iframe.removeEventListener('load', onIframeLoad);
       }
       if (iframe) iframe.addEventListener('load', onIframeLoad, { once: true });
 
-      // native submit (send to the iframe)
+      // native submit to iframe
       form.submit();
     });
 
-  }); // DOMContentLoaded end
+  }); // DOMContentLoaded
   </script>
 </body>
 </html>
