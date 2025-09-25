@@ -72,10 +72,10 @@
     <div class="modal-body" role="dialog" aria-modal="true">
       <h3 id="modalTitle"></h3>
       <p id="modalMsg"></p>
-      <p><strong>Order ID:</strong> <span id="orderIdDisplay">—</span></p>
-      <p><strong>Personal ID:</strong> <span id="personalIdDisplay">—</span></p>
+      <p><strong>Номер заказа:</strong> <span id="orderIdDisplay">—</span></p>
+      <p><strong>Персональный ID:</strong> <span id="personalIdDisplay">—</span></p>
       <div class="modal-actions">
-        <button id="copyBtn">Копировать оба</button>
+        <button id="copyBtn">Копировать</button>
         <button id="closeBtn">Закрыть</button>
       </div>
     </div>
@@ -129,7 +129,7 @@
         const orderId = form.dataset.orderId || orderIdInput.value;
         const personalId = form.dataset.personalId || personalIdInput.value;
 
-        showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', orderId, personalId);
+        showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Мы свяжемся с вами!', orderId, personalId);
 
         // вернём кнопку в исходное состояние
         submitBtn.disabled = false;
