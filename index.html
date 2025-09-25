@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Форма заказа запчастей — дизайн + полнота фич</title>
+  <title>Форма заказа запчастей</title>
   <style>
     /* RESET */
     *{box-sizing:border-box}
@@ -460,7 +460,7 @@
 
     function showModal(title, msg, orderId, personalId) {
       modalTitle.textContent = title||'Заявка принята';
-      modalMsg.textContent = msg||'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.';
+      modalMsg.textContent = msg||'Спасибо, ваша заявка отправлена.';
       orderIdDisplay.textContent = orderId || '—';
       personalIdDisplay.textContent = personalId || '—';
       try { renderQR(orderId, personalId); } catch(e){ qrContainer.textContent = 'QR недоступен'; }
