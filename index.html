@@ -105,23 +105,39 @@
       }
 
       form.addEventListener('submit', (ev) => {
-        // Сгенерируем ID'ы ДО отправки
-        const orderId = String(Date.now());
-        const phone = (form.querySelector("[name='phone']").value || '');
-        const phoneDigits = phone.replace(/\D/g, '');
-        const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
+  // проверим согласие
+  const consentEl = document.getElementById('consentCheckbox');
+  const consentError = document.getElementById('consentError');
 
-        orderIdInput.value = orderId;
-        personalIdInput.value = personalId;
+  if (!consentEl || !consentEl.checked) {
+    // если чекбокс не найден или не отмечен — блокируем отправку и показываем ошибку
+    ev.preventDefault();
+    consentError.style.display = 'block';
+    consentEl?.focus();
+    return;
+  } else {
+    consentError.style.display = 'none';
+  }
 
-        // Сохраним для показа после ответа (iframe.onload)
-        form.dataset.orderId = orderId;
-        form.dataset.personalId = personalId;
+  // Сгенерируем ID'ы ДО отправки (как было раньше)
+  const orderId = String(Date.now());
+  const phone = (form.querySelector("[name='phone']").value || '');
+  const phoneDigits = phone.replace(/\D/g, '');
+  const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
 
-        // Защита от дублей
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Отправляется...';
-      });
+  orderIdInput.value = orderId;
+  personalIdInput.value = personalId;
+
+  // Сохраним для показа после ответа (iframe.onload)
+  form.dataset.orderId = orderId;
+  form.dataset.personalId = personalId;
+
+  // Защита от дублей
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Отправляется...';
+  // (Не вызываем ev.preventDefault() — отправляем форму естественным образом в iframe)
+});
+
 
       // Когда iframe загрузится (ответ от сервера) — показываем модалку
       iframe.addEventListener('load', () => {
