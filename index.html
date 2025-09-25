@@ -262,7 +262,6 @@
       </div>
     </div>
   </main>
-
   <!-- скрытый iframe для POST -->
   <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
@@ -282,114 +281,137 @@
 
   <!-- Скрипт: надёжный, ждёт DOM, валидирует чекбокс, показывает модалку -->
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const form = document.getElementById('orderForm');
-      const submitBtn = document.getElementById('submitBtn');
-      const iframe = document.getElementById('hidden_iframe');
-      const modal = document.getElementById('modal');
-      const orderIdInput = document.getElementById('orderId');
-      const personalIdInput = document.getElementById('personalId');
-      const copyBtn = document.getElementById('copyBtn');
-      const closeBtn = document.getElementById('closeBtn');
-      const consentEl = document.getElementById('consentCheckbox');
-      const consentError = document.getElementById('consentError');
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('orderForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const iframe = document.getElementById('hidden_iframe');
+  const modal = document.getElementById('modal');
+  const orderIdInput = document.getElementById('orderId');
+  const personalIdInput = document.getElementById('personalId');
+  const copyBtn = document.getElementById('copyBtn');
+  const closeBtn = document.getElementById('closeBtn');
+  const consentEl = document.getElementById('consentCheckbox');
+  const consentError = document.getElementById('consentError');
 
-      if (!form) {
-        console.warn('orderForm not found — script aborted');
-        return;
+  if (!form) {
+    console.warn('orderForm not found — script aborted');
+    return;
+  }
+
+  // Показать модалку (безопасно)
+  function showModal(title, msg, orderId, personalId) {
+    if (!modal) {
+      alert(title + '\n\n' + msg + '\nOrder ID: ' + (orderId || '—') + '\nPersonal ID: ' + (personalId || '—'));
+      return;
+    }
+    const titleEl = document.getElementById('modalTitle');
+    const msgEl = document.getElementById('modalMsg');
+    const orderDisplay = document.getElementById('orderIdDisplay');
+    const personalDisplay = document.getElementById('personalIdDisplay');
+    if (titleEl) titleEl.textContent = title || '';
+    if (msgEl) msgEl.textContent = msg || '';
+    if (orderDisplay) orderDisplay.textContent = orderId || '—';
+    if (personalDisplay) personalDisplay.textContent = personalId || '—';
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    // по желанию очищаем форму после закрытия:
+    // form.reset();
+  }
+
+  // Обработчик сабмита: проверяем чекбокс, генерируем ID и даём время на ответ iframe
+  form.addEventListener('submit', function (ev) {
+    // валидация чекбокса согласия (если он есть)
+    if (consentEl && !consentEl.checked) {
+      ev.preventDefault();
+      if (consentError) consentError.style.display = 'block';
+      consentEl.focus();
+      return;
+    } else if (consentError) {
+      consentError.style.display = 'none';
+    }
+
+    // Генерация ID до отправки
+    const orderId = String(Date.now());
+    const phone = (form.querySelector("[name='phone']")?.value || '');
+    const phoneDigits = phone.replace(/\D/g, '');
+    const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
+
+    if (orderIdInput) orderIdInput.value = orderId;
+    if (personalIdInput) personalIdInput.value = personalId;
+
+    // Сохраним данные для модалки
+    form.dataset.orderId = orderId;
+    form.dataset.personalId = personalId;
+
+    // Блокировка кнопки чтобы не нажимали повторно
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправляется...';
+    }
+
+    // Если iframe отсутствует — показываем модалку как fallback через 1s
+    if (!iframe) {
+      console.warn('hidden_iframe not found — showing modal as fallback');
+      setTimeout(() => showModal('Заявка принята', 'Спасибо, ваша заявка отправлена (fallback). Проверьте таблицу/почту.', orderId, personalId), 500);
+      return;
+    }
+
+    // Устанавливаем таймаут-фоллбек: если в течение 10 сек не сработал load — показываем модалку всё равно
+    const fallbackTimer = setTimeout(() => {
+      console.warn('iframe load not detected in time — showing modal as fallback');
+      showModal('Заявка принята', 'Спасибо, ваша заявка отправлена (без подтверждения от сервера). Проверьте таблицу/почту.', orderId, personalId);
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Отправить заказ';
       }
+    }, 10000); // 10 секунд
 
-      function showModal(title, msg, orderId, personalId) {
-        if (!modal) {
-          alert(title + "\n\n" + msg + "\nOrder ID: " + (orderId || '—') + "\nPersonal ID: " + (personalId || '—'));
-          return;
-        }
-        document.getElementById('modalTitle').textContent = title || '';
-        document.getElementById('modalMsg').textContent = msg || '';
-        document.getElementById('orderIdDisplay').textContent = orderId || '—';
-        document.getElementById('personalIdDisplay').textContent = personalId || '—';
-        modal.style.display = 'flex';
-        modal.setAttribute('aria-hidden', 'false');
+    // Слушаем load iframe один раз (попадёт при получении ответа)
+    function onIframeLoad() {
+      clearTimeout(fallbackTimer);
+      // получаем id'ы из data-атрибутов (или инпутов)
+      const finalOrderId = form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—';
+      const finalPersonalId = form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—';
+      showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', finalOrderId, finalPersonalId);
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Отправить заказ';
       }
+      // не делаем form.reset() здесь, чтобы пользователь успел скопировать ID
+      // снимаем обработчик (чтобы не сработал несколько раз)
+      iframe.removeEventListener('load', onIframeLoad);
+    }
 
-      function closeModal() {
-        if (!modal) return;
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
+    iframe.addEventListener('load', onIframeLoad, { once: true });
+    // форма отправится естественным образом в hidden_iframe (не вызываем ev.preventDefault())
+  });
+
+  // Обработчики модалки
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const order = form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—';
+      const personal = form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—';
+      const text = `Order ID: ${order}, Personal ID: ${personal}`;
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).then(() => alert('Скопировано: ' + text)).catch(() => prompt('Скопируйте вручную:', text));
+      } else {
+        prompt('Скопируйте вручную:', text);
       }
-
-      form.addEventListener('submit', (ev) => {
-        // проверим согласие
-        if (consentEl && !consentEl.checked) {
-          ev.preventDefault();
-          if (consentError) consentError.style.display = 'block';
-          consentEl.focus();
-          return;
-        } else if (consentError) {
-          consentError.style.display = 'none';
-        }
-
-        // генерируем ID'ы
-        const orderId = String(Date.now());
-        const phone = (form.querySelector("[name='phone']")?.value || '');
-        const phoneDigits = phone.replace(/\D/g, '');
-        const personalId = phoneDigits ? phoneDigits.slice(-4) : '';
-
-        if (orderIdInput) orderIdInput.value = orderId;
-        if (personalIdInput) personalIdInput.value = personalId;
-
-        form.dataset.orderId = orderId;
-        form.dataset.personalId = personalId;
-
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'Отправляется...';
-        }
-        // отправка происходит естественно в hidden_iframe (не отменяем)
-      });
-
-      if (iframe) {
-        iframe.addEventListener('load', () => {
-          const orderId = form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—';
-          const personalId = form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—';
-          showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', orderId, personalId);
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Отправить заказ';
-          }
-          form.reset();
-        });
-      }
-
-      if (copyBtn) {
-        copyBtn.addEventListener('click', () => {
-          const text = `Order ID: ${form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—'}, Personal ID: ${form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—'}`;
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(() => { alert('Скопировано: ' + text); }).catch(() => { prompt('Скопируйте вручную:', text); });
-          } else { prompt('Скопируйте вручную:', text); }
-        });
-      }
-
-      if (closeBtn) closeBtn.addEventListener('click', closeModal);
-
-      if (modal) {
-        modal.addEventListener('click', (ev) => {
-          if (ev.target === modal) closeModal();
-        });
-      }
-
-      // Вспомогательные нижние кнопки (на случай, если они используются)
-      const copyBtnBelow = document.getElementById('copyBtnBelow');
-      const closeBtnBelow = document.getElementById('closeBtnBelow');
-      if (copyBtnBelow) {
-        copyBtnBelow.addEventListener('click', () => {
-          const text = `Order ID: ${form.dataset.orderId || (orderIdInput && orderIdInput.value) || '—'}, Personal ID: ${form.dataset.personalId || (personalIdInput && personalIdInput.value) || '—'}`;
-          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
-          alert('Скопировано: ' + text);
-        });
-      }
-      if (closeBtnBelow) closeBtnBelow.addEventListener('click', () => alert('Закрыть — можно использовать модалку или очистить форму'));
     });
-  </script>
+  }
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (modal) {
+    modal.addEventListener('click', (ev) => {
+      if (ev.target === modal) closeModal();
+    });
+  }
+});
+</script>
 </body>
 </html>
