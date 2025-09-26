@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Проверка статуса заказа</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .status-box {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #f7f9fb;
+      display: none;
+    }
+    .status-box.success { border: 1px solid #22c55e; color: #166534; background:#dcfce7; }
+    .status-box.error   { border: 1px solid #ef4444; color: #7f1d1d; background:#fee2e2; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Проверка статуса заказа</h2>
+    <form id="statusForm">
+      <label>
+        Введите ваш Personal ID или Order ID *
+        <input type="text" id="checkId" name="id" required placeholder="Например: 9027 или П-1979">
+      </label>
+      <button type="submit">Проверить</button>
+    </form>
+
+    <div id="result" class="status-box"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('statusForm');
+    const resultBox = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('checkId').value.trim();
+      if (!id) return;
+
+      resultBox.style.display = 'block';
+      resultBox.textContent = 'Загрузка...';
+      resultBox.className = 'status-box';
+
+      try {
+        const res = await fetch(
+          "https://script.google.com/macros/s/AKfycby7lHiick8xcyXC61bTxbji2jl6keEuU6ZhCNzY8_POl1Gim7nYrn-GBUxanaifQUdnIg/exec" + encodeURIComponent(id)
+        );
+        const data = await res.json();
+
+        if (data.found) {
+          resultBox.textContent = "Статус заказа ("+ id + "): " + data.status;
+          resultBox.className = 'status-box success';
+        } else {
+          resultBox.textContent = "Заказ с таким ID не найден.";
+          resultBox.className = 'status-box error';
+        }
+      } catch (err) {
+        resultBox.textContent = "Ошибка запроса: " + err.message;
+        resultBox.className = 'status-box error';
+      }
+    });
+  </script>
+</body>
+</html>
