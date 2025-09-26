@@ -74,6 +74,8 @@
       .modal-card{ padding:12px; }
       .qr-large{ width:200px; height:200px; }
     }
+    /* small link style within consent text */
+    .consent a { color:#0f6ee6; text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -87,28 +89,28 @@
 
           <div class="field">
             <label for="name">ФИО *</label>
-            <input id="name" name="name" type="text" placeholder="Иванов Иван" required>
+            <input id="name" name="name" type="text" placeholder="Иванов Иван" required aria-required="true" aria-describedby="nameError">
             <div class="small-hint">Имя и фамилия кириллицей, минимум 2 слова.</div>
-            <div id="nameError" class="error">Введите корректное ФИО (кириллица, 2 слова, без нецензурных слов).</div>
+            <div id="nameError" class="error" role="alert" aria-live="polite">Введите корректное ФИО (кириллица, 2 слова, без нецензурных слов).</div>
           </div>
 
           <div class="field">
             <label for="phone">Телефон *</label>
-            <input id="phone" name="phone" type="tel" placeholder="+7 (XXX) XXX-XX-XX" required>
-            <div id="phoneError" class="error">Введите корректный телефон.</div>
+            <input id="phone" name="phone" type="tel" placeholder="+7 (XXX) XXX-XX-XX" required aria-required="true" aria-describedby="phoneError">
+            <div id="phoneError" class="error" role="alert" aria-live="polite">Введите корректный телефон.</div>
           </div>
 
           <div class="field">
             <label for="email">Email</label>
-            <input id="email" name="email" type="email" placeholder="example@mail.com">
-            <div id="emailError" class="error">Некорректный email.</div>
+            <input id="email" name="email" type="email" placeholder="example@mail.com" aria-describedby="emailError">
+            <div id="emailError" class="error" role="alert" aria-live="polite">Некорректный email.</div>
           </div>
 
           <div class="field">
             <label for="vin">VIN-код автомобиля *</label>
-            <input id="vin" name="vin" type="text" placeholder="Введите 17-значный VIN-код" required>
+            <input id="vin" name="vin" type="text" placeholder="Введите 17-значный VIN-код" required aria-required="true" aria-describedby="vinError">
             <div class="small-hint">VIN из 17 символов (без I, O, Q)</div>
-            <div id="vinError" class="error">Некорректный VIN.</div>
+            <div id="vinError" class="error" role="alert" aria-live="polite">Некорректный VIN.</div>
           </div>
 
           <div class="field">
@@ -123,8 +125,8 @@
 
           <div class="field">
             <label for="partName">Название детали / Описание *</label>
-            <input id="partName" name="partName" type="text" placeholder="Амортизатор, тормозной диск..." required>
-            <div id="partError" class="error">Укажите название детали.</div>
+            <input id="partName" name="partName" type="text" placeholder="Амортизатор, тормозной диск..." required aria-required="true" aria-describedby="partError">
+            <div id="partError" class="error" role="alert" aria-live="polite">Укажите название детали.</div>
           </div>
 
           <div class="field">
@@ -134,7 +136,7 @@
 
           <div class="field">
             <label for="qty">Количество *</label>
-            <input id="qty" name="qty" type="number" min="1" value="1" required>
+            <input id="qty" name="qty" type="number" min="1" value="1" required aria-required="true">
           </div>
 
           <div class="field">
@@ -143,12 +145,16 @@
           </div>
 
           <div class="field consent">
-            <input id="consentCheckbox" type="checkbox" name="consent">
-            <div style="font-size:13px;color:#4b5b6b;">
-              Нажимая «Отправить заявку», я даю согласие на обработку моих персональных данных в соответствии с <a href="#" style="color:#0f6ee6;text-decoration:underline" target="_blank" rel="noopener">Политикой конфиденциальности</a>.
+            <!-- сделал чекбокс обязательным и связал с ошибкой через aria-describedby -->
+            <input id="consentCheckbox" type="checkbox" name="consent" required aria-required="true" aria-describedby="consentError">
+            <div style="font-size:13px;color:#4b5b6b;line-height:1.35;">
+              Нажимая «Отправить заявку», я подтверждаю, что ознакомлен(а) и принимаю
+              <a href="user_agreement.html" target="_blank" rel="noopener noreferrer">Пользовательское соглашение</a>
+              и
+              <a href="politica_confed.html" target="_blank" rel="noopener noreferrer">Политику конфиденциальности</a>.
             </div>
           </div>
-          <div id="consentError" class="error">Для отправки формы необходимо ваше согласие.</div>
+          <div id="consentError" class="error" role="alert" aria-live="polite">Для отправки формы необходимо ваше согласие.</div>
 
           <!-- hidden ids -->
           <input type="hidden" name="orderId" id="orderId">
@@ -271,6 +277,7 @@
       let digits = d;
       if (digits.startsWith('8')) digits = '7' + digits.slice(1);
       const p = digits.replace(/^7/,'');
+
       let out = '+7';
       if (p.length > 0) out += ' (';
       if (p.length <= 3) out += p;
@@ -360,9 +367,7 @@
 
     // ---------- short order id generator (e.g. "З-2431") ----------
     function getCyrillicAlphabet() {
-      // набор заглавных букв кириллицы (можно отредактировать)
       return 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЭЮЯ'.split('');
-      // Примечание: убрал Ъ и Ь и несколько редких символов, чтобы id выглядел чище
     }
 
     function readGeneratedIds() {
@@ -542,6 +547,7 @@
       const em = validateEmail(); if (!em.ok){ showError(emailError, em.msg); ok=false; } else showError(emailError,'');
       const vr = validateVIN(); if (!vr.ok){ showError(vinError, vr.msg); ok=false; } else showError(vinError,'');
       const pr = validatePart(); if (!pr.ok){ showError(partError, pr.msg); ok=false; } else showError(partError,'');
+
       if (!consentEl.checked) { showError(consentError, 'Для отправки формы необходимо ваше согласие.'); ok=false; } else showError(consentError,'');
 
       return ok;
