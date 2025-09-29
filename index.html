@@ -585,7 +585,7 @@
         submitBtn.disabled = false;
         btnText.textContent = 'Отправить заявку';
         successBanner.style.display = 'block';
-        showModal('Заявка принята', 'Спасибо, ваша заявка отправлена. Проверьте таблицу/почту.', orderId, personalId);
+        showModal('Заявка принята', 'Спасибо, ваша заявка принята и находиться на рассмотрении, Мы свяжемся с вами в бижайшее время!.', orderId, personalId);
         try { localStorage.removeItem('orderFormDraft'); } catch(e){}
         iframe.removeEventListener('load', onIframeLoad);
       }
